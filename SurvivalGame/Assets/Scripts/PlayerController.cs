@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
         playerInputActions.Player.Enable();
 
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Script'in ilk kez aktif olduğu anda çalışır.
