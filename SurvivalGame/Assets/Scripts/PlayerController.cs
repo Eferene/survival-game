@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Cinemachine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
@@ -16,9 +17,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("Camera & Look Settings")]
     [SerializeField] Transform cameraTransform;
+    [SerializeField] CinemachineCamera playerCamera;
 
     private bool isSprinting = false;
     public bool isGrounded = false;
+
+    private float targetFOV = 60f; // Hedef FOV değeri
+    [SerializeField] private float transitionSpeed = 5f; // FOV geçiş hızı
 
     private void Awake()
     {
@@ -57,11 +62,26 @@ public class PlayerController : MonoBehaviour
     {
         // Move eyleminden gelen Vector2 değerini okur ve moveInput değişkenine atar.
         moveInput = playerInputActions.Player.Move.ReadValue<Vector2>();
+
+        playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * transitionSpeed);
     }
 
     private void FixedUpdate()
     {
-        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed; // Sprint yapılıyorsa hızı artırıyoruz.
+        float currentSpeed = moveSpeed; // Varsayılan hız olarak normal hareket hızını kullan
+        if (isSprinting)
+        {
+            if (!isGrounded)
+            {
+                isSprinting = false; // Yerde değilse sprinti kapat
+            }
+            currentSpeed = sprintSpeed; // Sprint hızını kullan
+            targetFOV = 70f; // Sprint sırasında kamera FOV'sini artır
+        }else 
+        {
+            targetFOV = 60f; // Normal hızda FOV'yi eski haline getir
+            currentSpeed = moveSpeed; // Normal hareket hızı
+        } 
 
         // Kameranın ileri ve sağ yönlerini alıyoruz
         Vector3 camForward = cameraTransform.forward;
