@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
     private Input playerInputActions;
     private Rigidbody rb;
     private Vector2 moveInput;
-    [SerializeField] private Collider groundCollider;
 
     [Header("Movement Settings")]
     [SerializeField] float jumpForce = 10f;
