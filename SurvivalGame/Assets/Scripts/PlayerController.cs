@@ -7,14 +7,19 @@ public class PlayerController : MonoBehaviour
     private Input playerInputActions;
     private Rigidbody rb;
     private Vector2 moveInput;
+    [SerializeField] private Collider groundCollider;
 
     [Header("Movement Settings")]
     [SerializeField] float jumpForce = 10f;
     [SerializeField] float moveSpeed = 5f;
-    [SerializeField] float fallMultiplier = 5f;
+    [SerializeField] float sprintSpeed = 10f;
+    //[SerializeField] float fallMultiplier = 5f;
 
     [Header("Camera & Look Settings")]
     [SerializeField] Transform cameraTransform;
+
+    private bool isSprinting = false;
+    public bool isGrounded = false;
 
     private void Awake()
     {
@@ -29,6 +34,10 @@ public class PlayerController : MonoBehaviour
         // Player action map'ini aktif eder.
         playerInputActions.Player.Enable();
 
+        playerInputActions.Player.Run.performed += ctx => isSprinting = true;
+        playerInputActions.Player.Run.canceled += ctx => isSprinting = false;
+        playerInputActions.Player.Jump.performed += ctx => Jump();
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -39,6 +48,10 @@ public class PlayerController : MonoBehaviour
         // Player action map'ini devre dışı bırak.
         // Oyun durunca veya karakter ölünce kaynakları serbest bırakmak amacıyla.
         playerInputActions.Player.Disable();
+
+        playerInputActions.Player.Run.performed += ctx => isSprinting = true;
+        playerInputActions.Player.Run.canceled += ctx => isSprinting = false;
+        playerInputActions.Player.Jump.performed -= ctx => Jump();
     }
 
     private void Update()
@@ -49,25 +62,38 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y);
+        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed; // Sprint yapılıyorsa hızı artırıyoruz.
 
-        rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
-    }
-
-    private void LateUpdate()
-    {
-        // Kameranin ileri yonunu al
+        // Kameranın ileri ve sağ yönlerini alıyoruz
         Vector3 camForward = cameraTransform.forward;
-
-        // Yukari-asagi bileeni sifirla, sadece yatay dondurme yap
-        camForward.y = 0f;
+        Vector3 camRight = cameraTransform.right;
+        // Karakter yukarı aşağı hareket etmemesi için Y eksenindeki bileşenleri sıfırlıyoruz.
+        camForward.y = 0;
+        camRight.y = 0;
         camForward.Normalize();
+        camRight.Normalize();
 
-        // Eğer kamera bir yere bakiyorsa karakteri kameranin baktigi yone dogru dondur
-        if (camForward != Vector3.zero)
+        // Hareket vektörünü kameranın yönüne göre hesaplıyoruz.
+        Vector3 moveDirection = (camForward * moveInput.y + camRight * moveInput.x).normalized;
+
+        // Rigidbody'e hızı uyguluyoruz.
+        rb.linearVelocity = new Vector3(moveDirection.x * currentSpeed, rb.linearVelocity.y, moveDirection.z * currentSpeed);
+
+        // Eğer karakter hareket ediyorsa, hareket ettiği yöne baksın.
+        if (moveDirection != Vector3.zero)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(camForward);
-            transform.rotation = targetRotation;
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 15f); // 15f değeriyle dönüş hızını ayarla
         }
     }
+
+    private void Jump()
+    {
+        if (isGrounded) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
+
+    //public bool GetIsGrounded()
+    //{
+    //    return isGrounded;
+    //}
 }
