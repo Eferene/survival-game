@@ -1,7 +1,5 @@
 ﻿using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,9 +23,14 @@ public class PlayerController : MonoBehaviour
     private float targetFOV = 60f; // Hedef FOV değeri
     [SerializeField] private float transitionSpeed = 5f; // FOV geçiş hızı
 
+    [Header("Raycast & Inventory Settings")]
+    public PlayerInventory playerInventory;
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        playerInventory = GetComponent<PlayerInventory>();
 
         playerInputActions = new Input();
     }
@@ -53,8 +56,8 @@ public class PlayerController : MonoBehaviour
         // Oyun durunca veya karakter ölünce kaynakları serbest bırakmak amacıyla.
         playerInputActions.Player.Disable();
 
-        playerInputActions.Player.Run.performed += ctx => isSprinting = true;
-        playerInputActions.Player.Run.canceled += ctx => isSprinting = false;
+        playerInputActions.Player.Run.performed -= ctx => isSprinting = true;
+        playerInputActions.Player.Run.canceled -= ctx => isSprinting = false;
         playerInputActions.Player.Jump.performed -= ctx => Jump();
     }
 
@@ -64,6 +67,19 @@ public class PlayerController : MonoBehaviour
         moveInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * transitionSpeed);
+
+        //Raycast
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
+        {
+            if (hit.distance < 5)
+            {
+                if (hit.collider.CompareTag("Item"))
+                {
+                    playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
+                }
+            }   
+        }
     }
 
     private void FixedUpdate()
