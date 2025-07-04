@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerGeneral : MonoBehaviour
 {
+    [Header("Player Values")]
     [SerializeField] private float currentHealth;
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float healthDecreaseRate;
@@ -38,6 +40,12 @@ public class PlayerGeneral : MonoBehaviour
         set { currentThirst = Mathf.Clamp(value, 0, maxThirst); }
     }
 
+    [Header("Player Values UI")]
+    [SerializeField] private Image healthBar;
+    //[SerializeField] private Image staminaBar;
+    [SerializeField] private Image hungerBar;
+    [SerializeField] private Image thirstBar;
+
     private void Start()
     {
         CurrentHealth = maxHealth;
@@ -52,5 +60,10 @@ public class PlayerGeneral : MonoBehaviour
         if (CurrentStamina > 0) CurrentStamina -= Time.deltaTime * staminaDecreaseRate;
         if (CurrentHunger > 0) CurrentHunger -= Time.deltaTime * hungerDecreaseRate;
         if (CurrentThirst > 0) CurrentThirst -= Time.deltaTime * thirstDecreaseRate;
+
+        healthBar.fillAmount = CurrentHealth / maxHealth;
+        //staminaBar.fillAmount = CurrentStamina / maxStamina;
+        hungerBar.fillAmount = CurrentHunger / maxHunger;
+        thirstBar.fillAmount = CurrentThirst / maxThirst;
     }
 }
