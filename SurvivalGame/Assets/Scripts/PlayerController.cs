@@ -76,9 +76,16 @@ public class PlayerController : MonoBehaviour
             {
                 if (hit.collider.CompareTag("Item"))
                 {
-                    playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
+                    if (playerInputActions.Player.Interaction.triggered)
+                    {
+                        if (hit.collider.gameObject.GetComponent<Object>().item != null)
+                        {
+                            playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
+                            Destroy(hit.collider.gameObject);
+                        }
+                    }
                 }
-            }   
+            }
         }
     }
 
@@ -93,11 +100,12 @@ public class PlayerController : MonoBehaviour
             }
             currentSpeed = sprintSpeed; // Sprint hızını kullan
             targetFOV = 70f; // Sprint sırasında kamera FOV'sini artır
-        }else 
+        }
+        else
         {
             targetFOV = 60f; // Normal hızda FOV'yi eski haline getir
             currentSpeed = moveSpeed; // Normal hareket hızı
-        } 
+        }
 
         // Kameranın ileri ve sağ yönlerini alıyoruz
         Vector3 camForward = cameraTransform.forward;

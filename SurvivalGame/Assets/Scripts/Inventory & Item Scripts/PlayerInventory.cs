@@ -66,6 +66,13 @@ public class PlayerInventory : MonoBehaviour
             }
             else if (inventorySlots[i].itemData == itemData)
             {
+                if (itemData.isStackable == false) { return; }
+                if (itemData.maxStackSize <= inventorySlots[i].quantity + quantity)
+                {
+                    inventorySlots[i].quantity = itemData.maxStackSize;
+                    quantity = itemData.maxStackSize - inventorySlots[i].quantity;
+                    return;
+                }
                 inventorySlots[i].quantity += quantity;
                 inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                 return;
