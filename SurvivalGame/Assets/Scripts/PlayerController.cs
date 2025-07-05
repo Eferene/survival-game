@@ -107,27 +107,12 @@ public class PlayerController : MonoBehaviour
             currentSpeed = moveSpeed; // Normal hareket hızı
         }
 
-        // Kameranın ileri ve sağ yönlerini alıyoruz
-        Vector3 camForward = cameraTransform.forward;
-        Vector3 camRight = cameraTransform.right;
-        // Karakter yukarı aşağı hareket etmemesi için Y eksenindeki bileşenleri sıfırlıyoruz.
-        camForward.y = 0;
-        camRight.y = 0;
-        camForward.Normalize();
-        camRight.Normalize();
+        float targetYRotation = cameraTransform.eulerAngles.y;
+        transform.rotation = Quaternion.Euler(0f, targetYRotation, 0f);
 
-        // Hareket vektörünü kameranın yönüne göre hesaplıyoruz.
-        Vector3 moveDirection = (camForward * moveInput.y + camRight * moveInput.x).normalized;
+        Vector3 moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
 
-        // Rigidbody'e hızı uyguluyoruz.
         rb.linearVelocity = new Vector3(moveDirection.x * currentSpeed, rb.linearVelocity.y, moveDirection.z * currentSpeed);
-
-        // Eğer karakter hareket ediyorsa, hareket ettiği yöne baksın.
-        if (moveDirection != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 15f); // 15f değeriyle dönüş hızını ayarla
-        }
     }
 
     private void Jump()
