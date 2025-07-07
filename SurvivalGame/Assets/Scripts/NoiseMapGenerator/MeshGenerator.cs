@@ -1,10 +1,10 @@
-using UnityEditor.ShaderGraph.Internal;
+﻿using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightMap)
+    public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve heightCurve)
     {
         int width = heightMap.GetLength(0);
         int height = heightMap.GetLength(1);
@@ -14,20 +14,27 @@ public static class MeshGenerator
         MeshData meshData = new MeshData(width, height);
         int vertexIndex = 0;
 
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, topLeftZ - y);
+                meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
+                vertexIndex++;
+            }
+        }
+
         for (int y = 0; y < height - 1; y++)
         {
             for (int x = 0; x < width - 1; x++)
             {
-                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightMap[x, y], topLeftZ - y);
-                meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
+                int a = y * width + x;
+                int b = a + 1;
+                int c = a + width;
+                int d = a + width + 1;
 
-                if (x < width - 1 && y < height - 1)
-                {
-                    meshData.AddTriangle(vertexIndex, vertexIndex + width + 1, vertexIndex + width);
-                    meshData.AddTriangle(vertexIndex + width + 1, vertexIndex, vertexIndex + 1);
-                }
-
-                vertexIndex++;
+                meshData.AddTriangle(a, d, c);
+                meshData.AddTriangle(d, a, b);
             }
         }
 
