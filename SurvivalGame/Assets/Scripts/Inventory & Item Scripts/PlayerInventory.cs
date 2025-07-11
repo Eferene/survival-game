@@ -65,14 +65,13 @@ public class PlayerInventory : MonoBehaviour
                 {
                     quantity -= inventorySlots[i].quantity;
                     inventorySlots[i].quantity = itemData.maxStackSize;
-                    inventorySlotUIs[i].UpdateUI(itemData, quantity);
+                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                     continue;
                 }
                 else if (itemData.maxStackSize >= inventorySlots[i].quantity + quantity)
                 {
                     inventorySlots[i].quantity += quantity;
                     inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
-                    inventorySlotUIs[i].UpdateUI(itemData, quantity);
                     return;
                 }
             }
@@ -83,13 +82,13 @@ public class PlayerInventory : MonoBehaviour
                 {
                     quantity -= itemData.maxStackSize;
                     inventorySlots[i].quantity = itemData.maxStackSize;
-                    inventorySlotUIs[i].UpdateUI(itemData, quantity);
+                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                     continue;
                 }
                 else
                 {
                     inventorySlots[i].quantity = quantity;
-                    inventorySlotUIs[i].UpdateUI(itemData, quantity);
+                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                     return;
                 }
             }

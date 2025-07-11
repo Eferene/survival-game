@@ -70,10 +70,12 @@ public class PlayerController : MonoBehaviour
 
         //Raycast
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
         {
             if (hit.distance < 5)
             {
+                Debug.DrawRay(cameraTransform.position, cameraTransform.forward * hit.distance, Color.yellow);
+                Debug.Log("Did Hit: " + hit.collider.name);
                 if (hit.collider.CompareTag("Item"))
                 {
                     if (playerInputActions.Player.Interaction.triggered)

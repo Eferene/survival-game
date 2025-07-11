@@ -4,7 +4,7 @@ public abstract class ItemData : ScriptableObject
 {
     public int itemID;
     public string itemName;
-    public string itemDescription;
+    [TextArea] public string itemDescription;
     public Sprite itemIcon;
     public GameObject itemPrefab;
     public bool isStackable;
