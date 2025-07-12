@@ -1,5 +1,9 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class PlayerInventory : MonoBehaviour
 {
@@ -14,9 +18,18 @@ public class PlayerInventory : MonoBehaviour
     public InventorySlot[] inventorySlots = new InventorySlot[8];
     public InventorySlotUI[] inventorySlotUIs = new InventorySlotUI[8];
 
+    [Header("Raycaster")]
+    public GraphicRaycaster raycaster;
+    public EventSystem eventSystem;
+    public Transform handTransform;
+    private InputAction pointerPositionAction;
+
     private void Awake()
     {
         playerUIActions = new Input();
+
+        pointerPositionAction = playerUIActions.UI.Point;
+        pointerPositionAction.Enable();
     }
 
     private void OnEnable()
@@ -42,6 +55,7 @@ public class PlayerInventory : MonoBehaviour
             Cursor.visible = true;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
             crosshair.SetActive(false);
+            UseItem();
         }
         else
         {
@@ -90,6 +104,48 @@ public class PlayerInventory : MonoBehaviour
                     inventorySlots[i].quantity = quantity;
                     inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                     return;
+                }
+            }
+        }
+    }
+
+    public void UseItem()
+    {
+        Vector2 mousePos = pointerPositionAction.ReadValue<Vector2>();
+
+        PointerEventData pointerEventData = new PointerEventData(eventSystem)
+        {
+            position = mousePos
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        raycaster.Raycast(pointerEventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            InventorySlotUI slotUI = result.gameObject.GetComponent<InventorySlotUI>();
+            if(slotUI != null)
+            {
+                int index = System.Array.IndexOf(inventorySlotUIs, slotUI);
+                if (index >= 0 && inventorySlots[index].itemData != null)
+                {
+                    if (handTransform.childCount > 0)
+                    {
+                        if (handTransform.GetChild(0).GetComponent<Object>().item != inventorySlots[index].itemData)
+                        {
+                            Destroy(handTransform.GetChild(0).gameObject);
+                            ItemData itemData = inventorySlots[index].itemData;
+                            GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
+                            newItem.transform.localRotation = Quaternion.identity;
+                            newItem.GetComponent<Object>().SetPhysicsEnabled(false);
+                        }
+                    } else if(handTransform.childCount == 0)
+                    {
+                        ItemData itemData = inventorySlots[index].itemData;
+                        GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
+                        newItem.transform.localRotation = Quaternion.identity;
+                        newItem.GetComponent<Object>().SetPhysicsEnabled(false);
+                    }
                 }
             }
         }
