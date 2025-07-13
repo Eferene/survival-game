@@ -8,19 +8,19 @@ using UnityEngine;
 [CustomEditor(typeof(MapGenerator))]
 public class MapGeneratorEditor : Editor
 {
+    [SerializeField] private bool autoUpdate;
+
     // Inspector her yeniden çizildiğinde bu fonksiyon çalışır.
     public override void OnInspectorGUI()
     {
         // Hedef component'i (bizim durumumuzda MapGenerator) alıyoruz.
-        MapGenerator mapGenerator = (MapGenerator)target;
+        MapGenerator mapGenerator = (MapGenerator)target;        
 
         // DrawDefaultInspector(), Inspector'daki tüm public değişkenleri varsayılan şekilde çizer.
         // Eğer bu çizim sırasında bir değer değişirse 'true' döner.
         if (DrawDefaultInspector())
         {
-            // Eğer MapGenerator script'indeki bir değer değiştiyse ve otomatik güncelleme açıksa...
-            // Bu sayede Inspector'daki slider'ları kaydırırken anlık sonuç görürsün. Super useful.
-            if (mapGenerator.autoGenerateOnStart)
+            if (autoUpdate)
             {
                 // Haritayı yeniden oluştur.
                 mapGenerator.GenerateWorld();
@@ -29,9 +29,13 @@ public class MapGeneratorEditor : Editor
 
         EditorGUILayout.Space(); // Araya küçük bir boşluk ekle.
 
+        // autoUpdate değişkeni için bir toggle (aç/kapa) butonu ekliyoruz.
+        autoUpdate = EditorGUILayout.Toggle("Auto Update", autoUpdate);
+
         // "Generate World" butonu, manuel üretim için candır.
         if (GUILayout.Button("Generate World"))
         {
+            // Haritayı yeniden oluştur.
             mapGenerator.GenerateWorld();
         }
     }

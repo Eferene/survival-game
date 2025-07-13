@@ -58,7 +58,6 @@ public class MapGenerator : MonoBehaviour
         display = GetComponent<MapDisplay>();
     }
 
-    // Oyun döngüsünün ilk frame'inde çalışır.
     void Start()
     {
         // Eğer otomatik üretim açıksa, dünyayı yarat.
