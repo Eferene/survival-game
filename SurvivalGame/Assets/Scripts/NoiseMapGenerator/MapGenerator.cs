@@ -47,16 +47,11 @@ public class MapGenerator : MonoBehaviour
     public TerrainType[] regions; // Farklı yükseklikler için tanımlanmış arazi tipleri (su, kumsal, çimen vs.).
 
     // --- Private Değişkenler ---
-    private MapDisplay display; // Üretilen haritayı ekranda göstermek için referans.
+    [SerializeField] private MapDisplay display; // Üretilen haritayı ekranda göstermek için referans.
     private const int MAX_ISLAND_PLACEMENT_ATTEMPTS = 50; // Bir adayı yerleştirmek için maksimum deneme sayısı.
 
     // Genellikle data hazırlığı ve referans atamaları Awake'te yapılır.
     // Diğer scriptlerin Start() metodundan önce çalışmasını garantiler.
-    void Awake()
-    {
-        // Bu objenin üzerindeki MapDisplay component'ini bul ve ata.
-        display = GetComponent<MapDisplay>();
-    }
 
     void Start()
     {
