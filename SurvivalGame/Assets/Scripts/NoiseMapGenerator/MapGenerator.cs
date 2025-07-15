@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 
 // Bu script'in çalışması için MapDisplay component'inin aynı GameObject'te bulunmasını zorunlu kılar.
-// Eğer yoksa, Unity otomatik olarak ekler. It's a lifesaver, trust me.
+// Eğer yoksa, Unity otomatik olarak ekler.
 [RequireComponent(typeof(MapDisplay))]
+
 // Harita üretiminin beyni. Bütün ayarları buradan yapıp, üretimi tetikleriz.
 public class MapGenerator : MonoBehaviour
 {
     // --- INSPECTOR AYARLARI ---
-    // Bu değişkenler Unity Editor'deki Inspector panelinde görünür ve buradan ayarlanabilir.
 
-    [Header("World Settings")] // Dünyanın temel boyut ve su seviyesi ayarları
+    [Header("World Settings")] // Dünyanın temel boyut ayarı
     public int worldSize = 513; // Haritanın kare olarak boyutu (genellikle 2^n + 1 kullanılır)
-    [Range(0, 1)]
-    public float waterLevel = 0.35f; // Su seviyesinin ne kadar yüksek olacağı (0-1 arası)
 
     [Header("Island Generation")] // Ada oluşturma parametreleri
     public int numberOfIslands = 5; // Ana ada dahil toplam ada sayısı
@@ -41,7 +39,7 @@ public class MapGenerator : MonoBehaviour
     public AnimationCurve meshHeightCurve; // Yüksekliklerin dağılımını bir eğriyle kontrol etmemizi sağlar.
     [Range(0, 6)]
     public int levelOfDetail; // Detay seviyesi. Yüksek değerler daha az poligonlu, daha performanslı bir mesh oluşturur.
-    public bool autoGenerateOnStart = true; // Oyun başladığında veya Inspector'da değer değiştiğinde haritayı otomatik üretir.
+    public bool autoGenerateOnStart = true; // Oyun başladığında haritayı otomatik üretir.
 
     [Header("Terrain Coloring")] // Arazi renklendirme ayarları
     public TerrainType[] regions; // Farklı yükseklikler için tanımlanmış arazi tipleri (su, kumsal, çimen vs.).
@@ -49,9 +47,6 @@ public class MapGenerator : MonoBehaviour
     // --- Private Değişkenler ---
     [SerializeField] private MapDisplay display; // Üretilen haritayı ekranda göstermek için referans.
     private const int MAX_ISLAND_PLACEMENT_ATTEMPTS = 50; // Bir adayı yerleştirmek için maksimum deneme sayısı.
-
-    // Genellikle data hazırlığı ve referans atamaları Awake'te yapılır.
-    // Diğer scriptlerin Start() metodundan önce çalışmasını garantiler.
 
     void Start()
     {
@@ -65,6 +60,17 @@ public class MapGenerator : MonoBehaviour
     /// <summary>
     /// Ana dünya oluşturma metodu. Orkestra şefi gibi diğer metodları yönetir.
     /// </summary>
+
+    // Inspector'da arazi tiplerini kolayca tanımlamak için kullanılan bir veri yapısı.
+    [System.Serializable]
+    public struct TerrainType
+    {
+        public string name; // Bölgenin adı (ex: "Sand")
+        [Range(0, 1)]
+        public float height; // Bu bölgenin bittiği maksimum yükseklik.
+        public Color color;  // Bölgenin rengi.
+    }
+
     public void GenerateWorld()
     {
         // 1. Adaların merkez pozisyonlarını belirle.
@@ -117,8 +123,8 @@ public class MapGenerator : MonoBehaviour
             for (int attempt = 0; attempt < MAX_ISLAND_PLACEMENT_ATTEMPTS; attempt++)
             {
                 // Rastgele bir açı ve mesafe belirle.
-                float angle = (float)prng.NextDouble() * 360f;
-                float distance = (float)(prng.NextDouble() * (maxSpawnRadius - minSpawnRadius) + minSpawnRadius);
+                float angle = Random.Range(0f, 360f);
+                float distance = Random.Range(minSpawnRadius, maxSpawnRadius);
 
                 // Açı ve mesafeden yeni bir pozisyon (x, y) hesapla.
                 float x = mainIslandCenter.x + distance * Mathf.Cos(angle * Mathf.Deg2Rad);
@@ -180,15 +186,5 @@ public class MapGenerator : MonoBehaviour
             }
         }
         return colorMap;
-    }
-
-    // Inspector'da arazi tiplerini kolayca tanımlamak için kullanılan bir veri yapısı.
-    [System.Serializable]
-    public struct TerrainType
-    {
-        public string name; // Bölgenin adı (ör: "Kumsal")
-        [Range(0, 1)]
-        public float height; // Bu bölgenin bittiği maksimum yükseklik.
-        public Color color;  // Bölgenin rengi.
     }
 }
