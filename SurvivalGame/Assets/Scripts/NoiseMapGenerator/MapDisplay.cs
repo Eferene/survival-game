@@ -25,5 +25,21 @@ public class MapDisplay : MonoBehaviour
         // Yukarıdakiyle aynı sebeple .sharedMesh kullanıyoruz. Bu, editörde sızıntıyı önler.
         meshFilter.sharedMesh = meshData.CreateMesh();
         meshRenderer.sharedMaterial.mainTexture = texture;
+
+        // Bu GameObject üzerinde hali hazırda bir MeshCollider var mı diye kontrol ediyoruz.
+        // GetComponent<T>() eğer component yoksa null döner.
+        MeshCollider meshCollider = meshFilter.gameObject.GetComponent<MeshCollider>();
+
+        // Eğer bir MeshCollider component'i bulunamazsa, AddComponent<T>() ile bir tane ekliyoruz.
+        // Bu, script'in collider'ın önceden eklenip eklenmediğine bakmaksızın çalışmasını sağlar.
+        if (meshCollider == null)
+        {
+            meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
+        }
+
+        // Son olarak, görsel mesh'in (MeshFilter'daki) aynısını fiziksel çarpışmalar için
+        // MeshCollider'a atıyoruz. '.sharedMesh' kullanmak, her seferinde yeni bir mesh kopyası
+        // oluşturmayı önleyerek hem hafızadan tasarruf sağlar hem de performansı artırır.
+        meshCollider.sharedMesh = meshFilter.sharedMesh;
     }
 }

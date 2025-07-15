@@ -124,7 +124,7 @@ public class PlayerInventory : MonoBehaviour
         foreach (RaycastResult result in results)
         {
             InventorySlotUI slotUI = result.gameObject.GetComponent<InventorySlotUI>();
-            if(slotUI != null)
+            if (slotUI != null)
             {
                 int index = System.Array.IndexOf(inventorySlotUIs, slotUI);
                 if (index >= 0 && inventorySlots[index].itemData != null)
@@ -136,14 +136,15 @@ public class PlayerInventory : MonoBehaviour
                             Destroy(handTransform.GetChild(0).gameObject);
                             ItemData itemData = inventorySlots[index].itemData;
                             GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
-                            newItem.transform.localRotation = Quaternion.identity;
+                            newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                             newItem.GetComponent<Object>().SetPhysicsEnabled(false);
                         }
-                    } else if(handTransform.childCount == 0)
+                    }
+                    else if (handTransform.childCount == 0)
                     {
                         ItemData itemData = inventorySlots[index].itemData;
                         GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
-                        newItem.transform.localRotation = Quaternion.identity;
+                        newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                         newItem.GetComponent<Object>().SetPhysicsEnabled(false);
                     }
                 }

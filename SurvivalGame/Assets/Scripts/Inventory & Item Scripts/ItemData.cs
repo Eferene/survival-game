@@ -9,6 +9,8 @@ public abstract class ItemData : ScriptableObject
     public GameObject itemPrefab;
     public bool isStackable;
     public int maxStackSize;
+    public Vector3 handPosition;
+    public Vector3 handRotation;
 
     public abstract ItemType itemType { get; }
 }
