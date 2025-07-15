@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a92f710f0cfe58b4e932898154c3233c, type: 3}
-  m_Name: Gecici Silah 2
+  m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
+  m_Name: Gold
   m_EditorClassIdentifier: 
-  itemID: 98
-  itemName: "Ge\xE7ici Silah"
-  itemDescription: Silah.
-  itemIcon: {fileID: 21300000, guid: 05037067f26bacb4088dd3a2eaf9ba58, type: 3}
+  itemID: 2
+  itemName: Gold Ore
+  itemDescription: Gold Ore.
+  itemIcon: {fileID: 0}
   itemPrefab: {fileID: 0}
-  isStackable: 1
-  maxStackSize: 2
-  damage: 1
-  attackSpeed: 1
+  isStackable: 0
+  maxStackSize: 0
+  handPosition: {x: 0, y: 0, z: 0}
+  handRotation: {x: 0, y: 0, z: 0}
