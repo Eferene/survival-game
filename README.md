@@ -66,6 +66,6 @@ Bir Pull Request açın.
 <p align="left">📧 İletişim</p>
 <p align="left">
 <strong>Geliştirici 1:</strong> Galip Efe Öncü - galipefe75@gmail.com <br>
-<strong>Geliştirici 2:</strong> Muhammed Eren Yaprakcı - merenypkrc@gmail.com
+<strong>Geliştirici 2:</strong> Muhammed Eren Yaprakcı - merenyprkc@gmail.com
 </p>
 </div>
