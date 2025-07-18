@@ -21,6 +21,7 @@ MonoBehaviour:
   maxStackSize: 1
   handPosition: {x: 0, y: 0, z: 0}
   handRotation: {x: 0, y: 180, z: 0}
-  efficiency: 10
+  minEfficiency: 10
+  maxEfficiency: 15
   effectiveTags:
   - Tree

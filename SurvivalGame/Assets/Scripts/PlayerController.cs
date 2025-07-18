@@ -1,5 +1,7 @@
-﻿using Unity.Cinemachine;
+using TMPro;
+using Unity.Cinemachine;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -29,6 +31,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Raycast & Inventory Settings")]
     public PlayerInventory playerInventory;
+    public GameObject damageTextPrefab; 
+    
 
     private void Awake()
     {
@@ -91,7 +95,7 @@ public class PlayerController : MonoBehaviour
                         }
                     }
                 }
-                if(playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
+                if(playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool) // ToolItem ile hasar verme işlemi
                 {
                     ToolItem toolItem = playerInventory.handItem as ToolItem;
                     for (int i = 0; i < toolItem.effectiveTags.Length; i++)
@@ -103,8 +107,13 @@ public class PlayerController : MonoBehaviour
                                 if (hit.collider.gameObject.GetComponent<Breakable>() != null)
                                 {
                                     Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
-                                    breakable.TakeDamage(toolItem.efficiency);
+                                    int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
+                                    breakable.TakeDamage(dmg);
                                     lastHitTime = Time.time;
+                                    GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity, hit.collider.transform);
+                                    damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
+                                    damageText.transform.localScale = new Vector3(hit.collider.transform.localScale.x * 0.001f, hit.collider.transform.localScale.y * 0.001f, hit.collider.transform.localScale.z * 0.001f);
+                                    damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
                                 }
                             }
                         }
