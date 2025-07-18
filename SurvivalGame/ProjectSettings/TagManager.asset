@@ -9,6 +9,7 @@ TagManager:
   - Gold
   - Iron
   - Rock
+  - Tree
   layers:
   - Default
   - TransparentFX

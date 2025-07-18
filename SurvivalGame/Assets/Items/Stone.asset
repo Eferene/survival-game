@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
-  m_Name: Gold
+  m_Name: Stone
   m_EditorClassIdentifier: 
-  itemID: 2
-  itemName: Gold Ore
-  itemDescription: Gold Ore.
-  itemIcon: {fileID: 21300000, guid: dcd87d702b8271147a6fcbc5a1194f28, type: 3}
-  itemPrefab: {fileID: 6848602941623016924, guid: 2396ff604d0ec874cb29cf0221321ae7, type: 3}
+  itemID: 0
+  itemName: Stone.
+  itemDescription: Stone.
+  itemIcon: {fileID: 21300000, guid: 25f385de85494044e9b1f087441ed47b, type: 3}
+  itemPrefab: {fileID: 1477070430978016809, guid: f3aa12feb787c1147a9213b2944e6cac, type: 3}
   isStackable: 1
   maxStackSize: 16
   handPosition: {x: 0, y: 0, z: 0}

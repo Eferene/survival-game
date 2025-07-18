@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 5152119652496307811}
   - component: {fileID: 4894974634164310961}
   - component: {fileID: 8800871207329653362}
+  - component: {fileID: 3412286095631380945}
   - component: {fileID: 6524902041822605293}
+  - component: {fileID: 8770725449658035088}
   m_Layer: 0
   m_Name: Iron Ore
   m_TagString: Item
@@ -27,13 +29,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1284017658565679969}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  m_LocalRotation: {x: -0.7069834, y: 0, z: 0, w: 0.7072302}
   m_LocalPosition: {x: -0.28318587, y: 0.1029545, z: 4.1983795}
   m_LocalScale: {x: 12.367797, y: 12.367797, z: 12.367797}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!33 &4894974634164310961
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -88,6 +90,33 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &3412286095631380945
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284017658565679969}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!65 &6524902041822605293
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -109,3 +138,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.059754383, y: 0.07059926, z: 0.04230239}
   m_Center: {x: 0.02148212, y: -0.021732463, z: 0.008354617}
+--- !u!114 &8770725449658035088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284017658565679969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2746607e003eb4682e073ca352e3fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: 209a06cd24fe3d14082b4daec40afe89, type: 2}
+  quantity: 1
+  physics: 1

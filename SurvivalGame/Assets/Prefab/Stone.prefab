@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 4037418150570821687}
   - component: {fileID: 6500945512838833697}
   - component: {fileID: 1891348345907704972}
+  - component: {fileID: 5995649023415318429}
   - component: {fileID: 2699865062719008473}
+  - component: {fileID: 946530718387950067}
   m_Layer: 0
   m_Name: Stone
   m_TagString: Item
@@ -27,13 +29,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1477070430978016809}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+  m_LocalRotation: {x: -0.7069834, y: 0, z: 0, w: 0.7072302}
   m_LocalPosition: {x: 2.8991046, y: 0, z: 4.612626}
   m_LocalScale: {x: 51.845108, y: 51.845108, z: 51.845108}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!33 &6500945512838833697
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -87,6 +89,33 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!54 &5995649023415318429
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477070430978016809}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!65 &2699865062719008473
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -108,3 +137,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.018333333, y: 0.014914956, z: 0.008649043}
   m_Center: {x: 0, y: 0.004966594, z: 0.0043245214}
+--- !u!114 &946530718387950067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477070430978016809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2746607e003eb4682e073ca352e3fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: 57889826ab83122468e614f322bcc4d4, type: 2}
+  quantity: 1
+  physics: 1

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
   m_Name: Stone Axe
   m_EditorClassIdentifier: 
-  itemID: 0
+  itemID: 99
   itemName: Stone Axe
   itemDescription: Axe.
   itemIcon: {fileID: 21300000, guid: 81df3c9396f1f0a4999f4ce21d4bedc1, type: 3}

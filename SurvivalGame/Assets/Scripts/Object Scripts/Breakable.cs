@@ -2,18 +2,29 @@ using UnityEngine;
 
 public class Breakable : MonoBehaviour
 {
-    public int hp;
-    public GameObject ore;
-    public int minDrop;
-    public int maxDrop;
+    public float hp;
+    public Drop[] drops;
 
-    public void Update()
+    public void TakeDamage(float damage)
     {
+        hp -= damage;
         if (hp <= 0)
         {
-            GameObject newOre = Instantiate(ore, transform.position, Quaternion.identity);
-            newOre.GetComponent<Object>().quantity = Random.Range(minDrop, maxDrop);
+            for (int j = 0; j < drops.Length; j++)
+            {
+                GameObject newDrop = Instantiate(drops[j].drop, transform.position, Quaternion.identity);
+                newDrop.GetComponent<Object>().quantity = Random.Range(drops[j].minDrop, drops[j].maxDrop + 1);
+                newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
+            }
             Destroy(gameObject);
         }
     }
+}
+
+[System.Serializable]
+public class Drop
+{
+    public GameObject drop;
+    public int minDrop = 1;
+    public int maxDrop = 5;
 }

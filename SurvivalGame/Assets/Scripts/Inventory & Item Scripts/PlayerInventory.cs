@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInventory : MonoBehaviour
 {
+    public ItemData handItem;
+
     [Header("Player Inventory Settings")]
     private Input playerUIActions;
     [SerializeField] private GameObject inventoryPanelGO;
@@ -135,6 +137,7 @@ public class PlayerInventory : MonoBehaviour
                         {
                             Destroy(handTransform.GetChild(0).gameObject);
                             ItemData itemData = inventorySlots[index].itemData;
+                            handItem = itemData;
                             GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                             newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                             newItem.GetComponent<Object>().SetPhysicsEnabled(false);
@@ -143,6 +146,7 @@ public class PlayerInventory : MonoBehaviour
                     else if (handTransform.childCount == 0)
                     {
                         ItemData itemData = inventorySlots[index].itemData;
+                        handItem = itemData;
                         GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                         newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                         newItem.GetComponent<Object>().SetPhysicsEnabled(false);

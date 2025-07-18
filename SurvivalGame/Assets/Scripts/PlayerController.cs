@@ -26,7 +26,6 @@ public class PlayerController : MonoBehaviour
     [Header("Raycast & Inventory Settings")]
     public PlayerInventory playerInventory;
 
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -84,6 +83,24 @@ public class PlayerController : MonoBehaviour
                         {
                             playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
                             Destroy(hit.collider.gameObject);
+                        }
+                    }
+                }
+                if(playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
+                {
+                    ToolItem toolItem = playerInventory.handItem as ToolItem;
+                    for (int i = 0; i < toolItem.effectiveTags.Length; i++)
+                    {
+                        if (hit.collider.CompareTag(toolItem.effectiveTags[i]))
+                        {
+                            if (playerInputActions.Player.Hit.triggered)
+                            {
+                                if (hit.collider.gameObject.GetComponent<Breakable>() != null)
+                                {
+                                    Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
+                                    breakable.TakeDamage(toolItem.efficiency);
+                                }
+                            }
                         }
                     }
                 }
