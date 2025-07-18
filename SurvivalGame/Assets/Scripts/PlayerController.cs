@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Input playerInputActions;
+    private PlayerGeneral playerGeneral;
     private Rigidbody rb;
     private Vector2 moveInput;
 
@@ -20,6 +21,9 @@ public class PlayerController : MonoBehaviour
     private bool isSprinting = false;
     public bool isGrounded = false;
 
+    private float lastHitTime = -1f;
+    private float hitCooldown = 0.5f;
+
     private float targetFOV = 60f; // Hedef FOV değeri
     [SerializeField] private float transitionSpeed = 5f; // FOV geçiş hızı
 
@@ -30,6 +34,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         playerInventory = GetComponent<PlayerInventory>();
+        playerGeneral = GetComponent<PlayerGeneral>();
 
         playerInputActions = new Input();
     }
@@ -93,12 +98,13 @@ public class PlayerController : MonoBehaviour
                     {
                         if (hit.collider.CompareTag(toolItem.effectiveTags[i]))
                         {
-                            if (playerInputActions.Player.Hit.triggered)
+                            if (playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
                             {
                                 if (hit.collider.gameObject.GetComponent<Breakable>() != null)
                                 {
                                     Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
                                     breakable.TakeDamage(toolItem.efficiency);
+                                    lastHitTime = Time.time;
                                 }
                             }
                         }
@@ -108,22 +114,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private float lastSprintTime;
     private void FixedUpdate()
     {
         float currentSpeed = moveSpeed; // Varsayılan hız olarak normal hareket hızını kullan
-        if (isSprinting)
+        if (isSprinting && playerGeneral.CurrentStamina > 0)
         {
             if (!isGrounded)
             {
                 isSprinting = false; // Yerde değilse sprinti kapat
             }
             currentSpeed = sprintSpeed; // Sprint hızını kullan
+            playerGeneral.CurrentStamina -= Time.fixedDeltaTime * playerGeneral.staminaDecreaseRate;
+            if (playerGeneral.CurrentStamina <= 0)
+            {
+                isSprinting = false;
+                lastSprintTime = Time.time; 
+            }
             targetFOV = 70f; // Sprint sırasında kamera FOV'sini artır
         }
         else
         {
             targetFOV = 60f; // Normal hızda FOV'yi eski haline getir
             currentSpeed = moveSpeed; // Normal hareket hızı
+        }
+
+        if (!isSprinting && playerGeneral.CurrentStamina < playerGeneral.maxStamina && Time.time - lastSprintTime > 1f)
+        {
+            playerGeneral.CurrentStamina += Time.fixedDeltaTime * playerGeneral.staminaIncreaseRate;
         }
 
         float targetYRotation = cameraTransform.eulerAngles.y;

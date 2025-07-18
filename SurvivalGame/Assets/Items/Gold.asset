@@ -19,5 +19,5 @@ MonoBehaviour:
   itemPrefab: {fileID: 6848602941623016924, guid: 2396ff604d0ec874cb29cf0221321ae7, type: 3}
   isStackable: 1
   maxStackSize: 16
-  handPosition: {x: 0, y: 0, z: 0}
-  handRotation: {x: 0, y: 0, z: 0}
+  handPosition: {x: -0.2, y: 0.45, z: 0}
+  handRotation: {x: -90, y: 0, z: 0}

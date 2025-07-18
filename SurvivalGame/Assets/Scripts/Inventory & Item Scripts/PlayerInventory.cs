@@ -140,6 +140,7 @@ public class PlayerInventory : MonoBehaviour
                             handItem = itemData;
                             GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                             newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
+                            newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
                             newItem.GetComponent<Object>().SetPhysicsEnabled(false);
                         }
                     }
@@ -149,6 +150,7 @@ public class PlayerInventory : MonoBehaviour
                         handItem = itemData;
                         GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                         newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
+                        newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
                         newItem.GetComponent<Object>().SetPhysicsEnabled(false);
                     }
                 }

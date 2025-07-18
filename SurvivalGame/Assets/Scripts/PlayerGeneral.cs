@@ -14,8 +14,9 @@ public class PlayerGeneral : MonoBehaviour
     }
 
     [SerializeField] private float currentStamina;
-    [SerializeField] private float maxStamina = 100f;
-    [SerializeField] private float staminaDecreaseRate;
+    public float maxStamina = 100f;
+    public float staminaDecreaseRate;
+    public float staminaIncreaseRate;
     public float CurrentStamina
     {
         get => currentStamina;
@@ -45,6 +46,8 @@ public class PlayerGeneral : MonoBehaviour
     //[SerializeField] private Image staminaBar;
     [SerializeField] private Image hungerBar;
     [SerializeField] private Image thirstBar;
+    [SerializeField] private RectTransform staminaBar;
+    [SerializeField] private GameObject staminaBG;
 
     private void Start()
     {
@@ -57,7 +60,6 @@ public class PlayerGeneral : MonoBehaviour
     private void Update()
     {
         if (CurrentHealth > 0) CurrentHealth -= Time.deltaTime * healthDecreaseRate;
-        if (CurrentStamina > 0) CurrentStamina -= Time.deltaTime * staminaDecreaseRate;
         if (CurrentHunger > 0) CurrentHunger -= Time.deltaTime * hungerDecreaseRate;
         if (CurrentThirst > 0) CurrentThirst -= Time.deltaTime * thirstDecreaseRate;
 
@@ -65,5 +67,8 @@ public class PlayerGeneral : MonoBehaviour
         //staminaBar.fillAmount = CurrentStamina / maxStamina;
         hungerBar.fillAmount = CurrentHunger / maxHunger;
         thirstBar.fillAmount = CurrentThirst / maxThirst;
+        staminaBar.localScale = new Vector3(CurrentStamina / maxStamina, 1, 1);
+        if (currentStamina < maxStamina) staminaBG.gameObject.SetActive(true);
+        else staminaBG.gameObject.SetActive(false);
     }
 }
