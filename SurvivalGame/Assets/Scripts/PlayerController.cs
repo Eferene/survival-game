@@ -109,10 +109,15 @@ public class PlayerController : MonoBehaviour
                                     Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
                                     int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
                                     breakable.TakeDamage(dmg);
+                                    if(playerInventory.handItemGO.GetComponent<Animator>() != null)
+                                    {
+                                        playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
+                                    }
                                     lastHitTime = Time.time;
-                                    GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity, hit.collider.transform);
+                                    GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
+                                    // Parent olarak hit.collider.transform vermiyorsun!
                                     damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
-                                    damageText.transform.localScale = new Vector3(hit.collider.transform.localScale.x * 0.001f, hit.collider.transform.localScale.y * 0.001f, hit.collider.transform.localScale.z * 0.001f);
+                                    damageText.transform.localScale = Vector3.one * 0.2f; // Sabit, her objede aynı büyüklükte
                                     damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
                                 }
                             }

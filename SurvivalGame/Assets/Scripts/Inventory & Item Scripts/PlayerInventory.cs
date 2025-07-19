@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 public class PlayerInventory : MonoBehaviour
 {
     public ItemData handItem;
+    public GameObject handItemGO;
 
     [Header("Player Inventory Settings")]
     private Input playerUIActions;
@@ -138,20 +139,26 @@ public class PlayerInventory : MonoBehaviour
                             Destroy(handTransform.GetChild(0).gameObject);
                             ItemData itemData = inventorySlots[index].itemData;
                             handItem = itemData;
+                            
                             GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                             newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                             newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
                             newItem.GetComponent<Object>().SetPhysicsEnabled(false);
+
+                            handItemGO = newItem;
                         }
                     }
                     else if (handTransform.childCount == 0)
                     {
                         ItemData itemData = inventorySlots[index].itemData;
                         handItem = itemData;
+
                         GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                         newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                         newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
                         newItem.GetComponent<Object>().SetPhysicsEnabled(false);
+
+                        handItemGO = newItem;
                     }
                 }
             }
