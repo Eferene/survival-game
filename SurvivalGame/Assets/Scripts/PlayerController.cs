@@ -76,6 +76,21 @@ public class PlayerController : MonoBehaviour
 
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * transitionSpeed);
 
+        #region Animator & Animations
+        if (playerInventory.handItemGO != null)
+        {
+            if (playerInventory.handItemGO.GetComponent<Animator>() != null)
+            {
+                if(playerInputActions.Player.Hit.triggered)
+                {
+                    if(Time.time - lastHitTime > hitCooldown)
+                    {
+                        playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
+                    }
+                }
+            }
+        }
+        #endregion
         //Raycast
         RaycastHit hit;
         #region Item Alma Raycast
@@ -129,18 +144,6 @@ public class PlayerController : MonoBehaviour
             }
         }
         #endregion
-        #region Animator & Animations
-        if (playerInventory.handItemGO != null)
-        {
-            if (playerInventory.handItemGO.GetComponent<Animator>() != null)
-            {
-                if(playerInputActions.Player.Hit.triggered)
-                {
-                    playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
-                }
-            }
-        }
-        #endregion
     }
 
     private float lastSprintTime;
@@ -150,7 +153,6 @@ public class PlayerController : MonoBehaviour
         if (isSprinting && playerGeneral.CurrentStamina > 0)
         {
             currentSpeed = sprintSpeed; // Sprint hızını kullan
-            playerGeneral.CurrentStamina -= Time.fixedDeltaTime * playerGeneral.staminaDecreaseRate;
             if (playerGeneral.CurrentStamina <= 0)
             {
                 isSprinting = false;

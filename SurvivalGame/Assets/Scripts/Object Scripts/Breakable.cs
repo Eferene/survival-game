@@ -19,6 +19,7 @@ public class Breakable : MonoBehaviour
                 newDrop.GetComponent<Object>().quantity = Random.Range(drops[j].minDrop, drops[j].maxDrop + 1);
                 newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
             }
+            DOTween.Kill(transform);
             Destroy(gameObject);
         }
     }

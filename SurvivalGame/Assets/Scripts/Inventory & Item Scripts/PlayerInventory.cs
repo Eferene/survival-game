@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PlayerInventory : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class PlayerInventory : MonoBehaviour
     private void OnEnable()
     {
         playerActions.Player.Enable();
-        playerActions.Player.Drop.performed += ctx => OpenCloseDropUI();
+        playerActions.Player.Drop.performed += ctx => DropItem();
 
         playerActions.UI.Enable();
         playerActions.UI.Inventory.performed += ctx => OpenInventory();
@@ -58,7 +59,7 @@ public class PlayerInventory : MonoBehaviour
     private void OnDisable()
     {
         playerActions.Player.Disable();
-        playerActions.Player.Drop.performed -= ctx => OpenCloseDropUI();
+        playerActions.Player.Drop.performed -= ctx => DropItem();
 
         playerActions.UI.Disable();
         playerActions.UI.Inventory.performed -= ctx => OpenInventory();
@@ -76,22 +77,28 @@ public class PlayerInventory : MonoBehaviour
 
     private void OpenInventory()
     {
-        inventoryPanelGO.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
-        crosshair.SetActive(false);
-        isInventoryOpen = true;
+        if (!isDropUIOpen)
+        {
+            inventoryPanelGO.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
+            crosshair.SetActive(false);
+            isInventoryOpen = true;
+        }
     }
 
     public void CloseInventory()
     {
-        inventoryPanelGO.SetActive(false);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
-        crosshair.SetActive(true);
-        isInventoryOpen = false;
+        if (!isDropUIOpen)
+        {
+            inventoryPanelGO.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
+            crosshair.SetActive(true);
+            isInventoryOpen = false;
+        }
     }
 
     public void OpenCloseDropUI()
@@ -104,8 +111,10 @@ public class PlayerInventory : MonoBehaviour
             Cursor.visible = false;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
         }
-        else if(handItemGO != null && !dropItemUI.activeSelf)
+        else if (handItemGO != null && !dropItemUI.activeSelf)
         {
+            if (inventoryPanelGO.activeSelf) CloseInventory();
+
             dropItemUI.SetActive(true);
             isDropUIOpen = true;
             Cursor.lockState = CursorLockMode.None;
@@ -116,44 +125,70 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    public void DropItem()
+    {
+        if (handItemGO != null && handItemGO.GetComponent<Object>().quantity > 1)
+        {
+            OpenCloseDropUI();
+        }
+        else if (handItemGO != null && handItemGO.GetComponent<Object>().quantity == 1)
+        {
+            handItemGO.GetComponent<Object>().quantity -= 1;
+            inventorySlots[selectedSlotIndex].quantity -= 1;
+            GameObject dropPrefab = inventorySlots[selectedSlotIndex].itemData.itemPrefab;
+
+            Destroy(handItemGO);
+            handItemGO = null;
+            handItem = null;
+            inventorySlots[selectedSlotIndex].itemData = null;
+            inventorySlotUIs[selectedSlotIndex].UpdateUI(null, 0);
+            selectedSlotIndex = -1;
+
+            GameObject droppedItem = Instantiate(dropPrefab, handTransform.position, Quaternion.identity);
+            droppedItem.GetComponent<Object>().quantity = 1;
+            droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
+        }
+    }
+
     public void AddItemToInventory(ItemData itemData, int quantity)
     {
+        if (!itemData.isStackable)
+        {
+            for (int i = 0; i < inventorySlots.Length; i++)
+            {
+                if (inventorySlots[i].itemData == null)
+                {
+                    inventorySlots[i].itemData = itemData;
+                    inventorySlots[i].quantity = 1;
+                    inventorySlotUIs[i].UpdateUI(itemData, 1);
+                    return;
+                }
+            }
+            return;
+        }
+
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             if (inventorySlots[i].itemData == itemData)
             {
-                if (itemData.isStackable == false) continue;
-                if (itemData.maxStackSize == inventorySlots[i].quantity) continue;
-                else if (itemData.maxStackSize < inventorySlots[i].quantity + quantity)
-                {
-                    quantity -= inventorySlots[i].quantity;
-                    inventorySlots[i].quantity = itemData.maxStackSize;
-                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
-                    continue;
-                }
-                else if (itemData.maxStackSize >= inventorySlots[i].quantity + quantity)
-                {
-                    inventorySlots[i].quantity += quantity;
-                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
-                    return;
-                }
+                int space = itemData.maxStackSize - inventorySlots[i].quantity;
+                int addAmount = Mathf.Min(space, quantity);
+                inventorySlots[i].quantity += addAmount;
+                inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
+                quantity -= addAmount;
+                if (quantity <= 0) return;
             }
-            else if (inventorySlots[i].itemData == null)
+        }
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].itemData == null)
             {
+                int addAmount = Mathf.Min(itemData.maxStackSize, quantity);
                 inventorySlots[i].itemData = itemData;
-                if (quantity > itemData.maxStackSize)
-                {
-                    quantity -= itemData.maxStackSize;
-                    inventorySlots[i].quantity = itemData.maxStackSize;
-                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
-                    continue;
-                }
-                else
-                {
-                    inventorySlots[i].quantity = quantity;
-                    inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
-                    return;
-                }
+                inventorySlots[i].quantity = addAmount;
+                inventorySlotUIs[i].UpdateUI(itemData, addAmount);
+                quantity -= addAmount;
+                if (quantity <= 0) return;
             }
         }
     }
@@ -184,33 +219,32 @@ public class PlayerInventory : MonoBehaviour
                         if (handTransform.GetChild(0).GetComponent<Object>().item != inventorySlots[index].itemData)
                         {
                             Destroy(handTransform.GetChild(0).gameObject);
-                            ItemData itemData = inventorySlots[index].itemData;
-                            handItem = itemData;
-
-                            GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
-                            newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
-                            newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
-                            newItem.GetComponent<Object>().quantity = inventorySlots[index].quantity;
-                            newItem.GetComponent<Object>().SetPhysicsEnabled(false);
-
-                            handItemGO = newItem;
+                            UpdateHandItem(index);
                         }
                     }
                     else if (handTransform.childCount == 0)
                     {
-                        ItemData itemData = inventorySlots[index].itemData;
-                        handItem = itemData;
-
-                        GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
-                        newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
-                        newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
-                        newItem.GetComponent<Object>().quantity = inventorySlots[index].quantity;
-                        newItem.GetComponent<Object>().SetPhysicsEnabled(false);
-
-                        handItemGO = newItem;
+                        UpdateHandItem(index);
                     }
                 }
             }
         }
+    }
+
+    private void UpdateHandItem(int index)
+    {
+        if (handTransform.childCount > 0) Destroy(handTransform.GetChild(0).gameObject);
+
+        ItemData itemData = inventorySlots[index].itemData;
+        handItem = itemData;
+
+        GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
+        newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
+        newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
+        newItem.GetComponent<Object>().quantity = inventorySlots[index].quantity;
+        newItem.GetComponent<Object>().inHand = true;
+        newItem.GetComponent<Object>().SetPhysicsEnabled(false);
+
+        handItemGO = newItem;
     }
 }

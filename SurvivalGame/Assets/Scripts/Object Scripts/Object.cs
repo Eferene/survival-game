@@ -6,6 +6,7 @@ public class Object : MonoBehaviour
     public int quantity;
 
     public bool physics;
+    public bool inHand;
 
     public void SetPhysicsEnabled(bool enabled)
     {
@@ -16,7 +17,7 @@ public class Object : MonoBehaviour
             rb.isKinematic = !enabled;
             rb.useGravity = enabled;
         }
-        if(col != null)
+        if (col != null)
         {
             col.enabled = enabled;
         }
