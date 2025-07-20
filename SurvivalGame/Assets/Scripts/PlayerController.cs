@@ -78,12 +78,11 @@ public class PlayerController : MonoBehaviour
 
         //Raycast
         RaycastHit hit;
+        #region Item Alma Raycast
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
         {
             if (hit.distance < 5)
             {
-                Debug.DrawRay(cameraTransform.position, cameraTransform.forward * hit.distance, Color.yellow);
-                Debug.Log("Did Hit: " + hit.collider.name);
                 if (hit.collider.CompareTag("Item"))
                 {
                     if (playerInputActions.Player.Interaction.triggered)
@@ -95,7 +94,15 @@ public class PlayerController : MonoBehaviour
                         }
                     }
                 }
-                if(playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool) // ToolItem ile hasar verme işlemi
+            }
+        }
+        #endregion
+        #region Hit Raycast
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
+        {
+            if (hit.distance < 3)
+            {
+                if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
                 {
                     ToolItem toolItem = playerInventory.handItem as ToolItem;
                     for (int i = 0; i < toolItem.effectiveTags.Length; i++)
@@ -109,13 +116,8 @@ public class PlayerController : MonoBehaviour
                                     Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
                                     int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
                                     breakable.TakeDamage(dmg);
-                                    if(playerInventory.handItemGO.GetComponent<Animator>() != null)
-                                    {
-                                        playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
-                                    }
                                     lastHitTime = Time.time;
                                     GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
-                                    // Parent olarak hit.collider.transform vermiyorsun!
                                     damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
                                     damageText.transform.localScale = Vector3.one * 0.2f; // Sabit, her objede aynı büyüklükte
                                     damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
@@ -126,6 +128,19 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        #endregion
+        #region Animator & Animations
+        if (playerInventory.handItemGO != null)
+        {
+            if (playerInventory.handItemGO.GetComponent<Animator>() != null)
+            {
+                if(playerInputActions.Player.Hit.triggered)
+                {
+                    playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
+                }
+            }
+        }
+        #endregion
     }
 
     private float lastSprintTime;

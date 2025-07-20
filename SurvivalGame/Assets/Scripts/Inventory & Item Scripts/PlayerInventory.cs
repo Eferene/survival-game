@@ -4,18 +4,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
+using TMPro;
 
 public class PlayerInventory : MonoBehaviour
 {
     public ItemData handItem;
     public GameObject handItemGO;
+    public int selectedSlotIndex = -1; // -1 hiç bir item seçilmediğini gösterir
 
     [Header("Player Inventory Settings")]
-    private Input playerUIActions;
-    [SerializeField] private GameObject inventoryPanelGO;
-    public bool isHoldingKey;
     [SerializeField] private GameObject playerCamera;
     [SerializeField] private GameObject crosshair;
+    [SerializeField] private GameObject inventoryPanelGO;
+    private Input playerActions;
+    public bool isHoldingKey;
 
     [Header("Slots")]
     public InventorySlot[] inventorySlots = new InventorySlot[8];
@@ -27,46 +30,89 @@ public class PlayerInventory : MonoBehaviour
     public Transform handTransform;
     private InputAction pointerPositionAction;
 
+    [Header("UI Elements")]
+    [SerializeField] private GameObject dropItemUI;
+    [SerializeField] private Slider dropItemSlider;
+    [SerializeField] private TextMeshProUGUI dropItemText;
+    private bool isDropUIOpen = false;
+    bool isInventoryOpen = false;
+
     private void Awake()
     {
-        playerUIActions = new Input();
+        playerActions = new Input();
 
-        pointerPositionAction = playerUIActions.UI.Point;
+        pointerPositionAction = playerActions.UI.Point;
         pointerPositionAction.Enable();
     }
 
     private void OnEnable()
     {
-        playerUIActions.UI.Enable();
-        playerUIActions.UI.Inventory.performed += ctx => isHoldingKey = true;
-        playerUIActions.UI.Inventory.canceled += ctx => isHoldingKey = false;
+        playerActions.Player.Enable();
+        playerActions.Player.Drop.performed += ctx => OpenCloseDropUI();
+
+        playerActions.UI.Enable();
+        playerActions.UI.Inventory.performed += ctx => OpenInventory();
+        playerActions.UI.Inventory.canceled += ctx => CloseInventory();
     }
 
     private void OnDisable()
     {
-        playerUIActions.UI.Disable();
-        playerUIActions.UI.Inventory.performed -= ctx => isHoldingKey = true;
-        playerUIActions.UI.Inventory.canceled -= ctx => isHoldingKey = false;
+        playerActions.Player.Disable();
+        playerActions.Player.Drop.performed -= ctx => OpenCloseDropUI();
+
+        playerActions.UI.Disable();
+        playerActions.UI.Inventory.performed -= ctx => OpenInventory();
+        playerActions.UI.Inventory.canceled -= ctx => CloseInventory();
     }
 
     private void Update()
     {
-        if (isHoldingKey)
+        if (isInventoryOpen) UseItem();
+        if (isDropUIOpen && handItemGO != null)
         {
-            inventoryPanelGO.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
-            crosshair.SetActive(false);
-            UseItem();
+            dropItemText.text = dropItemSlider.value + "/" + handItemGO.GetComponent<Object>().quantity;
         }
-        else
+    }
+
+    private void OpenInventory()
+    {
+        inventoryPanelGO.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
+        crosshair.SetActive(false);
+        isInventoryOpen = true;
+    }
+
+    public void CloseInventory()
+    {
+        inventoryPanelGO.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
+        crosshair.SetActive(true);
+        isInventoryOpen = false;
+    }
+
+    public void OpenCloseDropUI()
+    {
+        if (dropItemUI.activeSelf)
         {
-            inventoryPanelGO.SetActive(false);
+            dropItemUI.SetActive(false);
+            isDropUIOpen = false;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
-            crosshair.SetActive(true);
+        }
+        else if(handItemGO != null && !dropItemUI.activeSelf)
+        {
+            dropItemUI.SetActive(true);
+            isDropUIOpen = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
+            dropItemSlider.maxValue = handItemGO.GetComponent<Object>().quantity;
+            dropItemSlider.value = 0;
         }
     }
 
@@ -132,6 +178,7 @@ public class PlayerInventory : MonoBehaviour
                 int index = System.Array.IndexOf(inventorySlotUIs, slotUI);
                 if (index >= 0 && inventorySlots[index].itemData != null)
                 {
+                    selectedSlotIndex = index;
                     if (handTransform.childCount > 0)
                     {
                         if (handTransform.GetChild(0).GetComponent<Object>().item != inventorySlots[index].itemData)
@@ -139,10 +186,11 @@ public class PlayerInventory : MonoBehaviour
                             Destroy(handTransform.GetChild(0).gameObject);
                             ItemData itemData = inventorySlots[index].itemData;
                             handItem = itemData;
-                            
+
                             GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                             newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                             newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
+                            newItem.GetComponent<Object>().quantity = inventorySlots[index].quantity;
                             newItem.GetComponent<Object>().SetPhysicsEnabled(false);
 
                             handItemGO = newItem;
@@ -156,6 +204,7 @@ public class PlayerInventory : MonoBehaviour
                         GameObject newItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity, handTransform);
                         newItem.transform.localRotation = Quaternion.Euler(newItem.GetComponent<Object>().item.handRotation);
                         newItem.transform.localPosition = newItem.GetComponent<Object>().item.handPosition;
+                        newItem.GetComponent<Object>().quantity = inventorySlots[index].quantity;
                         newItem.GetComponent<Object>().SetPhysicsEnabled(false);
 
                         handItemGO = newItem;

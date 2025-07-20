@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Drop",
+                    "type": "Button",
+                    "id": "555b967a-537e-4d5d-bb95-bfb1166df312",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -144,10 +153,21 @@
                     "name": "",
                     "id": "4c368782-fcb5-44c9-9f2c-7097a4cc1d16",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "Tap",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
                     "action": "Hit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "32aec5da-0b4a-49d0-820d-176cd5c37598",
+                    "path": "<Keyboard>/q",
+                    "interactions": "Hold(duration=0.4,pressPoint=0.4),Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

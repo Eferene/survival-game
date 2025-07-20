@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
 public class InventorySlotUI : MonoBehaviour
 {
     [Header("Slot UI Elements")]
