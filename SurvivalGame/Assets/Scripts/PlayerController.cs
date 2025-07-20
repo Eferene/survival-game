@@ -179,15 +179,10 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded)
+        if (isGrounded && playerGeneral.CurrentStamina >= 10)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             playerGeneral.CurrentStamina -= playerGeneral.jumpStaminaCost;
         }
     }
-
-    //public bool GetIsGrounded()
-    //{
-    //    return isGrounded;
-    //}
 }

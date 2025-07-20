@@ -33,7 +33,7 @@ public class MapGeneratorEditor : Editor
         autoUpdate = EditorGUILayout.Toggle("Auto Update", autoUpdate);
 
         // "Generate World" butonu, manuel üretim için candır.
-        if (GUILayout.Button("Generate World"))
+        if (GUILayout.Button("Generate World", GUILayout.Height(25)))
         {
             // Haritayı yeniden oluştur.
             mapGenerator.GenerateIsland();
