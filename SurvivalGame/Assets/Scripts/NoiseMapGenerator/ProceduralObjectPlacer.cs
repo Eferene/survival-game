@@ -1,7 +1,4 @@
-﻿// Ana Script: ProceduralObjectPlacer.cs
-// Bu scripti MeshFilter ve MeshCollider'a sahip olan harita objene eklemelisin.
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 // Bu sınıf, Inspector'da her bir obje türü için ayarları tutar.
@@ -85,15 +82,14 @@ public class ProceduralObjectPlacer : MonoBehaviour
 
                 if (Physics.Raycast(rayStart, Vector3.down, out hit, bounds.size.y + 20f) && hit.collider == meshCollider)
                 {
-                    // --- GÜNCELLENEN MANTIK BURADA BAŞLIYOR ---
-
                     float normalizedHeight = Mathf.InverseLerp(bounds.min.y, bounds.max.y, hit.point.y);
 
-                    // 1. Bu noktaya yerleşebilecek tüm adayları ve toplam yoğunluklarını bul.
                     List<PlaceableObject> candidates = new List<PlaceableObject>();
                     float totalDensity = 0f;
                     foreach (PlaceableObject objType in objectsToPlace)
                     {
+                        // HATA: Eskiden 'hit.point.y' (örn: 35.4f) ile 'objType.minHeight' (örn: 0.5f) gibi farklı ölçekteki değerler karşılaştırılabilirdi, bu da mantığı bozuyordu.
+                        // DÜZELTME: Artık 'hit.point.y' değerini 'normalizedHeight' ile 0-1 arasına çekiyoruz. Karşılaştırma, normalize edilmiş bu değer üzerinden yapıldığı için doğru çalışıyor.
                         if (normalizedHeight >= objType.minHeight && normalizedHeight <= objType.maxHeight)
                         {
                             candidates.Add(objType);
@@ -101,7 +97,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
                         }
                     }
 
-                    // 2. Eğer aday varsa, yoğunluklarına göre bir kura çek.
                     if (candidates.Count > 0)
                     {
                         float randomWeight = Random.Range(0f, totalDensity);
@@ -117,7 +112,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
                             randomWeight -= candidate.density;
                         }
 
-                        // 3. Kurayı kazanan objeyi yerleştir.
                         if (chosenObject != null)
                         {
                             Vector3 position = hit.point + new Vector3(0, chosenObject.yOffset, 0);
@@ -136,7 +130,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
                             Instantiate(chosenObject.prefab, position, rotation, parentTransforms[chosenObject]);
                         }
                     }
-                    // --- GÜNCELLENEN MANTIK BURADA BİTİYOR ---
                 }
             }
         }
