@@ -23,7 +23,7 @@ public class MapGeneratorEditor : Editor
             if (autoUpdate)
             {
                 // Haritayı yeniden oluştur.
-                mapGenerator.GenerateWorld();
+                mapGenerator.GenerateIsland();
             }
         }
 
@@ -36,7 +36,7 @@ public class MapGeneratorEditor : Editor
         if (GUILayout.Button("Generate World"))
         {
             // Haritayı yeniden oluştur.
-            mapGenerator.GenerateWorld();
+            mapGenerator.GenerateIsland();
         }
     }
 }

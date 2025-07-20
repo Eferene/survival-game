@@ -134,10 +134,6 @@ public class PlayerController : MonoBehaviour
         float currentSpeed = moveSpeed; // Varsayılan hız olarak normal hareket hızını kullan
         if (isSprinting && playerGeneral.CurrentStamina > 0)
         {
-            if (!isGrounded)
-            {
-                isSprinting = false; // Yerde değilse sprinti kapat
-            }
             currentSpeed = sprintSpeed; // Sprint hızını kullan
             playerGeneral.CurrentStamina -= Time.fixedDeltaTime * playerGeneral.staminaDecreaseRate;
             if (playerGeneral.CurrentStamina <= 0)
@@ -168,7 +164,11 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded) rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        if (isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            playerGeneral.CurrentStamina -= playerGeneral.jumpStaminaCost;
+        }
     }
 
     //public bool GetIsGrounded()

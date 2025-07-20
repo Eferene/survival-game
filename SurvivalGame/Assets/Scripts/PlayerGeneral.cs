@@ -17,6 +17,7 @@ public class PlayerGeneral : MonoBehaviour
     public float maxStamina = 100f;
     public float staminaDecreaseRate;
     public float staminaIncreaseRate;
+    public float jumpStaminaCost;
     public float CurrentStamina
     {
         get => currentStamina;
