@@ -269,6 +269,8 @@ GameObject:
   - component: {fileID: 4500115860228805765}
   - component: {fileID: 8938543876999700474}
   - component: {fileID: 1720947991367223633}
+  - component: {fileID: 8551250124192866107}
+  - component: {fileID: 2994193550900540368}
   m_Layer: 0
   m_Name: CN Tree Body.002
   m_TagString: Untagged
@@ -352,6 +354,43 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &8551250124192866107
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3923050175742411883}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1373352434650051976, guid: 855da92700c04b7439eeafe39b48bb99, type: 3}
+--- !u!114 &2994193550900540368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3923050175742411883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 251498d90ad0137408a9a561283bf56e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 150
+  drops: []
+  hasParent: 1
 --- !u!1 &4048793326185605858
 GameObject:
   m_ObjectHideFlags: 0

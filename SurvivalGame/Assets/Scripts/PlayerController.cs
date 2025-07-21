@@ -32,7 +32,6 @@ public class PlayerController : MonoBehaviour
     [Header("Raycast & Inventory Settings")]
     public PlayerInventory playerInventory;
     public GameObject damageTextPrefab; 
-    
 
     private void Awake()
     {
