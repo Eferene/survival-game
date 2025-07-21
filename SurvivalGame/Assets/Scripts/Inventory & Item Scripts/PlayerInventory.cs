@@ -147,6 +147,7 @@ public class PlayerInventory : MonoBehaviour
             GameObject droppedItem = Instantiate(dropPrefab, handTransform.position, Quaternion.identity);
             droppedItem.GetComponent<Object>().quantity = 1;
             droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
+            droppedItem.GetComponent<Rigidbody>().AddForce(handTransform.forward * 5f, ForceMode.Impulse);
         }
     }
 

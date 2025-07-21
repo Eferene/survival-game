@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour
         {
             if (hit.distance < 5)
             {
-                if (hit.collider.CompareTag("Item"))
+                if (hit.collider.CompareTag("Item") || hit.collider.CompareTag("Consumable"))
                 {
                     if (playerInputActions.Player.Interaction.triggered)
                     {

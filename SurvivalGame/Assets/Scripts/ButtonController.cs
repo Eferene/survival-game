@@ -30,12 +30,21 @@ public class ButtonController : MonoBehaviour
             GameObject droppedItem = Instantiate(dropPrefab, playerInventory.handTransform.position, Quaternion.identity);
             droppedItem.GetComponent<Object>().quantity = (int)slider.value;
             droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
+            droppedItem.GetComponent<Rigidbody>().AddForce(playerInventory.handTransform.forward * 5f, ForceMode.Impulse);
             playerInventory.OpenCloseDropUI();
         }
         else
         {
             PlayerInventory playerInventory = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerInventory>();
             playerInventory.OpenCloseDropUI();
+        }
+    }
+
+    public void CloseUI(GameObject ui)
+    {
+        if (ui != null)
+        {
+            ui.SetActive(false);
         }
     }
 }

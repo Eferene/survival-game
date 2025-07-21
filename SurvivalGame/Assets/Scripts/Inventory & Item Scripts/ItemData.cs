@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UnityEngine;
 
 public abstract class ItemData : ScriptableObject
@@ -8,11 +9,22 @@ public abstract class ItemData : ScriptableObject
     public Sprite itemIcon;
     public GameObject itemPrefab;
     public bool isStackable;
-    public int maxStackSize;
+    [ShowIf("isStackable")] public int maxStackSize;
     public Vector3 handPosition;
     public Vector3 handRotation;
+    public bool isCraftable;
+
+    [ShowIf("isCraftable")] public bool canCraftInHand;
+    [ShowIf("isCraftable")] public CraftingData[] crafting;
 
     public abstract ItemType itemType { get; }
+}
+
+[System.Serializable]
+public class CraftingData
+{
+    public ItemData craftingMaterial;
+    public int craftingMaterialAmount;
 }
 
 public enum ItemType

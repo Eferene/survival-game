@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7069834, y: 0, z: 0, w: 0.7072302}
   m_LocalPosition: {x: -0.28318587, y: 0.1029545, z: 4.1983795}
-  m_LocalScale: {x: 12.367797, y: 12.367797, z: 12.367797}
+  m_LocalScale: {x: 12.367797, y: 12.367795, z: 12.367795}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -153,3 +153,4 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 209a06cd24fe3d14082b4daec40afe89, type: 2}
   quantity: 1
   physics: 1
+  inHand: 0
