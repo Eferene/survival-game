@@ -1,65 +1,100 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
-// Bu sınıf, Inspector'da her bir obje türü için ayarları tutar.
-// [System.Serializable] sayesinde Inspector'da görünebilir hale gelir.
 [System.Serializable]
 public class PlaceableObject
 {
-    public string name; // Inspector'da kolayca tanımak için isim
-    public GameObject prefab; // Yerleştirilecek objenin prefab'ı
-    [Range(0f, 1f)]
-    public float minHeight = 0f; // Yerleştirme için minimum yükseklik (normalize edilmiş, 0-1 arası)
-    [Range(0f, 1f)]
-    public float maxHeight = 1f; // Yerleştirme için maksimum yükseklik (normalize edilmiş, 0-1 arası)
-    [Range(0f, 100f)]
-    public float density = 10f; // Yoğunluk/Şans. Bu değer ne kadar yüksekse o kadar sık obje yerleşir.
-    [Tooltip("Objeyi dikey eksende kaydırmak için kullanılır. Pivotu ortada olan modeller için pozitif değer girin.")]
+    public string name;
+    public GameObject prefab;
+    [Range(0f, 1f)] public float minHeight = 0f;
+    [Range(0f, 1f)] public float maxHeight = 1f;
+    [Range(0f, 100f)] public float density = 10f;
     public float yOffset = 0f;
-    public bool alignToSurface = false; // Obje yüzeyin eğimine göre mi hizalansın? (Taşlar için ideal)
-    public bool randomRotationY = true; // Y ekseninde rastgele döndürülsün mü? (Ağaçlar için ideal)
+    public bool alignToSurface = false;
+    public bool randomRotationY = true;
 }
 
-[RequireComponent(typeof(MeshCollider))] // Bu scriptin çalışması için MeshCollider zorunlu.
+[RequireComponent(typeof(MeshCollider))]
 public class ProceduralObjectPlacer : MonoBehaviour
 {
-    // Script aktif olduğunda anons sistemine abone ol.
-    private void OnEnable()
-    {
-        MapGenerator.OnIslandGenerated += GenerateObjects;
-    }
+    [Tooltip("Objeleri yerleştirmek için harita verisini sağlayacak olan MapGenerator.")]
+    public MapGenerator mapGenerator;
 
-    // Script pasif olduğunda abonelikten çık (hafıza sızıntısını önler).
-    private void OnDisable()
-    {
-        MapGenerator.OnIslandGenerated -= GenerateObjects;
-    }
-
-    // Inspector'dan ayarlayacağın obje listesi
     public PlaceableObject[] objectsToPlace;
-
-    [Tooltip("Objeleri yerleştirmek için ne kadar sıklıkla örnek alınacağını belirler. Düşük değerler daha yoğun tarama yapar.")]
     [Range(0.5f, 200f)]
     public float placementStep = 10f;
 
-    // Oluşturulan objeleri içinde toplayacak parent objelerin referansları
+    private float[,] heightMap;
     private Transform objectParentContainer;
+    [SerializeField] private GameObject environment;
 
-    // Bu metod, editördeki butondan veya MapGenerator'dan gelen anonsla çağrılacak
-    public void GenerateObjects()
+    private void OnEnable()
+    {
+        MapGenerator.OnIslandGenerated += HandleMapGeneration;
+    }
+
+    private void OnDisable()
+    {
+        MapGenerator.OnIslandGenerated -= HandleMapGeneration;
+    }
+
+    public void HandleMapGeneration(MapData mapData)
+    {
+        this.heightMap = mapData.heightMap;
+
+        // DEĞİŞTİ: Oyun modunda Coroutine, editörde delayCall kullanılıyor.
+        // Bu, MeshCollider'ın güncellenmesi için zaman tanır.
+        if (Application.isPlaying)
+        {
+            StartCoroutine(PlaceObjectsAfterFrame());
+        }
+        else
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.delayCall += PlaceObjects;
+#endif
+        }
+    }
+
+    // YENİ: Oyun modunda bir frame bekleyip objeleri yerleştiren Coroutine.
+    private IEnumerator PlaceObjectsAfterFrame()
+    {
+        yield return null;
+        PlaceObjects();
+    }
+
+    public void PlaceObjects()
     {
         ClearObjects();
+
+        if (mapGenerator != null)
+        {
+            Debug.Log("MapGenerator'dan en güncel harita verisi isteniyor...");
+            MapData? data = mapGenerator.GetLastGeneratedMapData();
+            if (data.HasValue)
+            {
+                this.heightMap = data.Value.heightMap;
+            }
+        }
+
+        if (this.heightMap == null)
+        {
+            Debug.LogError("HeightMap alınamadı! Önce haritayı oluşturun ve 'Map Generator' referansını atayın.");
+            return;
+        }
 
         MeshCollider meshCollider = GetComponent<MeshCollider>();
         if (meshCollider == null || meshCollider.sharedMesh == null)
         {
-            Debug.LogWarning("Obje yerleştirme atlandı çünkü MeshCollider veya mesh henüz hazır değil. Harita oluşturulduktan sonra tekrar denenecek.");
+            Debug.LogWarning("Obje yerleştirme atlandı çünkü MeshCollider veya mesh hazır değil. Önce harita oluşturun.");
             return;
         }
+
         Bounds bounds = meshCollider.bounds;
 
-        GameObject mainParent = new GameObject("Procedurally Placed Objects");
-        mainParent.transform.SetParent(this.transform);
+        GameObject mainParent = new GameObject("Procedurally Placed Objects " + gameObject.name);
+        mainParent.transform.SetParent(environment.transform);
         objectParentContainer = mainParent.transform;
 
         Dictionary<PlaceableObject, Transform> parentTransforms = new Dictionary<PlaceableObject, Transform>();
@@ -76,20 +111,16 @@ public class ProceduralObjectPlacer : MonoBehaviour
             {
                 float sampleX = x + Random.Range(-placementStep / 2f, placementStep / 2f);
                 float sampleZ = z + Random.Range(-placementStep / 2f, placementStep / 2f);
-
                 Vector3 rayStart = new Vector3(sampleX, bounds.max.y + 10f, sampleZ);
-                RaycastHit hit;
 
-                if (Physics.Raycast(rayStart, Vector3.down, out hit, bounds.size.y + 20f) && hit.collider == meshCollider)
+                if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, 1, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
                 {
-                    float normalizedHeight = Mathf.InverseLerp(bounds.min.y, bounds.max.y, hit.point.y);
+                    float normalizedHeight = MapGenerator.GetBilinearInterpolatedHeight(this.heightMap, hit.textureCoord.x, hit.textureCoord.y);
 
                     List<PlaceableObject> candidates = new List<PlaceableObject>();
                     float totalDensity = 0f;
                     foreach (PlaceableObject objType in objectsToPlace)
                     {
-                        // HATA: Eskiden 'hit.point.y' (örn: 35.4f) ile 'objType.minHeight' (örn: 0.5f) gibi farklı ölçekteki değerler karşılaştırılabilirdi, bu da mantığı bozuyordu.
-                        // DÜZELTME: Artık 'hit.point.y' değerini 'normalizedHeight' ile 0-1 arasına çekiyoruz. Karşılaştırma, normalize edilmiş bu değer üzerinden yapıldığı için doğru çalışıyor.
                         if (normalizedHeight >= objType.minHeight && normalizedHeight <= objType.maxHeight)
                         {
                             candidates.Add(objType);
@@ -101,7 +132,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
                     {
                         float randomWeight = Random.Range(0f, totalDensity);
                         PlaceableObject chosenObject = null;
-
                         foreach (PlaceableObject candidate in candidates)
                         {
                             if (randomWeight < candidate.density)
@@ -112,21 +142,14 @@ public class ProceduralObjectPlacer : MonoBehaviour
                             randomWeight -= candidate.density;
                         }
 
-                        if (chosenObject != null)
+                        if (chosenObject != null && chosenObject.prefab != null)
                         {
                             Vector3 position = hit.point + new Vector3(0, chosenObject.yOffset, 0);
-                            Quaternion rotation = Quaternion.identity;
-
-                            if (chosenObject.alignToSurface)
-                            {
-                                rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-                            }
-
+                            Quaternion rotation = chosenObject.alignToSurface ? Quaternion.FromToRotation(Vector3.up, hit.normal) : Quaternion.identity;
                             if (chosenObject.randomRotationY)
                             {
                                 rotation *= Quaternion.Euler(0, Random.Range(0, 360), 0);
                             }
-
                             Instantiate(chosenObject.prefab, position, rotation, parentTransforms[chosenObject]);
                         }
                     }
@@ -138,10 +161,28 @@ public class ProceduralObjectPlacer : MonoBehaviour
 
     public void ClearObjects()
     {
-        Transform container = transform.Find("Procedurally Placed Objects");
-        if (container != null)
+        string parentName = "Procedurally Placed Objects " + gameObject.name;
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
         {
-            DestroyImmediate(container.gameObject);
+            Transform existing = environment.transform.Find(parentName);
+            if (existing != null)
+            {
+                DestroyImmediate(existing.gameObject);
+            }
+            return;
+        }
+#endif
+
+        if (Application.isPlaying)
+        {
+            Transform existing = environment.transform.Find(parentName);
+            if (existing != null)
+            {
+                Destroy(existing.gameObject);
+            }
         }
     }
+
 }

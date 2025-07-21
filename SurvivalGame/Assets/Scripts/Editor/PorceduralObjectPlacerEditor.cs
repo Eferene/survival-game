@@ -7,21 +7,25 @@ public class ProceduralObjectPlacerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        // Varsayılan Inspector alanlarını çiz
         DrawDefaultInspector();
 
-        // Scriptin referansını al
         ProceduralObjectPlacer placer = (ProceduralObjectPlacer)target;
 
-        // Butonları ekle
-        if (GUILayout.Button("Tüm Objeleri Oluştur", GUILayout.Height(25)))
+        // DEĞİŞTİ: Buton artık sadece objeleri yerleştiriyor.
+        if (GUILayout.Button("Place Objects on Current Map", GUILayout.Height(30)))
         {
-            placer.GenerateObjects();
+            if (placer.mapGenerator != null)
+            {
+                // MapGenerator'ı tetiklemek yerine doğrudan yerleştirme fonksiyonunu çağırıyoruz.
+                placer.PlaceObjects();
+            }
+            else
+            {
+                Debug.LogError("'Map Generator' referansı atanmamış!");
+            }
         }
 
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Tüm Objeleri Temizle", GUILayout.Height(25)))
+        if (GUILayout.Button("Clear Objects", GUILayout.Height(25)))
         {
             placer.ClearObjects();
         }

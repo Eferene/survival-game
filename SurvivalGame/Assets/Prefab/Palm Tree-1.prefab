@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 6972485396040519184}
   - component: {fileID: 6345736407285231367}
   - component: {fileID: 6030834200619888424}
+  - component: {fileID: 741571730030637751}
   m_Layer: 0
   m_Name: CN Tree Body.001
   m_TagString: Untagged
@@ -180,6 +181,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &741571730030637751
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940900306772759645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6355025543044866620, guid: 855da92700c04b7439eeafe39b48bb99, type: 3}
 --- !u!1 &1391522845269725903
 GameObject:
   m_ObjectHideFlags: 0
