@@ -1,7 +1,5 @@
-using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
-using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -23,20 +21,12 @@ public class PlayerController : MonoBehaviour
     private bool isSprinting = false;
     public bool isGrounded = false;
 
-    private float lastHitTime = -1f;
-    private float hitCooldown = 0.5f;
-
     private float targetFOV = 60f; // Hedef FOV değeri
     [SerializeField] private float transitionSpeed = 5f; // FOV geçiş hızı
-
-    [Header("Raycast & Inventory Settings")]
-    public PlayerInventory playerInventory;
-    public GameObject damageTextPrefab; 
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        playerInventory = GetComponent<PlayerInventory>();
         playerGeneral = GetComponent<PlayerGeneral>();
 
         playerInputActions = new Input();
@@ -74,75 +64,6 @@ public class PlayerController : MonoBehaviour
         moveInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * transitionSpeed);
-
-        #region Animator & Animations
-        if (playerInventory.handItemGO != null)
-        {
-            if (playerInventory.handItemGO.GetComponent<Animator>() != null)
-            {
-                if(playerInputActions.Player.Hit.triggered)
-                {
-                    if(Time.time - lastHitTime > hitCooldown)
-                    {
-                        playerInventory.handItemGO.GetComponent<Animator>().SetTrigger("Hit");
-                    }
-                }
-            }
-        }
-        #endregion
-        //Raycast
-        RaycastHit hit;
-        #region Item Alma Raycast
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
-        {
-            if (hit.distance < 5)
-            {
-                if (hit.collider.CompareTag("Item") || hit.collider.CompareTag("Consumable"))
-                {
-                    if (playerInputActions.Player.Interaction.triggered)
-                    {
-                        if (hit.collider.gameObject.GetComponent<Object>().item != null)
-                        {
-                            playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
-                            Destroy(hit.collider.gameObject);
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
-        #region Hit Raycast
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
-        {
-            if (hit.distance < 3)
-            {
-                if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
-                {
-                    ToolItem toolItem = playerInventory.handItem as ToolItem;
-                    for (int i = 0; i < toolItem.effectiveTags.Length; i++)
-                    {
-                        if (hit.collider.CompareTag(toolItem.effectiveTags[i]))
-                        {
-                            if (playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
-                            {
-                                if (hit.collider.gameObject.GetComponent<Breakable>() != null)
-                                {
-                                    Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
-                                    int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
-                                    breakable.TakeDamage(dmg);
-                                    lastHitTime = Time.time;
-                                    GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
-                                    damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
-                                    damageText.transform.localScale = Vector3.one * 0.2f; // Sabit, her objede aynı büyüklükte
-                                    damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
     }
 
     private float lastSprintTime;

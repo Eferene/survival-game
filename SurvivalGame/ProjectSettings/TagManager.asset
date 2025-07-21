@@ -7,10 +7,10 @@ TagManager:
   - Ground
   - Item
   - Gold
-  - Iron
   - Rock
   - Tree
   - Consumable
+  - Erenium
   layers:
   - Default
   - TransparentFX

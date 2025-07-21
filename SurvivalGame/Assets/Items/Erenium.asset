@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
-  m_Name: Iron
+  m_Name: Erenium
   m_EditorClassIdentifier: 
   itemID: 1
-  itemName: Iron Ore
-  itemDescription: Iron Ore.
-  itemIcon: {fileID: 21300000, guid: 4bacd20eb998027428888fec299ceca9, type: 3}
+  itemName: Erenium.
+  itemDescription: Erenium Ore.
+  itemIcon: {fileID: 21300000, guid: 4a9fc93e535a61d4bb6758eb6769e95a, type: 3}
   itemPrefab: {fileID: 1284017658565679969, guid: 3259f4d2ee8486e4c8866d34035e6ddb, type: 3}
   isStackable: 1
   maxStackSize: 16

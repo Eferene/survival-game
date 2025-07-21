@@ -359,7 +359,7 @@ GameObject:
   - component: {fileID: 5689106419928614770}
   m_Layer: 0
   m_Name: CN Tree Body.002
-  m_TagString: Untagged
+  m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

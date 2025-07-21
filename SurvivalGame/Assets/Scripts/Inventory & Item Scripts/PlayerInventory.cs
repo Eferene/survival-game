@@ -4,12 +4,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 using TMPro;
-using Unity.VisualScripting;
 
 public class PlayerInventory : MonoBehaviour
 {
+    private PlayerGeneral playerGeneral;
     public ItemData handItem;
     public GameObject handItemGO;
     public int selectedSlotIndex = -1; // -1 hiç bir item seçilmediğini gösterir
@@ -46,10 +45,15 @@ public class PlayerInventory : MonoBehaviour
         pointerPositionAction.Enable();
     }
 
+    private void Start()
+    {
+        playerGeneral = GetComponent<PlayerGeneral>();
+    }
+
     private void OnEnable()
     {
         playerActions.Player.Enable();
-        playerActions.Player.Drop.performed += ctx => DropItem();
+        playerActions.Player.Drop.performed += ctx => DropUIControl();
 
         playerActions.UI.Enable();
         playerActions.UI.Inventory.performed += ctx => OpenInventory();
@@ -59,7 +63,7 @@ public class PlayerInventory : MonoBehaviour
     private void OnDisable()
     {
         playerActions.Player.Disable();
-        playerActions.Player.Drop.performed -= ctx => DropItem();
+        playerActions.Player.Drop.performed -= ctx => DropUIControl();
 
         playerActions.UI.Disable();
         playerActions.UI.Inventory.performed -= ctx => OpenInventory();
@@ -73,6 +77,9 @@ public class PlayerInventory : MonoBehaviour
         {
             dropItemText.text = dropItemSlider.value + "/" + handItemGO.GetComponent<Object>().quantity;
         }
+
+        if(isDropUIOpen || isInventoryOpen) playerGeneral.canHit = false;
+        else playerGeneral.canHit = true;
     }
 
     private void OpenInventory()
@@ -125,30 +132,46 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public void DropItem()
+    public void DropUIControl()
     {
-        if (handItemGO != null && handItemGO.GetComponent<Object>().quantity > 1)
+        if (handItemGO != null)
         {
-            OpenCloseDropUI();
+            if (handItemGO.GetComponent<Object>().quantity > 1)
+            {
+                OpenCloseDropUI();
+            }
+            else if (handItemGO.GetComponent<Object>().quantity == 1)
+            {
+                DropItem(1);
+            }
         }
-        else if (handItemGO != null && handItemGO.GetComponent<Object>().quantity == 1)
-        {
-            handItemGO.GetComponent<Object>().quantity -= 1;
-            inventorySlots[selectedSlotIndex].quantity -= 1;
-            GameObject dropPrefab = inventorySlots[selectedSlotIndex].itemData.itemPrefab;
+    }
 
+    public void DropItem(int quant)
+    {
+        handItemGO.GetComponent<Object>().quantity -= quant;
+        inventorySlots[selectedSlotIndex].quantity -= quant;
+        GameObject dropPrefab = inventorySlots[selectedSlotIndex].itemData.itemPrefab;
+
+        if (handItemGO.GetComponent<Object>().quantity <= 0)
+        {
             Destroy(handItemGO);
             handItemGO = null;
             handItem = null;
             inventorySlots[selectedSlotIndex].itemData = null;
             inventorySlotUIs[selectedSlotIndex].UpdateUI(null, 0);
             selectedSlotIndex = -1;
-
-            GameObject droppedItem = Instantiate(dropPrefab, handTransform.position, Quaternion.identity);
-            droppedItem.GetComponent<Object>().quantity = 1;
-            droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
-            droppedItem.GetComponent<Rigidbody>().AddForce(handTransform.forward * 5f, ForceMode.Impulse);
         }
+        else
+        {
+            inventorySlotUIs[selectedSlotIndex].UpdateUI(handItem, handItemGO.GetComponent<Object>().quantity);
+        }
+
+        GameObject droppedItem = Instantiate(dropPrefab, handTransform.position, Quaternion.identity);
+        droppedItem.GetComponent<Object>().quantity = quant;
+        droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
+        droppedItem.GetComponent<Rigidbody>().AddForce(handTransform.forward * 5f + transform.up * 2f, ForceMode.Impulse);
+        OpenCloseDropUI();
     }
 
     public void AddItemToInventory(ItemData itemData, int quantity)
@@ -175,6 +198,10 @@ public class PlayerInventory : MonoBehaviour
                 int space = itemData.maxStackSize - inventorySlots[i].quantity;
                 int addAmount = Mathf.Min(space, quantity);
                 inventorySlots[i].quantity += addAmount;
+                if(handItem == itemData)
+                {
+                    handItemGO.GetComponent<Object>().quantity += addAmount;
+                }
                 inventorySlotUIs[i].UpdateUI(itemData, inventorySlots[i].quantity);
                 quantity -= addAmount;
                 if (quantity <= 0) return;

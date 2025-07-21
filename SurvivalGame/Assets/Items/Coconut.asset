@@ -25,6 +25,7 @@ MonoBehaviour:
   isCraftable: 0
   canCraftInHand: 0
   crafting: []
-  healthRestored: 5
-  hungerRestored: 5
-  thirstRestored: 10
+  healthRestore: 10
+  staminaRestore: 10
+  hungerRestore: 10
+  thirstRestore: 15

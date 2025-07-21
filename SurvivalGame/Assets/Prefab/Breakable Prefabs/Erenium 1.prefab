@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6848602941623016924
+--- !u!1 &6059244717465255152
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2642314707676220933}
-  - component: {fileID: 1862623756191984874}
-  - component: {fileID: 8452108762039627881}
-  - component: {fileID: 5524423989708099153}
-  - component: {fileID: 2283128531941819374}
-  - component: {fileID: 5639985581699420638}
+  - component: {fileID: 5595399982464996287}
+  - component: {fileID: 679732742649713330}
+  - component: {fileID: 26525344488605558}
+  - component: {fileID: 8787647266295885871}
+  - component: {fileID: 5167169384041342170}
   m_Layer: 0
-  m_Name: Gold Ore
-  m_TagString: Item
+  m_Name: Erenium-1
+  m_TagString: Erenium
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2642314707676220933
+--- !u!4 &5595399982464996287
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
+  m_GameObject: {fileID: 6059244717465255152}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7069834, y: 0, z: 0, w: 0.7072302}
-  m_LocalPosition: {x: -2.4576845, y: 0, z: 4.51875}
-  m_LocalScale: {x: 36.477547, y: 36.477547, z: 36.477547}
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
+  m_LocalPosition: {x: 0, y: 0.6980008, z: 0}
+  m_LocalScale: {x: 31.65907, y: 31.65907, z: 31.65907}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
---- !u!33 &1862623756191984874
+  m_Father: {fileID: 4160618565887784437}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &679732742649713330
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
-  m_Mesh: {fileID: -6606287097670836894, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
---- !u!23 &8452108762039627881
+  m_GameObject: {fileID: 6059244717465255152}
+  m_Mesh: {fileID: -5280727647475760728, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
+--- !u!23 &26525344488605558
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
+  m_GameObject: {fileID: 6059244717465255152}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -67,8 +66,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -876546973899608171, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
-  - {fileID: -3846018093981099296, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
+  - {fileID: 2100000, guid: b71c230f40b5e114198da95f3533b5a1, type: 2}
+  - {fileID: 2100000, guid: 1b1304cef58ed6b48a063a7f77bb7422, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -90,40 +89,31 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &5524423989708099153
-Rigidbody:
+--- !u!114 &8787647266295885871
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &2283128531941819374
+  m_GameObject: {fileID: 6059244717465255152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 251498d90ad0137408a9a561283bf56e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 150
+  drops:
+  - drop: {fileID: 1284017658565679969, guid: 3259f4d2ee8486e4c8866d34035e6ddb, type: 3}
+    minDrop: 1
+    maxDrop: 4
+  hasParent: 1
+--- !u!65 &5167169384041342170
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
+  m_GameObject: {fileID: 6059244717465255152}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -136,20 +126,37 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.01842438, y: 0.021462489, z: 0.013666693}
-  m_Center: {x: -0.000971626, y: -0.0009025683, z: -0.00042936616}
---- !u!114 &5639985581699420638
-MonoBehaviour:
+  m_Size: {x: 0.057576414, y: 0.07315731, z: 0.042222045}
+  m_Center: {x: 0.0007645283, y: 0.0013026351, z: -0.00014740785}
+--- !u!1 &6617970137487121425
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6848602941623016924}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c2746607e003eb4682e073ca352e3fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: 9380c07fdf54d2f45923af10928318a6, type: 2}
-  quantity: 1
-  physics: 1
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4160618565887784437}
+  m_Layer: 0
+  m_Name: Erenium 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4160618565887784437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6617970137487121425}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.32988, y: -0, z: 29.51}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5595399982464996287}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
