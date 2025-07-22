@@ -6,11 +6,11 @@ TagManager:
   tags:
   - Ground
   - Item
-  - Gold
   - Rock
   - Tree
   - Consumable
   - Erenium
+  - Galmend
   layers:
   - Default
   - TransparentFX

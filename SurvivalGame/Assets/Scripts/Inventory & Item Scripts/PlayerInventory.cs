@@ -241,16 +241,15 @@ public class PlayerInventory : MonoBehaviour
                 int index = System.Array.IndexOf(inventorySlotUIs, slotUI);
                 if (index >= 0 && inventorySlots[index].itemData != null)
                 {
+                    if (selectedSlotIndex == index) return;
+                    
                     selectedSlotIndex = index;
-                    if (handTransform.childCount > 0)
+                    if (handItemGO != null)
                     {
-                        if (handTransform.GetChild(0).GetComponent<Object>().item != inventorySlots[index].itemData)
-                        {
-                            Destroy(handTransform.GetChild(0).gameObject);
-                            UpdateHandItem(index);
-                        }
+                        Destroy(handTransform.GetChild(0).gameObject);
+                        UpdateHandItem(index);
                     }
-                    else if (handTransform.childCount == 0)
+                    else
                     {
                         UpdateHandItem(index);
                     }
