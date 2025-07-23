@@ -2,31 +2,41 @@
 using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// ProceduralObjectPlacer script'i için özel bir Inspector arayüzü oluşturur.
+/// Adds some neat buttons to make our lives easier.
+/// </summary>
 [CustomEditor(typeof(ProceduralObjectPlacer))]
 public class ProceduralObjectPlacerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        // Varsayılan Inspector elemanlarını çiz (public değişkenler vb.).
         DrawDefaultInspector();
 
+        // Hedef script'i al.
         ProceduralObjectPlacer placer = (ProceduralObjectPlacer)target;
 
-        // DEĞİŞTİ: Buton artık sadece objeleri yerleştiriyor.
+        // "Place Objects on Current Map" adında, 30 piksel yüksekliğinde bir buton oluştur.
         if (GUILayout.Button("Place Objects on Current Map", GUILayout.Height(30)))
         {
+            // Butona basıldığında, eğer MapGenerator referansı varsa...
             if (placer.mapGenerator != null)
             {
-                // MapGenerator'ı tetiklemek yerine doğrudan yerleştirme fonksiyonunu çağırıyoruz.
+                // Doğrudan yerleştirme fonksiyonunu çağır.
                 placer.PlaceObjects();
             }
             else
             {
+                // Referans yoksa hata mesajı göster.
                 Debug.LogError("'Map Generator' referansı atanmamış!");
             }
         }
 
+        // "Clear Objects" adında, 25 piksel yüksekliğinde bir buton oluştur.
         if (GUILayout.Button("Clear Objects", GUILayout.Height(25)))
         {
+            // Butona basıldığında temizleme fonksiyonunu çağır.
             placer.ClearObjects();
         }
     }

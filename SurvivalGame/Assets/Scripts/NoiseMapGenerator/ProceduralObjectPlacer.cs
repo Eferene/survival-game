@@ -2,75 +2,101 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Bu class, Inspector'da ayarlanabilen yerleştirilebilir bir obje türünü tanımlar.
+/// Örneğin bir "Ağaç" veya "Kaya" türü oluşturup özelliklerini belirleyebilirsin.
+/// </summary>
 [System.Serializable]
 public class PlaceableObject
 {
+    [Tooltip("Inspector'da bu obje türünü tanımak için kullanılacak isim.")]
     public string name;
+    [Tooltip("Yerleştirilecek olan asıl obje prefab'ı.")]
     public GameObject prefab;
+    [Tooltip("Bu objenin spawn olabileceği minimum arazi yüksekliği (0=deniz seviyesi, 1=en yüksek tepe).")]
     [Range(0f, 1f)] public float minHeight = 0f;
+    [Tooltip("Bu objenin spawn olabileceği maksimum arazi yüksekliği.")]
     [Range(0f, 1f)] public float maxHeight = 1f;
+    [Tooltip("Bu objenin spawn olma olasılığı/yoğunluğu. Diğer objelerle rekabet eder. Higher density = more common.")]
     [Range(0f, 100f)] public float density = 10f;
+    [Tooltip("Prefab'ı yerleştirdikten sonra Y ekseninde ne kadar yukarı/aşağı kaydırılacağı.")]
     public float yOffset = 0f;
+    [Tooltip("İşaretliyse, obje bulunduğu zeminin eğimine göre hizalanır.")]
     public bool alignToSurface = false;
+    [Tooltip("İşaretliyse, objenin Y eksenindeki rotasyonu rastgele ayarlanır.")]
     public bool randomRotationY = true;
 }
 
+// Bu component'in olduğu objeye otomatik olarak bir MeshCollider eklenmesini zorunlu kılar.
 [RequireComponent(typeof(MeshCollider))]
 public class ProceduralObjectPlacer : MonoBehaviour
 {
-    [Tooltip("Objeleri yerleştirmek için harita verisini sağlayacak olan MapGenerator.")]
+    // --- Public Değişkenler (Inspector'da Görünür) ---
+    [Header("Referanslar")]
+    [Tooltip("Objeleri yerleştirmek için harita verisini sağlayacak olan MapGenerator. This is mission-critical, bro.")]
     public MapGenerator mapGenerator;
 
+    [Header("Yerleştirme Ayarları")]
+    [Tooltip("Prosedürel olarak yerleştirilecek obje türlerinin listesi.")]
     public PlaceableObject[] objectsToPlace;
+    [Tooltip("Objelerin yerleştirileceği grid'in adım aralığı. Düşük değerler daha yoğun yerleşim demektir.")]
     [Range(0.5f, 200f)]
     public float placementStep = 10f;
 
-    private float[,] heightMap;
-    private Transform objectParentContainer;
+    [Header("Hiyerarşi Ayarları")]
+    [Tooltip("Oluşturulan tüm objelerin bu parent obje altına toplanmasını sağlar. Keeps the hierarchy clean.")]
     [SerializeField] private GameObject environment;
 
-    private void OnEnable()
-    {
-        MapGenerator.OnIslandGenerated += HandleMapGeneration;
-    }
+    // --- Private Değişkenler (Kod İçinde Kullanılır) ---
+    // MapGenerator'dan alınan yükseklik haritası.
+    private float[,] heightMap;
+    // Oluşturulan objeleri hiyerarşide düzenli tutmak için kullanılan parent transform.
+    private Transform objectParentContainer;
 
-    private void OnDisable()
-    {
-        MapGenerator.OnIslandGenerated -= HandleMapGeneration;
-    }
-
+    /// <summary>
+    /// Bu metod MapGenerator tarafından çağrılır, haritanın hazır olduğunu bildirir.
+    /// </summary>
     public void HandleMapGeneration(MapData mapData)
     {
+        // Gelen harita verisini kendi değişkenimize atıyoruz.
         this.heightMap = mapData.heightMap;
 
-        // DEĞİŞTİ: Oyun modunda Coroutine, editörde delayCall kullanılıyor.
-        // Bu, MeshCollider'ın güncellenmesi için zaman tanır.
+        // Eğer oyun çalışıyorsa (Play Mode)...
         if (Application.isPlaying)
         {
+            // Collider'ın güncellenmesini beklemek için bir sonraki frame'de objeleri yerleştirecek Coroutine'i başlat.
             StartCoroutine(PlaceObjectsAfterFrame());
         }
-        else
+        else // Eğer Editör'de isek...
         {
+            // Editör donmasın diye bir sonraki update döngüsünde çalışacak şekilde ayarla.
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.delayCall += PlaceObjects;
 #endif
         }
     }
 
-    // YENİ: Oyun modunda bir frame bekleyip objeleri yerleştiren Coroutine.
+    // Oyun modunda bir frame bekleyip objeleri yerleştiren Coroutine.
     private IEnumerator PlaceObjectsAfterFrame()
     {
+        // Bir sonraki frame'e kadar bekle. This is the way.
         yield return null;
+        // Şimdi objeleri yerleştir.
         PlaceObjects();
     }
 
+    /// <summary>
+    /// Mevcut harita verisine göre objeleri yerleştirir.
+    /// </summary>
     public void PlaceObjects()
     {
+        // Başlamadan önce, önceden yerleştirilmiş tüm objeleri temizle.
         ClearObjects();
 
+        // Eğer MapGenerator referansı atanmamışsa, harita verisini ondan isteyemeyiz.
         if (mapGenerator != null)
         {
-            Debug.Log("MapGenerator'dan en güncel harita verisi isteniyor...");
+            // En güncel harita verisini MapGenerator'dan al.
             MapData? data = mapGenerator.GetLastGeneratedMapData();
             if (data.HasValue)
             {
@@ -78,12 +104,14 @@ public class ProceduralObjectPlacer : MonoBehaviour
             }
         }
 
+        // Eğer heightMap hala boşsa, hata ver ve işlemi durdur. Can't do magic without the data, kral.
         if (this.heightMap == null)
         {
             Debug.LogError("HeightMap alınamadı! Önce haritayı oluşturun ve 'Map Generator' referansını atayın.");
             return;
         }
 
+        // Gerekli olan MeshCollider'ı al. Işın göndermek için bu lazım.
         MeshCollider meshCollider = GetComponent<MeshCollider>();
         if (meshCollider == null || meshCollider.sharedMesh == null)
         {
@@ -91,12 +119,15 @@ public class ProceduralObjectPlacer : MonoBehaviour
             return;
         }
 
+        // Haritanın sınırlarını (bounds) al. Bu sınırlar içinde dolaşacağız.
         Bounds bounds = meshCollider.bounds;
 
+        // Hiyerarşide düzen için ana bir parent obje oluştur.
         GameObject mainParent = new GameObject("Procedurally Placed Objects " + gameObject.name);
         mainParent.transform.SetParent(environment.transform);
         objectParentContainer = mainParent.transform;
 
+        // Her obje türü için ayrı bir parent obje oluştur (örn: "Ağaçlar", "Kayalar").
         Dictionary<PlaceableObject, Transform> parentTransforms = new Dictionary<PlaceableObject, Transform>();
         foreach (PlaceableObject objType in objectsToPlace)
         {
@@ -105,18 +136,23 @@ public class ProceduralObjectPlacer : MonoBehaviour
             parentTransforms.Add(objType, typeParent.transform);
         }
 
+        // Haritanın x ve z eksenlerinde, belirlenen 'placementStep' aralıklarıyla dolaş.
         for (float x = bounds.min.x; x < bounds.max.x; x += placementStep)
         {
             for (float z = bounds.min.z; z < bounds.max.z; z += placementStep)
             {
+                // Yerleşimin grid gibi görünmemesi için pozisyona küçük bir rastgelelik ekle.
                 float sampleX = x + Random.Range(-placementStep / 2f, placementStep / 2f);
                 float sampleZ = z + Random.Range(-placementStep / 2f, placementStep / 2f);
                 Vector3 rayStart = new Vector3(sampleX, bounds.max.y + 10f, sampleZ);
 
+                // Bu noktadan aşağı doğru bir ışın (Raycast) göndererek zemini bul.
                 if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, 1, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
                 {
+                    // Işının çarptığı yerdeki normalize edilmiş yüksekliği (0-1 arası) al.
                     float normalizedHeight = MapGenerator.GetBilinearInterpolatedHeight(this.heightMap, hit.textureCoord.x, hit.textureCoord.y);
 
+                    // Bu yükseklikte spawn olabilecek obje türlerini bul.
                     List<PlaceableObject> candidates = new List<PlaceableObject>();
                     float totalDensity = 0f;
                     foreach (PlaceableObject objType in objectsToPlace)
@@ -128,6 +164,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
                         }
                     }
 
+                    // Eğer aday varsa, yoğunluklarına göre birini rastgele seç.
                     if (candidates.Count > 0)
                     {
                         float randomWeight = Random.Range(0f, totalDensity);
@@ -142,6 +179,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
                             randomWeight -= candidate.density;
                         }
 
+                        // Eğer bir obje seçildiyse ve prefab'ı varsa, onu oluştur (Instantiate).
                         if (chosenObject != null && chosenObject.prefab != null)
                         {
                             Vector3 position = hit.point + new Vector3(0, chosenObject.yOffset, 0);
@@ -156,14 +194,17 @@ public class ProceduralObjectPlacer : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Prosedürel obje yerleştirme tamamlandı!");
     }
 
+    /// <summary>
+    /// Bu script tarafından daha önce oluşturulmuş tüm objeleri hiyerarşiden siler.
+    /// </summary>
     public void ClearObjects()
     {
         string parentName = "Procedurally Placed Objects " + gameObject.name;
 
 #if UNITY_EDITOR
+        // Eğer oyunda değilsek (Editör'de isek) DestroyImmediate kullanmalıyız.
         if (!Application.isPlaying)
         {
             Transform existing = environment.transform.Find(parentName);
@@ -175,6 +216,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
         }
 #endif
 
+        // Eğer oyundaysak normal Destroy yeterlidir.
         if (Application.isPlaying)
         {
             Transform existing = environment.transform.Find(parentName);
@@ -184,5 +226,4 @@ public class ProceduralObjectPlacer : MonoBehaviour
             }
         }
     }
-
 }
