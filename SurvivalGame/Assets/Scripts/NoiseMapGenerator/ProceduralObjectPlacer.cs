@@ -13,11 +13,11 @@ public class PlaceableObject
     public string name;
     [Tooltip("Yerleştirilecek olan asıl obje prefab'ı.")]
     public GameObject prefab;
-    [Tooltip("Bu objenin spawn olabileceği minimum arazi yüksekliği (0=deniz seviyesi, 1=en yüksek tepe).")]
+    [Tooltip("Bu objenin spawn olabileceği minimum arazi yüksekliği.")]
     [Range(0f, 1f)] public float minHeight = 0f;
     [Tooltip("Bu objenin spawn olabileceği maksimum arazi yüksekliği.")]
     [Range(0f, 1f)] public float maxHeight = 1f;
-    [Tooltip("Bu objenin spawn olma olasılığı/yoğunluğu. Diğer objelerle rekabet eder. Higher density = more common.")]
+    [Tooltip("Bu objenin spawn olma olasılığı/yoğunluğu. Diğer objelerle rekabet eder.")]
     [Range(0f, 100f)] public float density = 10f;
     [Tooltip("Prefab'ı yerleştirdikten sonra Y ekseninde ne kadar yukarı/aşağı kaydırılacağı.")]
     public float yOffset = 0f;
@@ -31,23 +31,21 @@ public class PlaceableObject
 [RequireComponent(typeof(MeshCollider))]
 public class ProceduralObjectPlacer : MonoBehaviour
 {
-    // --- Public Değişkenler (Inspector'da Görünür) ---
-    [Header("Referanslar")]
+    [Header("References")]
     [Tooltip("Objeleri yerleştirmek için harita verisini sağlayacak olan MapGenerator. This is mission-critical, bro.")]
     public MapGenerator mapGenerator;
 
-    [Header("Yerleştirme Ayarları")]
+    [Header("Placement Settings")]
     [Tooltip("Prosedürel olarak yerleştirilecek obje türlerinin listesi.")]
-    public PlaceableObject[] objectsToPlace;
+    [SerializeField] private PlaceableObject[] objectsToPlace;
     [Tooltip("Objelerin yerleştirileceği grid'in adım aralığı. Düşük değerler daha yoğun yerleşim demektir.")]
-    [Range(0.5f, 200f)]
+    [Range(5f, 50f)]
     public float placementStep = 10f;
 
-    [Header("Hiyerarşi Ayarları")]
-    [Tooltip("Oluşturulan tüm objelerin bu parent obje altına toplanmasını sağlar. Keeps the hierarchy clean.")]
+    [Header("Hierarchy Settings")]
+    [Tooltip("Oluşturulan tüm objelerin bu parent obje altına toplanmasını sağlar.")]
     [SerializeField] private GameObject environment;
 
-    // --- Private Değişkenler (Kod İçinde Kullanılır) ---
     // MapGenerator'dan alınan yükseklik haritası.
     private float[,] heightMap;
     // Oluşturulan objeleri hiyerarşide düzenli tutmak için kullanılan parent transform.
@@ -61,7 +59,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
         // Gelen harita verisini kendi değişkenimize atıyoruz.
         this.heightMap = mapData.heightMap;
 
-        // Eğer oyun çalışıyorsa (Play Mode)...
         if (Application.isPlaying)
         {
             // Collider'ın güncellenmesini beklemek için bir sonraki frame'de objeleri yerleştirecek Coroutine'i başlat.
@@ -79,7 +76,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
     // Oyun modunda bir frame bekleyip objeleri yerleştiren Coroutine.
     private IEnumerator PlaceObjectsAfterFrame()
     {
-        // Bir sonraki frame'e kadar bekle. This is the way.
+        // Bir sonraki frame'e kadar bekle.
         yield return null;
         // Şimdi objeleri yerleştir.
         PlaceObjects();

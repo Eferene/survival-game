@@ -101,7 +101,7 @@ public class PlayerSpawnManager : MonoBehaviour
                 }
             }
 
-            // Bu kısım, (x, z) koordinatlarının spiral çizmesini sağlayan matematik. Don't touch if you don't know, mate.
+            // Bu kısım, (x, z) koordinatlarının spiral çizmesini sağlayan matematik. Don't touch if you don't know, dude.
             if ((x == z) || (x < 0 && x == -z) || (x > 0 && x == 1 - z))
             {
                 float temp = dx;

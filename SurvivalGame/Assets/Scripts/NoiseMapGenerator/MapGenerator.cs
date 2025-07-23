@@ -94,7 +94,7 @@ public class MapGenerator : MonoBehaviour
         // Eğer oyun başlangıcında otomatik harita oluşturma aktifse...
         if (autoGenerateOnStart)
         {
-            // Ada oluşturma fonksiyonunu çağır. Let's get this party started.
+            // Ada oluşturma fonksiyonunu çağır.
             GenerateIsland();
         }
     }
@@ -104,10 +104,10 @@ public class MapGenerator : MonoBehaviour
     /// </summary>
     public void GenerateIsland()
     {
-        // Rastgele bir tohum (seed) değeri oluştur. Bu, her seferinde farklı bir harita üretilmesini sağlar.
+        // Rastgele bir seed değeri oluştur. Bu, her seferinde farklı bir harita üretilmesini sağlar.
         int seed = Random.Range(0, 100000);
 
-        // Noise (gürültü) ve falloff (kenar yumuşatma) haritalarını oluştur.
+        // Noise ve falloff haritalarını oluştur.
         float[,] heightMap = Noise.GenerateNoiseMap(mapSize, mapSize, seed, noiseScale, octaves, persistence, lacunarity, offset);
         float[,] falloffMap = FalloffGenerator.GenerateSingleIslandFalloff(mapSize, islandRadius, islandFalloffPower);
 
@@ -145,7 +145,7 @@ public class MapGenerator : MonoBehaviour
         // Eğer oyuncu spawn yöneticisi varsa ve oyun çalışıyorsa (editörde değil)...
         if (playerSpawner != null && Application.isPlaying)
         {
-            // Oyuncu spawn yöneticisine haritanın hazır olduğunu bildir. Time to spawn the player, dude.
+            // Oyuncu spawn yöneticisine haritanın hazır olduğunu bildir. Time to spawn the player.
             playerSpawner.OnMapReady();
         }
     }
@@ -179,7 +179,7 @@ public class MapGenerator : MonoBehaviour
                 float v = (float)y / (texHeight - 1);
                 float currentHeight = GetBilinearInterpolatedHeight(heightMap, u, v);
 
-                // Tanımlanan bölgeler (regions) arasında dolaşarak doğru rengi bul.
+                // Tanımlanan regions arasında dolaşarak doğru rengi bul.
                 for (int i = 0; i < regions.Length; i++)
                 {
                     if (currentHeight <= regions[i].height)

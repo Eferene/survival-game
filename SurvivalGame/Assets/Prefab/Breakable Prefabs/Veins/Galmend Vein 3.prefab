@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5846373738864185257
+--- !u!1 &3535476952925728803
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1260036322859657988}
-  - component: {fileID: 6245535616796493238}
-  - component: {fileID: 7701124990467119540}
-  - component: {fileID: 5908587185209975297}
-  - component: {fileID: 9202182106843672869}
+  - component: {fileID: 180432244964434174}
+  - component: {fileID: 1065122121590754815}
+  - component: {fileID: 2983960142539215987}
+  - component: {fileID: 5902075181599945196}
+  - component: {fileID: 927474506628372994}
   m_Layer: 0
-  m_Name: Erenium 1
-  m_TagString: Erenium
+  m_Name: Galmend-2
+  m_TagString: Galmend
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1260036322859657988
+--- !u!4 &180432244964434174
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5846373738864185257}
+  m_GameObject: {fileID: 3535476952925728803}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.43496594, y: -0.55749863, z: -0.5574985, w: 0.43496594}
-  m_LocalPosition: {x: 0.7659031, y: 0.7440449, z: 0.09514284}
-  m_LocalScale: {x: 35.000008, y: 35.000008, z: 35}
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0.561, z: 0}
+  m_LocalScale: {x: 30, y: 30, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -104.077}
---- !u!33 &6245535616796493238
+  m_Father: {fileID: 2717537669434339130}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!33 &1065122121590754815
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5846373738864185257}
-  m_Mesh: {fileID: -5280727647475760728, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
---- !u!23 &7701124990467119540
+  m_GameObject: {fileID: 3535476952925728803}
+  m_Mesh: {fileID: -8229977822963125352, guid: 68685cc3d024f68418975c2758f00ed6, type: 3}
+--- !u!23 &2983960142539215987
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5846373738864185257}
+  m_GameObject: {fileID: 3535476952925728803}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b71c230f40b5e114198da95f3533b5a1, type: 2}
+  - {fileID: 2100000, guid: adb4de758a870af4a86bd0370ae67c1e, type: 2}
   - {fileID: 2100000, guid: 1b1304cef58ed6b48a063a7f77bb7422, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -89,31 +89,31 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5908587185209975297
+--- !u!114 &5902075181599945196
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5846373738864185257}
+  m_GameObject: {fileID: 3535476952925728803}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 251498d90ad0137408a9a561283bf56e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 150
+  hp: 200
   drops:
-  - drop: {fileID: 1284017658565679969, guid: 3259f4d2ee8486e4c8866d34035e6ddb, type: 3}
+  - drop: {fileID: 6848602941623016924, guid: 2396ff604d0ec874cb29cf0221321ae7, type: 3}
     minDrop: 1
-    maxDrop: 4
+    maxDrop: 3
   hasParent: 1
---- !u!65 &9202182106843672869
+--- !u!65 &927474506628372994
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5846373738864185257}
+  m_GameObject: {fileID: 3535476952925728803}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -126,5 +126,37 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.057576414, y: 0.07315731, z: 0.042222045}
-  m_Center: {x: 0.0007645283, y: 0.0013026351, z: -0.00014740785}
+  m_Size: {x: 0.061271414, y: 0.07059926, z: 0.04551657}
+  m_Center: {x: 0.0031598574, y: 0.00013288666, z: 0.0035096065}
+--- !u!1 &8010948203469593588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2717537669434339130}
+  m_Layer: 0
+  m_Name: Galmend Vein 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2717537669434339130
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8010948203469593588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.83, y: 0.016460657, z: 3.19}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 180432244964434174}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
