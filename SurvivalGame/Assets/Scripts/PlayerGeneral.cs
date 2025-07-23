@@ -164,10 +164,22 @@ public class PlayerGeneral : MonoBehaviour
                                     lastHitTime = Time.time;
                                     GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
                                     damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
-                                    damageText.transform.localScale = Vector3.one * 0.2f; // Sabit, her objede aynı büyüklükte
+                                    damageText.transform.localScale = Vector3.one * 0.2f;
                                     damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
                                 }
                             }
+                        }
+                        else
+                        {
+                            if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
+                            {
+                                lastHitTime = Time.time;
+                                GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
+                                damageText.GetComponent<TextMeshPro>().text = "0";
+                                damageText.transform.localScale = Vector3.one * 0.2f;
+                                damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
+                            }
+
                         }
                     }
                 }

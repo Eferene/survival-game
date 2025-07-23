@@ -21,6 +21,8 @@ public class ButtonController : MonoBehaviour
         if (ui != null)
         {
             ui.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 }

@@ -34,6 +34,8 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private GameObject dropItemUI;
     [SerializeField] private Slider dropItemSlider;
     [SerializeField] private TextMeshProUGUI dropItemText;
+    [SerializeField] private TextMeshProUGUI itemNameText;
+    [SerializeField] private TextMeshProUGUI itemDescriptionText;
     private bool isDropUIOpen = false;
     bool isInventoryOpen = false;
 
@@ -242,8 +244,14 @@ public class PlayerInventory : MonoBehaviour
                 if (index >= 0 && inventorySlots[index].itemData != null)
                 {
                     if (selectedSlotIndex == index) return;
-                    
+
                     selectedSlotIndex = index;
+
+                    itemNameText.gameObject.SetActive(true);
+                    itemDescriptionText.gameObject.SetActive(true);
+                    itemNameText.text = inventorySlots[index].itemData.itemName;
+                    itemDescriptionText.text = inventorySlots[index].itemData.itemDescription;
+
                     if (handItemGO != null)
                     {
                         Destroy(handTransform.GetChild(0).gameObject);
@@ -254,6 +262,19 @@ public class PlayerInventory : MonoBehaviour
                         UpdateHandItem(index);
                     }
                 }
+                else if (index >= 0 && inventorySlots[index].itemData == null)
+                {
+                    selectedSlotIndex = -1;
+                    itemNameText.gameObject.SetActive(false);
+                    itemDescriptionText.gameObject.SetActive(false);
+                    if (handItemGO != null)
+                    {
+                        Destroy(handItemGO);
+                        handItemGO = null;
+                        handItem = null;
+                    }
+                    UpdateHandItem(-1);
+                }
             }
         }
     }
@@ -261,6 +282,12 @@ public class PlayerInventory : MonoBehaviour
     private void UpdateHandItem(int index)
     {
         if (handTransform.childCount > 0) Destroy(handTransform.GetChild(0).gameObject);
+        if (selectedSlotIndex == -1)
+        {
+            itemNameText.gameObject.SetActive(false);
+            itemDescriptionText.gameObject.SetActive(false);
+            return;
+        }
 
         ItemData itemData = inventorySlots[index].itemData;
         handItem = itemData;
