@@ -87,7 +87,6 @@ public class ProceduralObjectPlacer : MonoBehaviour
     /// </summary>
     public void PlaceObjects()
     {
-        // Başlamadan önce, önceden yerleştirilmiş tüm objeleri temizle.
         ClearObjects();
 
         // Eğer MapGenerator referansı atanmamışsa, harita verisini ondan isteyemeyiz.
