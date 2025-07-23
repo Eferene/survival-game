@@ -60,11 +60,12 @@ public class PlayerGeneral : MonoBehaviour
     private float lastHitTime = -1f;
     private float hitCooldown = 0.5f;
 
-    //Camera
-    [SerializeField] Transform cameraTransform;
-
     [Header("Raycast & Input Settings")]
     public bool canHit;
+
+    [Header("Other Things")]
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private TextMeshProUGUI characterDialogText;
 
     private void Awake()
     {
@@ -129,13 +130,33 @@ public class PlayerGeneral : MonoBehaviour
             {
                 if (hit.collider.CompareTag("Item") || hit.collider.CompareTag("Consumable"))
                 {
-                    Debug.DrawLine(cameraTransform.position, hit.point, Color.red);
                     if (canHit && playerInputActions.Player.Interaction.triggered)
                     {
                         if (hit.collider.gameObject.GetComponent<Object>().item != null)
                         {
-                            playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
-                            Destroy(hit.collider.gameObject);
+                            bool itemAdded = false;
+                            foreach (var slots in playerInventory.inventorySlots)
+                            {
+                                if (slots.itemData == null)
+                                {
+                                    Debug.DrawLine(cameraTransform.position, hit.point, Color.red);
+                                    playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
+                                    Destroy(hit.collider.gameObject);
+                                    itemAdded = true;
+                                    break;
+                                }
+                            }
+                            if (!itemAdded)
+                            {
+                                characterDialogText.transform.localScale = Vector3.one;
+                                characterDialogText.text = "Inventory is full!";
+                                characterDialogText.gameObject.SetActive(true);
+                                Tween myTween = characterDialogText.transform.DOScale(1.2f, 0.5f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+                                DOVirtual.DelayedCall(2f, () => {
+                                    myTween.Kill();
+                                    characterDialogText.gameObject.SetActive(false);
+                                });
+                            }
                         }
                     }
                 }

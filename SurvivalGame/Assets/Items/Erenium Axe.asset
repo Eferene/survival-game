@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemID: 101
   itemName: Erenium Axe
-  itemDescription: A erenium axe for chopping wood. It's strong. You can chop big
-    trees.
+  itemDescription: A erenium axe for chopping wood. You can chop bigger trees.
   itemIcon: {fileID: 21300000, guid: d80c323f659c6c248ae55238c0263ecb, type: 3}
   itemPrefab: {fileID: 5792404576503917507, guid: e47a6845614c235409972fc1dcf7890c, type: 3}
   isStackable: 0

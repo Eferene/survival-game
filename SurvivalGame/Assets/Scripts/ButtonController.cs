@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Cinemachine;
 
 public class ButtonController : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class ButtonController : MonoBehaviour
     {
         if (ui != null)
         {
+            GameObject fpscam = GameObject.FindGameObjectWithTag("FPSCam");
+            fpscam.GetComponent<CinemachineInputAxisController>().enabled = true;
             ui.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;

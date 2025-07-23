@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2746607e003eb4682e073ca352e3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: add07c798a1305e42b5f5f658aa2bb66, type: 2}
+  item: {fileID: 11400000, guid: 6f26500235b80244aa4d4c1ea2ec4e0d, type: 2}
   quantity: 1
   physics: 0
   inHand: 0

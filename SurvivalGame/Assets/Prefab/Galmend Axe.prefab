@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2746607e003eb4682e073ca352e3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: eedd134c64a853a4cabb837e39438565, type: 2}
+  item: {fileID: 11400000, guid: 20335f320ece60a4e85fd7627c5e088d, type: 2}
   quantity: 1
   physics: 0
   inHand: 0
