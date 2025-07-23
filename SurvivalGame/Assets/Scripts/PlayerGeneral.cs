@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using System.Linq;
 
 public class PlayerGeneral : MonoBehaviour
 {
@@ -173,7 +174,7 @@ public class PlayerGeneral : MonoBehaviour
                     ToolItem toolItem = playerInventory.handItem as ToolItem;
                     for (int i = 0; i < toolItem.effectiveTags.Length; i++)
                     {
-                        if (hit.collider.CompareTag(toolItem.effectiveTags[i]))
+                        if (toolItem.effectiveTags.Contains(hit.collider.tag))
                         {
                             if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
                             {
@@ -190,7 +191,7 @@ public class PlayerGeneral : MonoBehaviour
                                 }
                             }
                         }
-                        else
+                        else if(!toolItem.effectiveTags.Contains(hit.collider.tag) && hit.collider.tag != "Ground" && hit.collider.tag != "Untagged" && hit.collider.tag != "Item" && hit.collider.tag != "Consumable")
                         {
                             if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
                             {
@@ -200,7 +201,6 @@ public class PlayerGeneral : MonoBehaviour
                                 damageText.transform.localScale = Vector3.one * 0.2f;
                                 damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
                             }
-
                         }
                     }
                 }

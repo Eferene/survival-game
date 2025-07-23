@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 1710084003379475180}
   - component: {fileID: -8534097870410418289}
   m_Layer: 0
-  m_Name: Galmend Axe 1
+  m_Name: Galmend Pickaxe
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
