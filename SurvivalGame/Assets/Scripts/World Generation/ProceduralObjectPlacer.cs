@@ -19,6 +19,8 @@ public class PlaceableObject
     [Range(0f, 1f)] public float maxHeight = 1f;
     [Tooltip("Bu objenin spawn olma olasılığı/yoğunluğu. Diğer objelerle rekabet eder.")]
     [Range(0f, 100f)] public float density = 10f;
+    [Tooltip("Bu objenin spawn olma ihtimali. 0-100 arasında bir değer. 100, her zaman spawn olur demektir.")]
+    [Range(0f, 100f)] public float spawnChance = 100f;
     [Tooltip("Prefab'ı yerleştirdikten sonra Y ekseninde ne kadar yukarı/aşağı kaydırılacağı.")]
     public float yOffset = 0f;
     [Tooltip("İşaretliyse, obje bulunduğu zeminin eğimine göre hizalanır.")]
@@ -178,13 +180,18 @@ public class ProceduralObjectPlacer : MonoBehaviour
                         // Eğer bir obje seçildiyse ve prefab'ı varsa, onu oluştur (Instantiate).
                         if (chosenObject != null && chosenObject.prefab != null)
                         {
-                            Vector3 position = hit.point + new Vector3(0, chosenObject.yOffset, 0);
-                            Quaternion rotation = chosenObject.alignToSurface ? Quaternion.FromToRotation(Vector3.up, hit.normal) : Quaternion.identity;
-                            if (chosenObject.randomRotationY)
+                            float luckyNumber = Random.Range(0f, 100f);
+
+                            if (luckyNumber <= chosenObject.spawnChance)
                             {
-                                rotation *= Quaternion.Euler(0, Random.Range(0, 360), 0);
+                                Vector3 position = hit.point + new Vector3(0, chosenObject.yOffset, 0);
+                                Quaternion rotation = chosenObject.alignToSurface ? Quaternion.FromToRotation(Vector3.up, hit.normal) : Quaternion.identity;
+                                if (chosenObject.randomRotationY)
+                                {
+                                    rotation *= Quaternion.Euler(0, Random.Range(0, 360), 0);
+                                }
+                                Instantiate(chosenObject.prefab, position, rotation, parentTransforms[chosenObject]);
                             }
-                            Instantiate(chosenObject.prefab, position, rotation, parentTransforms[chosenObject]);
                         }
                     }
                 }

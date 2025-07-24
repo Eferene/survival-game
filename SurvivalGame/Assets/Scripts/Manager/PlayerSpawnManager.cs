@@ -23,7 +23,7 @@ public class PlayerSpawnManager : MonoBehaviour
 
     // --- Private Değişkenler ---
     // Haritanın fiziksel collider'ı. Işın göndermek için kullanılır.
-    private MeshCollider terrainCollider;
+    private MeshCollider meshCollider;
 
     /// <summary>
     /// Bu metod, MapGenerator tarafından harita hazır olduğunda tetiklenir.
@@ -38,8 +38,8 @@ public class PlayerSpawnManager : MonoBehaviour
         }
 
         // Haritanın collider'ını al. Bu çok önemli, çünkü zemini bununla bulacağız.
-        terrainCollider = mapGenerator.GetComponentInChildren<MeshCollider>();
-        if (terrainCollider == null)
+        meshCollider = mapGenerator.GetComponentInChildren<MeshCollider>();
+        if (meshCollider == null)
         {
             Debug.LogError("Haritada MeshCollider bulunamadı! Karakter pozisyonu ayarlanamıyor.");
             return;
@@ -67,7 +67,8 @@ public class PlayerSpawnManager : MonoBehaviour
         else
         {
             // Uygun bir yer bulunamadıysa hata ver. Muhtemelen bütün harita su altında kaldı.
-            Debug.LogError("Haritada spawn için uygun bir yer bulunamadı. Bütün harita su olabilir mi?");
+            Debug.LogError("Haritada spawn için uygun bir yer bulunamadı.");
+            playerCharacter.transform.position = new Vector3(0f,50f,0f);
         }
     }
 
@@ -89,8 +90,8 @@ public class PlayerSpawnManager : MonoBehaviour
         while (steps < maxSteps)
         {
             // Mevcut arama noktasından aşağı doğru bir ışın gönder.
-            Vector3 currentPoint = new Vector3(x, terrainCollider.bounds.max.y + 10f, z);
-            if (Physics.Raycast(currentPoint, Vector3.down, out RaycastHit hit, 500f) && hit.collider == terrainCollider)
+            Vector3 currentPoint = new Vector3(x, meshCollider.bounds.max.y + 10f, z);
+            if (Physics.Raycast(currentPoint, Vector3.down, out RaycastHit hit, 500f) && hit.collider == meshCollider)
             {
                 // Eğer ışının çarptığı yerin yüksekliği minimum yükseklikten fazlaysa...
                 if (hit.point.y > minWorldHeight)
