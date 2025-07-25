@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using NaughtyAttributes;
 
 public class Breakable : MonoBehaviour
 {
@@ -30,15 +31,54 @@ public class Breakable : MonoBehaviour
         {
             for (int j = 0; j < drops.Length; j++)
             {
-                GameObject newDrop = Instantiate(drops[j].drop, transform.position, Quaternion.identity);
-                newDrop.GetComponent<Object>().quantity = Random.Range(drops[j].minDrop, drops[j].maxDrop + 1);
-                newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
+                GameObject drop = drops[j].drop;
+                int dropCount = Random.Range(drops[j].minDrop, drops[j].maxDrop + 1);
+
+                Object dropObj = drop.GetComponent<Object>();
+                int maxStack = dropObj.item.maxStackSize;
+
+                if (!dropObj.item.isStackable)
+                {
+                    for (int i = 0; i < dropCount; i++)
+                    {
+                        Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 1, Random.Range(-0.5f, 0.5f));
+                        Vector3 spawnPos = transform.position + randomOffset;
+
+                        GameObject newDrop = Instantiate(drops[j].drop, spawnPos, Quaternion.identity);
+                        newDrop.GetComponent<Object>().quantity = 1;
+                        newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
+                    }
+                }
+                else
+                {
+                    while (dropCount > 0)
+                    {
+                        if (dropCount <= maxStack)
+                        {
+                            Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 1, Random.Range(-0.5f, 0.5f));
+                            Vector3 spawnPos = transform.position + randomOffset;
+
+                            GameObject newDrop = Instantiate(drops[j].drop, spawnPos, Quaternion.identity);
+                            newDrop.GetComponent<Object>().quantity = dropCount;
+                            newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
+                            break;
+                        }
+                        else
+                        {
+                            GameObject newDrop = Instantiate(drops[j].drop, transform.position, Quaternion.identity);
+                            newDrop.GetComponent<Object>().quantity = maxStack;
+                            newDrop.GetComponent<Object>().SetPhysicsEnabled(true);
+                            dropCount -= maxStack;
+                        }
+                    }
+                }
             }
             DOTween.Kill(obj.transform);
             Destroy(obj);
         }
     }
 }
+
 
 [System.Serializable]
 public class Drop

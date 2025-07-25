@@ -389,7 +389,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 150
-  drops: []
+  drops:
+  - drop: {fileID: 8930191586033691922, guid: 21edcd6efabd12340a43521946ab5804, type: 3}
+    minDrop: 2
+    maxDrop: 3
+  - drop: {fileID: 6619385385657764855, guid: 46c420179d473b241afca69841680e8d, type: 3}
+    minDrop: 1
+    maxDrop: 3
   hasParent: 1
 --- !u!1 &6653878990566145956
 GameObject:
