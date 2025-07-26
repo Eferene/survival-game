@@ -17,6 +17,12 @@ public class ButtonController : MonoBehaviour
         }
     }
 
+    public void CloseDropUI()
+    {
+        PlayerInventory playerInventory = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerInventory>();
+        playerInventory.OpenCloseDropUI();
+    }
+
     public void CloseUI(GameObject ui)
     {
         if (ui != null)

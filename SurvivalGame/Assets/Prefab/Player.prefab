@@ -111,7 +111,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3103284181115588581}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: fed8cc144c2097e4c80babaa5a6b8537, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -173,8 +173,6 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   isGrounded: 0
   transitionSpeed: 5
-  playerInventory: {fileID: 0}
-  damageTextPrefab: {fileID: 5481048422191962130, guid: 0d65dd2d93ae40445872a7421b182ceb, type: 3}
 --- !u!114 &5024548894498299344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,6 +192,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaDecreaseRate: 10
   staminaIncreaseRate: 20
+  jumpStaminaCost: 10
   currentHunger: 0
   maxHunger: 100
   hungerDecreaseRate: 0.1
@@ -205,6 +204,10 @@ MonoBehaviour:
   thirstBar: {fileID: 0}
   staminaBar: {fileID: 0}
   staminaBG: {fileID: 0}
+  damageTextPrefab: {fileID: 5481048422191962130, guid: 0d65dd2d93ae40445872a7421b182ceb, type: 3}
+  canHit: 0
+  cameraTransform: {fileID: 437529664689249707}
+  characterDialogText: {fileID: 0}
 --- !u!114 &9124616240012862849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,10 +222,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handItem: {fileID: 0}
   handItemGO: {fileID: 0}
-  inventoryPanelGO: {fileID: 0}
-  isHoldingKey: 0
+  selectedSlotIndex: -1
   playerCamera: {fileID: 0}
   crosshair: {fileID: 0}
+  inventoryPanelGO: {fileID: 0}
+  isHoldingKey: 0
   inventorySlots:
   - itemData: {fileID: 0}
     quantity: 0
@@ -252,6 +256,11 @@ MonoBehaviour:
   raycaster: {fileID: 0}
   eventSystem: {fileID: 0}
   handTransform: {fileID: 6404368015577463499}
+  dropItemUI: {fileID: 0}
+  dropItemSlider: {fileID: 0}
+  dropItemText: {fileID: 0}
+  itemNameText: {fileID: 0}
+  itemDescriptionText: {fileID: 0}
 --- !u!1 &5532812844677056779
 GameObject:
   m_ObjectHideFlags: 0

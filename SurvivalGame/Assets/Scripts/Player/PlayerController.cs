@@ -73,10 +73,11 @@ public class PlayerController : MonoBehaviour
         if (isSprinting && playerGeneral.CurrentStamina > 0)
         {
             currentSpeed = sprintSpeed; // Sprint hızını kullan
+            playerGeneral.CurrentStamina -= playerGeneral.staminaDecreaseRate * Time.fixedDeltaTime;
             if (playerGeneral.CurrentStamina <= 0)
             {
                 isSprinting = false;
-                lastSprintTime = Time.time; 
+                lastSprintTime = Time.time;
             }
             targetFOV = 70f; // Sprint sırasında kamera FOV'sini artır
         }
