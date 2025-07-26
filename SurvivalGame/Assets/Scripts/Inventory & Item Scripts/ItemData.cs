@@ -14,7 +14,7 @@ public abstract class ItemData : ScriptableObject
     public Vector3 handRotation;
     public bool isCraftable;
 
-    [ShowIf("isCraftable")] public bool canCraftInHand;
+    [ShowIf("isCraftable")] public CraftingType craftingType;
     [ShowIf("isCraftable")] public CraftingData[] crafting;
 
     public abstract ItemType itemType { get; }
@@ -34,4 +34,10 @@ public enum ItemType
     Weapon,
     Consumable,
     Clothing
+}
+
+public enum CraftingType
+{
+    Hand,
+    Workbench
 }

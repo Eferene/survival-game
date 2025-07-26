@@ -21,9 +21,13 @@ MonoBehaviour:
   maxStackSize: 1
   handPosition: {x: 0, y: 0, z: 0}
   handRotation: {x: 0, y: 0, z: 0}
-  isCraftable: 0
-  canCraftInHand: 0
-  crafting: []
+  isCraftable: 1
+  craftingType: 0
+  crafting:
+  - craftingMaterial: {fileID: 11400000, guid: ed2c365cbe9f2cb428a5eb8888daa506, type: 2}
+    craftingMaterialAmount: 2
+  - craftingMaterial: {fileID: 11400000, guid: 57889826ab83122468e614f322bcc4d4, type: 2}
+    craftingMaterialAmount: 2
   minEfficiency: 10
   maxEfficiency: 15
   effectiveTags:

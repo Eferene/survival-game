@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
-  m_Name: Galmend Pickaxe
+  m_Name: Erenium Pickaxe
   m_EditorClassIdentifier: 
   itemID: 102
-  itemName: Galmend Pickaxe
-  itemDescription: You can break stone, erenium and galmend with it. It's directly
-    from another universe!
-  itemIcon: {fileID: 21300000, guid: a16ef45361e4ce74d9492a6cb9e5f140, type: 3}
-  itemPrefab: {fileID: 6122146539804042376, guid: 5a53db7d0c425dd4caa1de1590318688, type: 3}
+  itemName: Erenium Pickaxe
+  itemDescription: You can break stone, erenium and galmend with it. Like a pickaxe
+    from another universe.
+  itemIcon: {fileID: 21300000, guid: ee1b6bde5a893b647b3ffe33f4726714, type: 3}
+  itemPrefab: {fileID: 1049825607691609232, guid: ea51d6cabc3b9944c8010f0b564995e7, type: 3}
   isStackable: 0
   maxStackSize: 1
   handPosition: {x: 0, y: 0, z: 0}
   handRotation: {x: 0, y: 0, z: 0}
-  isCraftable: 0
-  canCraftInHand: 0
+  isCraftable: 1
+  craftingType: 1
   crafting: []
-  minEfficiency: 40
-  maxEfficiency: 45
+  minEfficiency: 25
+  maxEfficiency: 30
   effectiveTags:
   - Rock
   - Erenium
