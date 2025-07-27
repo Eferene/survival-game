@@ -138,7 +138,46 @@ public class PlayerGeneral : MonoBehaviour
                             bool itemAdded = false;
                             foreach (var slots in playerInventory.inventorySlots)
                             {
-                                if (slots.itemData == null)
+                                if (slots.itemData != null)
+                                {
+                                    if (slots.itemData == hit.collider.gameObject.GetComponent<Object>().item)
+                                    {
+                                        if (hit.collider.gameObject.GetComponent<Object>().quantity + slots.quantity <= slots.itemData.maxStackSize)
+                                        {
+                                            playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
+                                            slots.quantity += hit.collider.gameObject.GetComponent<Object>().quantity;
+                                            Destroy(hit.collider.gameObject);
+                                            itemAdded = true;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            if (slots.quantity != slots.itemData.maxStackSize)
+                                            {
+                                                playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, slots.itemData.maxStackSize - slots.quantity);
+                                                hit.collider.gameObject.GetComponent<Object>().quantity -= slots.itemData.maxStackSize - slots.quantity;
+                                                slots.quantity = slots.itemData.maxStackSize;
+                                                itemAdded = true;
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                Debug.DrawLine(cameraTransform.position, hit.point, Color.red);
+                                                characterDialogText.transform.localScale = Vector3.one;
+                                                characterDialogText.text = "Inventory is full!";
+                                                characterDialogText.gameObject.SetActive(true);
+                                                Tween myTween = characterDialogText.transform.DOScale(1.2f, 0.5f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+                                                DOVirtual.DelayedCall(2f, () =>
+                                                {
+                                                    myTween.Kill();
+                                                    characterDialogText.gameObject.SetActive(false);
+                                                });
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (slots.itemData == null)
                                 {
                                     Debug.DrawLine(cameraTransform.position, hit.point, Color.red);
                                     playerInventory.AddItemToInventory(hit.collider.gameObject.GetComponent<Object>().item, hit.collider.gameObject.GetComponent<Object>().quantity);
