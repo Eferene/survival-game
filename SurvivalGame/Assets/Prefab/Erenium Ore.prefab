@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3412286095631380945}
   - component: {fileID: 6524902041822605293}
   - component: {fileID: 8770725449658035088}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium Ore
   m_TagString: Item
   m_Icon: {fileID: 0}

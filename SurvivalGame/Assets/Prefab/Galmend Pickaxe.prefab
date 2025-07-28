@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8681168353420125094}
   - component: {fileID: 7115264784276219522}
   - component: {fileID: 5244996905318553417}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 5657853247972652323}
   - component: {fileID: 3315546678205361157}
   - component: {fileID: 5592243195685936435}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 2300361420945055137}
   - component: {fileID: 1710084003379475180}
   - component: {fileID: -8534097870410418289}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend Pickaxe
   m_TagString: Item
   m_Icon: {fileID: 0}

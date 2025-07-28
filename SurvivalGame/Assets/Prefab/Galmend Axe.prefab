@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7954339077321059391}
   - component: {fileID: 1485689274052774216}
   - component: {fileID: 538488716226971494}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 6745927786577076868}
   - component: {fileID: 569594076920659773}
   - component: {fileID: 2519770521421171241}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend Axe
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 2678621077220153123}
   - component: {fileID: 5300294288619440453}
   - component: {fileID: 83166067994629585}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}

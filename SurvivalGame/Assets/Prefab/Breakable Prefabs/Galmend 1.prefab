@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 748104710751532034}
   - component: {fileID: 776139115574950832}
   - component: {fileID: 6678431514765043111}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend-1
   m_TagString: Galmend
   m_Icon: {fileID: 0}
@@ -137,7 +137,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2003301940023659769}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3576893173646052876}
   - component: {fileID: 1272382986785831242}
   - component: {fileID: -3118265772682827406}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium Pickaxe
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 8396647496099777167}
   - component: {fileID: 6581769929488892525}
   - component: {fileID: 6007449783318274153}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 6584573047788387459}
   - component: {fileID: 6101553311880253537}
   - component: {fileID: 4025028123054344732}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

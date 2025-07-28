@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5524423989708099153}
   - component: {fileID: 2283128531941819374}
   - component: {fileID: 5639985581699420638}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend Ore
   m_TagString: Item
   m_Icon: {fileID: 0}

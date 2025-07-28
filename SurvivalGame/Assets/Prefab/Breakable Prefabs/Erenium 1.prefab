@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9038682304599883994}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 7741919194611617274}
   - component: {fileID: 2637908390873268426}
   - component: {fileID: 7028087176799419547}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium-1
   m_TagString: Erenium
   m_Icon: {fileID: 0}

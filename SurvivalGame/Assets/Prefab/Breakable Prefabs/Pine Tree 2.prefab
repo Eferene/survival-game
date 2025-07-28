@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8199120194107064079}
   - component: {fileID: 8017917866153783094}
   - component: {fileID: 3650260120560338592}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PT-Leaf1.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3783508938031933004}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pine Tree 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 3868012756908184072}
   - component: {fileID: 277578863230894342}
   - component: {fileID: 4537308136692000049}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PT-Leaf2.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -217,7 +217,7 @@ GameObject:
   - component: {fileID: 7674437436707357094}
   - component: {fileID: 8292355657196920975}
   - component: {fileID: 8083634116226105908}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PT-Body.001
   m_TagString: Tree
   m_Icon: {fileID: 0}
@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 2022363070129533793}
   - component: {fileID: 3166742237289048473}
   - component: {fileID: 9214064003820024197}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PT-Leaf3.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}

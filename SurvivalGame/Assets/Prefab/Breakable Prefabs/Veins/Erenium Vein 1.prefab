@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8511966539379626356}
   - component: {fileID: 9088596679108146733}
   - component: {fileID: 5186167237585251930}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium-3
   m_TagString: Erenium
   m_Icon: {fileID: 0}
@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 5365865659144516896}
   - component: {fileID: 3537635601507674057}
   - component: {fileID: 7869752572955934071}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium-2
   m_TagString: Erenium
   m_Icon: {fileID: 0}
@@ -269,7 +269,7 @@ GameObject:
   - component: {fileID: 1499357781374611694}
   - component: {fileID: 1439616178946553392}
   - component: {fileID: 7881377706536697926}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium-1
   m_TagString: Erenium
   m_Icon: {fileID: 0}
@@ -393,7 +393,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6438175184408520842}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium Vein 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

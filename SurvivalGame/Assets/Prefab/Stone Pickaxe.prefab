@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8336555333174671409}
   - component: {fileID: 4484206448914048380}
   - component: {fileID: 4604665987636964012}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6760793406969598228}
   - component: {fileID: 6064483326246379174}
   - component: {fileID: 245484532736324329}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 7335143534464632290}
   - component: {fileID: 544337837853314282}
   - component: {fileID: 6988808362433927260}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stone Pickaxe
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -224,6 +224,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: add07c798a1305e42b5f5f658aa2bb66, type: 2}
   quantity: 1
   physics: 0
+  inHand: 0
 --- !u!54 &7335143534464632290
 Rigidbody:
   m_ObjectHideFlags: 0

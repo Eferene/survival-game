@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1565107272947630245}
   - component: {fileID: 4352411613345773229}
   - component: {fileID: 3975143659784391664}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 5361874185353460935}
   - component: {fileID: 4861413503058918247}
   - component: {fileID: 2925921180682161329}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stone Axe
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -137,6 +137,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: eedd134c64a853a4cabb837e39438565, type: 2}
   quantity: 1
   physics: 0
+  inHand: 0
 --- !u!65 &4861413503058918247
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -196,7 +197,7 @@ GameObject:
   - component: {fileID: 8620483690852196081}
   - component: {fileID: 5493479998716921672}
   - component: {fileID: 7428943348077284889}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

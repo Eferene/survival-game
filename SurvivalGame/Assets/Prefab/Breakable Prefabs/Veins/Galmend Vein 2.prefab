@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7686164651281403759}
   - component: {fileID: 5816783976112350102}
   - component: {fileID: 1745624198419756586}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: 'Galmend-3 '
   m_TagString: Galmend
   m_Icon: {fileID: 0}
@@ -137,7 +137,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3877055145147063329}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend Vein 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 9126232007658079884}
   - component: {fileID: 4452026630386313349}
   - component: {fileID: 2536491784472357338}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Galmend-2
   m_TagString: Galmend
   m_Icon: {fileID: 0}

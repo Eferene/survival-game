@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8730249156126600527}
   - component: {fileID: 6174860498632475629}
   - component: {fileID: 7430932403742645791}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium Axe
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 8144072557182915111}
   - component: {fileID: 4578813861651988774}
   - component: {fileID: 5280635814414897519}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 4089565819747371667}
   - component: {fileID: 1891057158431511373}
   - component: {fileID: 5928764511240024224}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -280,6 +280,15 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LoadScene"",
+                    ""type"": ""Button"",
+                    ""id"": ""96cb418b-935d-416c-b991-914d84b5d04c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -304,6 +313,17 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""381207e7-deb6-4af4-833d-b87366b98442"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LoadScene"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -322,6 +342,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Inventory = m_UI.FindAction("Inventory", throwIfNotFound: true);
         m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
+        m_UI_LoadScene = m_UI.FindAction("LoadScene", throwIfNotFound: true);
     }
 
     ~@Input()
@@ -556,6 +577,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
     private readonly InputAction m_UI_Inventory;
     private readonly InputAction m_UI_Point;
+    private readonly InputAction m_UI_LoadScene;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -575,6 +597,10 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Point".
         /// </summary>
         public InputAction @Point => m_Wrapper.m_UI_Point;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/LoadScene".
+        /// </summary>
+        public InputAction @LoadScene => m_Wrapper.m_UI_LoadScene;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -607,6 +633,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @Point.started += instance.OnPoint;
             @Point.performed += instance.OnPoint;
             @Point.canceled += instance.OnPoint;
+            @LoadScene.started += instance.OnLoadScene;
+            @LoadScene.performed += instance.OnLoadScene;
+            @LoadScene.canceled += instance.OnLoadScene;
         }
 
         /// <summary>
@@ -624,6 +653,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @Point.started -= instance.OnPoint;
             @Point.performed -= instance.OnPoint;
             @Point.canceled -= instance.OnPoint;
+            @LoadScene.started -= instance.OnLoadScene;
+            @LoadScene.performed -= instance.OnLoadScene;
+            @LoadScene.canceled -= instance.OnLoadScene;
         }
 
         /// <summary>
@@ -728,5 +760,12 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPoint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LoadScene" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLoadScene(InputAction.CallbackContext context);
     }
 }

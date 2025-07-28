@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6601563937924522430}
   - component: {fileID: 5218829946817669365}
   - component: {fileID: 1417171437403313907}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium-2
   m_TagString: Erenium
   m_Icon: {fileID: 0}
@@ -137,7 +137,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6148511582959701574}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Erenium Vein 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
