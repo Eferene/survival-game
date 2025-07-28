@@ -9,7 +9,7 @@ public class PlayerSpawnManager : MonoBehaviour
     [Header("Referanslar")]
     [Tooltip("Haritayı oluşturan ana script. Nereye spawn olacağımızı bilmek için bu şart.")]
     public MapGenerator mapGenerator;
-    [Tooltip("Pozisyonu ayarlanacak, sahnede zaten var olan karakter objesi. We ain't spawning a new one, just moving this dude.")]
+    [Tooltip("Pozisyonu ayarlanacak, sahnede zaten var olan karakter objesi.")]
     public GameObject playerCharacter;
 
     [Header("Spawn Ayarları")]
@@ -61,14 +61,14 @@ public class PlayerSpawnManager : MonoBehaviour
         if (TryFindSafeSpawnPoint(out Vector3 spawnPoint))
         {
             // Nokta bulunduysa, karakteri oraya ışınla.
-            playerCharacter.transform.position = spawnPoint;
+            playerCharacter.transform.position = new Vector3(spawnPoint.x, spawnPoint.y + 5, spawnPoint.z);
             playerCharacter.transform.rotation = Quaternion.identity; // Rotasyonu sıfırlamak temiz bir başlangıç sağlar.
         }
         else
         {
             // Uygun bir yer bulunamadıysa hata ver. Muhtemelen bütün harita su altında kaldı.
             Debug.LogError("Haritada spawn için uygun bir yer bulunamadı.");
-            playerCharacter.transform.position = new Vector3(0f,50f,0f);
+            playerCharacter.transform.position = new Vector3(0f, 50f, 0f);
         }
     }
 
@@ -81,7 +81,8 @@ public class PlayerSpawnManager : MonoBehaviour
     private bool TryFindSafeSpawnPoint(out Vector3 safePoint)
     {
         // Minumum dünya yüksekliğini hesapla (normalize değeri gerçek yüksekliğe çevir).
-        float minWorldHeight = minSpawnNormalizedHeight * mapGenerator.meshHeightMultiplier;
+        float normalizedHeightFromCurve = mapGenerator.meshHeightCurve.Evaluate(minSpawnNormalizedHeight);
+        float minWorldHeight = normalizedHeightFromCurve * mapGenerator.meshHeightMultiplier;
         float x = 0, z = 0, dx = 0, dy = -1;
         int steps = 0;
         int maxSteps = maxSearchRadiusSteps * maxSearchRadiusSteps;
