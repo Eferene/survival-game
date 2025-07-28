@@ -80,7 +80,7 @@ public class PlayerInventory : MonoBehaviour
             dropItemText.text = dropItemSlider.value + "/" + handItemGO.GetComponent<Object>().quantity;
         }
 
-        if(isDropUIOpen || isInventoryOpen) playerGeneral.canHit = false;
+        if (isDropUIOpen || isInventoryOpen) playerGeneral.canHit = false;
         else playerGeneral.canHit = true;
     }
 
@@ -200,7 +200,7 @@ public class PlayerInventory : MonoBehaviour
                 int space = itemData.maxStackSize - inventorySlots[i].quantity;
                 int addAmount = Mathf.Min(space, quantity);
                 inventorySlots[i].quantity += addAmount;
-                if(handItem == itemData)
+                if (handItem == itemData)
                 {
                     handItemGO.GetComponent<Object>().quantity += addAmount;
                 }
@@ -209,6 +209,7 @@ public class PlayerInventory : MonoBehaviour
                 if (quantity <= 0) return;
             }
         }
+
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             if (inventorySlots[i].itemData == null)
@@ -300,5 +301,63 @@ public class PlayerInventory : MonoBehaviour
         newItem.GetComponent<Object>().SetPhysicsEnabled(false);
 
         handItemGO = newItem;
+    }
+
+    public void CraftItem(ItemData item, List<ItemData> requiredItems)
+    {
+        for (int i = 0; i < requiredItems.Count; i++)
+        {
+            ItemData requiredItem = requiredItems[i];
+            int requiredAmount = item.crafting[i].craftingMaterialAmount;
+            int playerItemCount = 0;
+
+            foreach (InventorySlot slot in inventorySlots)
+            {
+                if (slot.itemData == requiredItem)
+                {
+                    playerItemCount += slot.quantity;
+                }
+            }
+
+            if (playerItemCount < requiredAmount)
+            {
+                break;
+            }
+            else
+            {
+                if (i == requiredItems.Count - 1)
+                {
+                    for (int j = 0; j < requiredItems.Count; j++)
+                    {
+                        ItemData reqItem = requiredItems[j];
+                        int reqAmount = item.crafting[j].craftingMaterialAmount;
+
+                        for (int k = 0; k < inventorySlots.Length; k++)
+                        {
+                            if (inventorySlots[k].itemData == reqItem)
+                            {
+                                if (inventorySlots[k].quantity >= reqAmount)
+                                {
+                                    inventorySlots[k].quantity -= reqAmount;
+                                    if (inventorySlots[k].quantity <= 0)
+                                    {
+                                        inventorySlots[k].itemData = null;
+                                        inventorySlotUIs[k].UpdateUI(null, 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    AddItemToInventory(item, 1);
+                    UpdateHandItem(selectedSlotIndex);
+                    for (int k = 0; k < inventorySlotUIs.Length; k++)
+                    {
+                        inventorySlotUIs[k].UpdateUI(inventorySlots[k].itemData, inventorySlots[k].quantity);
+                    }
+                    playerGeneral.ShowDialogue($"Crafted {item.itemName}!");
+                }
+            }
+        }
     }
 }

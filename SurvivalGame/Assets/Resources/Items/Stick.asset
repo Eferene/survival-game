@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
   m_Name: Stick
   m_EditorClassIdentifier: 
-  itemID: 4
+  itemID: 7
   itemName: Stick
   itemDescription: The stick, the stick we know.
   itemIcon: {fileID: 21300000, guid: 521d5f0598bf4014d8f4205d869c8cdb, type: 3}
@@ -22,5 +22,5 @@ MonoBehaviour:
   handPosition: {x: 0, y: 0, z: 0}
   handRotation: {x: 0, y: 162.2, z: 0}
   isCraftable: 0
-  canCraftInHand: 0
+  craftingType: 0
   crafting: []

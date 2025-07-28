@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
   m_Name: Erenium Axe
   m_EditorClassIdentifier: 
-  itemID: 101
+  itemID: 2
   itemName: Erenium Axe
   itemDescription: A erenium axe for chopping wood. You can chop bigger trees.
   itemIcon: {fileID: 21300000, guid: d80c323f659c6c248ae55238c0263ecb, type: 3}

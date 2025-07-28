@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
   m_Name: Galmend
   m_EditorClassIdentifier: 
-  itemID: 2
+  itemID: 4
   itemName: Galmend.
   itemDescription: Galmend Ore.
   itemIcon: {fileID: 21300000, guid: e5cffdeab49943445b3ce47ef3018bfd, type: 3}
@@ -22,5 +22,5 @@ MonoBehaviour:
   handPosition: {x: -0.2, y: 0.45, z: 0}
   handRotation: {x: -90, y: 0, z: 0}
   isCraftable: 0
-  canCraftInHand: 0
+  craftingType: 0
   crafting: []

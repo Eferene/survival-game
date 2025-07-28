@@ -36,6 +36,9 @@ public class CraftableItemSlotUI : MonoBehaviour
         {
             requiredItemPanel.SetActive(false);
         }
+
+        Button craftButton = GetComponentInChildren<Button>();
+        craftButton.onClick.AddListener(() => { playerInventory.CraftItem(item, requiredItems); });
     }
 
     void Update()

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
   m_Name: Stone Pickaxe
   m_EditorClassIdentifier: 
-  itemID: 100
+  itemID: 10
   itemName: Stone Pickaxe
   itemDescription: You can break stone and erenium with it. It's a bit weak.
   itemIcon: {fileID: 21300000, guid: 14a44ad70264e9343900a5d71b759657, type: 3}

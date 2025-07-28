@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
   m_Name: Wooden Log
   m_EditorClassIdentifier: 
-  itemID: 5
+  itemID: 11
   itemName: Wooden Log
   itemDescription: Wooden log you can build something with.
   itemIcon: {fileID: 21300000, guid: 4cc13c452270d2646a914379deda2e10, type: 3}
@@ -22,5 +22,5 @@ MonoBehaviour:
   handPosition: {x: 0.36, y: 0.93, z: 0}
   handRotation: {x: 0, y: 0, z: 0}
   isCraftable: 0
-  canCraftInHand: 0
+  craftingType: 0
   crafting: []

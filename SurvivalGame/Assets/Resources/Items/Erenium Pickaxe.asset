@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
   m_Name: Erenium Pickaxe
   m_EditorClassIdentifier: 
-  itemID: 102
+  itemID: 3
   itemName: Erenium Pickaxe
   itemDescription: You can break stone, erenium and galmend with it. Like a pickaxe
     from another universe.

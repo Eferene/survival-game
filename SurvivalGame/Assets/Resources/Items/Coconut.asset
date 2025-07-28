@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 005a9b80919669d4891f1a066fa56a09, type: 3}
   m_Name: Coconut
   m_EditorClassIdentifier: 
-  itemID: 3
+  itemID: 0
   itemName: Coconut
   itemDescription: It's a food you'll find a lot of around here. Ideal for both thirst
     and hunger.
@@ -23,7 +23,7 @@ MonoBehaviour:
   handPosition: {x: -0.09, y: 0.45, z: 0.19}
   handRotation: {x: 44.71, y: 180, z: 180}
   isCraftable: 0
-  canCraftInHand: 0
+  craftingType: 0
   crafting: []
   healthRestore: 10
   staminaRestore: 10

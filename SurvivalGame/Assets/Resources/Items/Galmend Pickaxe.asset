@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
   m_Name: Galmend Pickaxe
   m_EditorClassIdentifier: 
-  itemID: 102
+  itemID: 6
   itemName: Galmend Pickaxe
   itemDescription: You can break stone, erenium and galmend with it. It's directly
     from another universe!

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: 
-  itemID: 0
+  itemID: 8
   itemName: Stone
   itemDescription: Stone.
   itemIcon: {fileID: 21300000, guid: 25f385de85494044e9b1f087441ed47b, type: 3}
@@ -22,5 +22,5 @@ MonoBehaviour:
   handPosition: {x: -0.05, y: 0.55, z: 0.09}
   handRotation: {x: -90, y: 0, z: 0}
   isCraftable: 0
-  canCraftInHand: 0
+  craftingType: 0
   crafting: []
