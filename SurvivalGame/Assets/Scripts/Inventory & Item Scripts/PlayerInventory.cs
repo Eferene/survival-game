@@ -38,6 +38,7 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
     public bool isDropUIOpen = false;
     public bool isInventoryOpen = false;
+    public bool isHandBuildingOpen = false;
 
     private void Awake()
     {

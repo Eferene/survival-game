@@ -187,6 +187,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Hand Building",
+                    "type": "Button",
+                    "id": "ff9f88bc-46fd-48a4-ad95-28e54f4595e5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Point",
                     "type": "Value",
                     "id": "3fd757b8-bc20-4974-8901-c1b2d4db753d",
@@ -236,6 +245,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "LoadScene",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "19e499da-3b13-44ea-88ca-828fc200324c",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hand Building",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
