@@ -1,26 +1,26 @@
 using UnityEngine;
 
-public class GroundTrigger : MonoBehaviour
+public class WaterTrigger : MonoBehaviour
 {
     PlayerController playerController;
-    private void Start()
+    void Start()
     {
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("Water"))
         {
-            playerController.isGrounded = true;
+            playerController.isInWater = true;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("Water"))
         {
-            playerController.isGrounded = false;
+            playerController.isInWater = false;
         }
     }
 }

@@ -1,111 +1,226 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private Input playerInputActions;
-    private PlayerGeneral playerGeneral;
     private Rigidbody rb;
-    private Vector2 moveInput;
-
-    [Header("Movement Settings")]
-    [SerializeField] float jumpForce = 10f;
-    [SerializeField] float moveSpeed = 5f;
-    [SerializeField] float sprintSpeed = 10f;
-    //[SerializeField] float fallMultiplier = 5f;
+    private PlayerGeneral playerGeneral;
+    private Input playerInputActions;
 
     [Header("Camera & Look Settings")]
-    [SerializeField] Transform cameraTransform;
-    [SerializeField] CinemachineCamera playerCamera;
+    [SerializeField] private CinemachineCamera playerCamera;
 
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float sprintSpeed = 10f;
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private float rotationSpeed = 15f;
+
+
+    [Header("Swimming Settings")]
+    [SerializeField] private float swimSpeedMultiplier = 0.7f;
+    [SerializeField] private float swimAscendSpeed = 3f;
+
+    [Header("Stamina Settings")]
+    [SerializeField] private float staminaRegenDelay = 1f;
+
+    [Header("FOV Settings")]
+    [SerializeField] private float defaultFOV = 60f;
+    [SerializeField] private float sprintFOV = 70f;
+    [SerializeField] private float fovTransitionSpeed = 5f;
+
+    private Vector2 moveInput;
     private bool isSprinting = false;
-    public bool isGrounded = false;
+    private bool isJumpPressing = false;
 
-    private float targetFOV = 60f; // Hedef FOV değeri
-    [SerializeField] private float transitionSpeed = 5f; // FOV geçiş hızı
+    public bool isGrounded = false;
+    public bool isInWater = false;
+
+    private float targetFOV;
+    private float lastSprintTime;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         playerGeneral = GetComponent<PlayerGeneral>();
-
         playerInputActions = new Input();
+
+        targetFOV = defaultFOV;
     }
 
-    // Script'in ilk kez aktif olduğu anda çalışır.
     private void OnEnable()
     {
-        // Player action map'ini aktif eder.
         playerInputActions.Player.Enable();
 
-        playerInputActions.Player.Run.performed += ctx => isSprinting = true;
-        playerInputActions.Player.Run.canceled += ctx => isSprinting = false;
-        playerInputActions.Player.Jump.performed += ctx => Jump();
+        // Bellek sızıntılarını (memory leak) önlemek için, OnEnable içerisinde abone olunan olaylar (events),
+        // obje pasif hale geçtiğinde veya yok edildiğinde OnDisable içerisinde abonelikten çıkarılmalıdır.
+        playerInputActions.Player.Run.performed += OnRunPerformed;
+        playerInputActions.Player.Run.canceled += OnRunCanceled;
+        playerInputActions.Player.Jump.performed += OnJumpPerformed;
+        playerInputActions.Player.Jump.canceled += OnJumpCanceled;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Script'in ilk kez aktif olduğu anda çalışır.
     private void OnDisable()
     {
-        // Player action map'ini devre dışı bırak.
-        // Oyun durunca veya karakter ölünce kaynakları serbest bırakmak amacıyla.
-        playerInputActions.Player.Disable();
+        playerInputActions.Player.Run.performed -= OnRunPerformed;
+        playerInputActions.Player.Run.canceled -= OnRunCanceled;
+        playerInputActions.Player.Jump.performed -= OnJumpPerformed;
+        playerInputActions.Player.Jump.canceled -= OnJumpCanceled;
 
-        playerInputActions.Player.Run.performed -= ctx => isSprinting = true;
-        playerInputActions.Player.Run.canceled -= ctx => isSprinting = false;
-        playerInputActions.Player.Jump.performed -= ctx => Jump();
+        playerInputActions.Player.Disable();
     }
 
     private void Update()
     {
-        // Move eyleminden gelen Vector2 değerini okur ve moveInput değişkenine atar.
         moveInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
-        playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * transitionSpeed);
+        if (isInWater)
+        {
+            isGrounded = false;
+        }
+
+        UpdateFOV();
     }
 
-    private float lastSprintTime;
     private void FixedUpdate()
     {
-        float currentSpeed = moveSpeed; // Varsayılan hız olarak normal hareket hızını kullan
-        if (isSprinting && playerGeneral.CurrentStamina > 0)
+        // Fizik hesaplamaları, oyunun anlık kare hızından (frame rate) etkilenmeden
+        // tutarlı bir şekilde çalışması için FixedUpdate içerisinde gerçekleştirilir.
+        HandleSprintAndStamina();
+        ApplyRotation();
+        ApplyMovement();
+        HandleSwimming();
+    }
+
+    private void OnRunPerformed(InputAction.CallbackContext context) => isSprinting = true;
+    private void OnRunCanceled(InputAction.CallbackContext context) => isSprinting = false;
+
+    private void OnJumpPerformed(InputAction.CallbackContext context)
+    {
+        if (isGrounded)
         {
-            currentSpeed = sprintSpeed; // Sprint hızını kullan
-            playerGeneral.CurrentStamina -= playerGeneral.staminaDecreaseRate * Time.fixedDeltaTime;
-            if (playerGeneral.CurrentStamina <= 0)
-            {
-                isSprinting = false;
-                lastSprintTime = Time.time;
-            }
-            targetFOV = 70f; // Sprint sırasında kamera FOV'sini artır
+            Jump();
+        }
+        else if (isInWater)
+        {
+            isJumpPressing = true;
+        }
+    }
+
+    private void OnJumpCanceled(InputAction.CallbackContext context)
+    {
+        isJumpPressing = false;
+    }
+
+    private void ApplyMovement()
+    {
+        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
+        if (isInWater) currentSpeed *= swimSpeedMultiplier;
+
+        Vector3 moveDirection;
+
+        // Hareket yönü, karakterin suda veya karada olmasına göre farklı şekilde belirlenir.
+        if (isInWater)
+        {
+            // Suda hareket yönü, kameranın baktığı yöne göre 3 boyutlu olarak belirlenir.
+            moveDirection = (playerCamera.transform.forward * moveInput.y + playerCamera.transform.right * moveInput.x).normalized;
         }
         else
         {
-            targetFOV = 60f; // Normal hızda FOV'yi eski haline getir
-            currentSpeed = moveSpeed; // Normal hareket hızı
+            // Karada ise hareket, karakterin kendi yerel X ve Z eksenlerine göre hesaplanır.
+            moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         }
 
-        if (!isSprinting && playerGeneral.CurrentStamina < playerGeneral.maxStamina && Time.time - lastSprintTime > 1f)
+        Vector3 targetVelocity = moveDirection * currentSpeed;
+
+        // Karakter yerdeyken, yatay hareketin dikey hızı (zıplama, düşme) etkilememesi için Rigidbody'nin mevcut Y ekseni hızı korunur.
+        if (!isInWater)
         {
-            playerGeneral.CurrentStamina += Time.fixedDeltaTime * playerGeneral.staminaIncreaseRate;
+            targetVelocity.y = rb.linearVelocity.y;
         }
 
-        float targetYRotation = cameraTransform.eulerAngles.y;
-        transform.rotation = Quaternion.Euler(0f, targetYRotation, 0f);
+        // Rigidbody'nin mevcut hızını doğrudan değiştirmek yerine, hedeflenen hıza ulaşmak için anlık bir kuvvet uygulanır.
+        // ForceMode.VelocityChange, objenin kütlesini göz ardı ederek anlık bir hız değişimi sağlar ve daha tepkisel bir kontrol hissi yaratır.
+        Vector3 velocityChange = (targetVelocity - rb.linearVelocity);
+        rb.AddForce(velocityChange, ForceMode.VelocityChange);
+    }
 
-        Vector3 moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
+    private void ApplyRotation()
+    {
+        float targetYRotation = playerCamera.transform.eulerAngles.y;
+        Quaternion targetRotation = Quaternion.Euler(0f, targetYRotation, 0f);
 
-        rb.linearVelocity = new Vector3(moveDirection.x * currentSpeed, rb.linearVelocity.y, moveDirection.z * currentSpeed);
+        // rb.MoveRotation, Rigidbody'nin dönüşünü fizik simülasyonu ile uyumlu bir şekilde günceller.
+        // Quaternion.Slerp, mevcut rotasyondan hedef rotasyona yumuşak, küresel bir geçiş yaparak ani dönüşleri engeller.
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed));
     }
 
     private void Jump()
     {
-        if (isGrounded && playerGeneral.CurrentStamina >= 10)
+        if (isGrounded && !isInWater && playerGeneral.CurrentStamina >= playerGeneral.jumpStaminaCost)
         {
+            // ForceMode.Impulse, objenin kütlesi de hesaba katılarak anlık bir itki kuvveti uygular. Bu mod, zıplama gibi anlık eylemler için idealdir.
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             playerGeneral.CurrentStamina -= playerGeneral.jumpStaminaCost;
+        }
+    }
+
+    private void HandleSwimming()
+    {
+        if (isInWater)
+        {
+            rb.useGravity = false;
+
+            // Yüzme sırasında zıplama tuşuna basıldığında, karakterin yukarı yönde yüzmesi için Y eksenindeki hızı sabit bir değere ayarlanır.
+            if (isJumpPressing && playerGeneral.CurrentStamina > 0)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, swimAscendSpeed, rb.linearVelocity.z);
+            }
+        }
+        else
+        {
+            rb.useGravity = true;
+        }
+    }
+
+    private void HandleSprintAndStamina()
+    {
+        if (isSprinting && moveInput.magnitude > 0.1f && playerGeneral.CurrentStamina > 0)
+        {
+            playerGeneral.CurrentStamina -= playerGeneral.staminaDecreaseRate * Time.fixedDeltaTime;
+            targetFOV = sprintFOV;
+            lastSprintTime = Time.time;
+
+            if (playerGeneral.CurrentStamina <= 0)
+            {
+                playerGeneral.CurrentStamina = 0;
+                isSprinting = false;
+            }
+        }
+        else
+        {
+            targetFOV = defaultFOV;
+
+            // Stamina yenilenmesi, son sprint eyleminden bu yana belirli bir gecikme süresi (staminaRegenDelay) geçtikten sonra başlar.
+            if (playerGeneral.CurrentStamina < playerGeneral.maxStamina && Time.time - lastSprintTime > staminaRegenDelay)
+            {
+                playerGeneral.CurrentStamina += playerGeneral.staminaIncreaseRate * Time.fixedDeltaTime;
+                // Stamina değerinin maksimum değeri aşmamasını sağlar.
+                playerGeneral.CurrentStamina = Mathf.Min(playerGeneral.CurrentStamina, playerGeneral.maxStamina);
+            }
+        }
+    }
+
+    private void UpdateFOV()
+    {
+        if (playerCamera != null)
+        {
+            // Mathf.Lerp (Lineer İnterpolasyon), mevcut görüş alanından (FOV) hedef görüş alanına belirlenen hızda yumuşak bir geçiş yapılmasını sağlar.
+            playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * fovTransitionSpeed);
         }
     }
 }

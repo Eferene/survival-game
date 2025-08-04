@@ -36,6 +36,7 @@ Transform:
   m_Children:
   - {fileID: 5749906677557157198}
   - {fileID: 4842525940844304920}
+  - {fileID: 7215479202865565209}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &4711287007865368744
@@ -103,9 +104,11 @@ MonoBehaviour:
   jumpForce: 5
   moveSpeed: 7
   sprintSpeed: 12
+  swimAscendSpeed: 3
   cameraTransform: {fileID: 9154225807180791772}
   playerCamera: {fileID: 0}
   isGrounded: 0
+  isInWater: 0
   transitionSpeed: 5
 --- !u!114 &4116075133719802600
 MonoBehaviour:
@@ -139,8 +142,9 @@ MonoBehaviour:
   staminaBar: {fileID: 0}
   staminaBG: {fileID: 0}
   damageTextPrefab: {fileID: 5481048422191962130, guid: 0d65dd2d93ae40445872a7421b182ceb, type: 3}
-  cameraTransform: {fileID: 9154225807180791772}
   canHit: 0
+  cameraTransform: {fileID: 9154225807180791772}
+  characterDialogText: {fileID: 0}
 --- !u!114 &2439014885553201749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,6 +198,9 @@ MonoBehaviour:
   dropItemText: {fileID: 0}
   itemNameText: {fileID: 0}
   itemDescriptionText: {fileID: 0}
+  isDropUIOpen: 0
+  isInventoryOpen: 0
+  isHandBuildingOpen: 0
 --- !u!1 &1288059982133919717
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,7 +213,7 @@ GameObject:
   - component: {fileID: 2778574313955998334}
   - component: {fileID: 1609383867432404369}
   m_Layer: 2
-  m_Name: Check Is Ground
+  m_Name: Check If Is On Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -494,3 +501,69 @@ Transform:
   - {fileID: 9154225807180791772}
   m_Father: {fileID: 807519937936275458}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8823145790436557295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7215479202865565209}
+  - component: {fileID: 6824878757875244824}
+  - component: {fileID: 6704760334949505459}
+  m_Layer: 2
+  m_Name: Check If Is In Water
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7215479202865565209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8823145790436557295}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 807519937936275458}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &6824878757875244824
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8823145790436557295}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.6
+  m_Center: {x: 0, y: 0.27, z: 0}
+--- !u!114 &6704760334949505459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8823145790436557295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e8a6781d794e64e8d39a68ce14eaf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
