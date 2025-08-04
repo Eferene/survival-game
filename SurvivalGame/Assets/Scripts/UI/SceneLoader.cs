@@ -40,7 +40,8 @@ public class SceneLoader : MonoBehaviour
 
     private void OnLoadSceneInput()
     {
-        isLoading = true;
+        if (loadingScreen.activeSelf)
+            isLoading = true;
     }
 
     public void OnClicked()

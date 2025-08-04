@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MAMI SCENE.unity
-    guid: 77233f9b24b24914f815e51f9251beba
-  - enabled: 1
     path: Assets/Scenes/HomeScene.unity
     guid: a8804711f3efd1840a022e66ac7033c0
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 69945268da0d993469c11dbfe97a4572
+  - enabled: 0
+    path: Assets/Scenes/MAMI SCENE.unity
+    guid: 77233f9b24b24914f815e51f9251beba
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -102,7 +102,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
             }
         }
 
-        // Eğer heightMap hala boşsa, hata ver ve işlemi durdur. Can't do magic without the data, kral.
+        // Eğer heightMap hala boşsa, hata ver ve işlemi durdur.
         if (this.heightMap == null)
         {
             Debug.LogError("HeightMap alınamadı! Önce haritayı oluşturun ve 'Map Generator' referansını atayın.");
@@ -145,7 +145,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
                 Vector3 rayStart = new Vector3(sampleX, bounds.max.y + 10f, sampleZ);
 
                 // Bu noktadan aşağı doğru bir ışın (Raycast) göndererek zemini bul.
-                if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, 1, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
+                if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, 1 << 3, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
                 {
                     // Işının çarptığı yerdeki normalize edilmiş yüksekliği (0-1 arası) al.
                     float normalizedHeight = MapGenerator.GetBilinearInterpolatedHeight(this.heightMap, hit.textureCoord.x, hit.textureCoord.y);

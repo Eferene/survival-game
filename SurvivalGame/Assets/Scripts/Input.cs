@@ -336,6 +336,17 @@ public partial class @Input: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""09ebbaa2-210d-43e4-b170-8985b2f0e2f7"",
+                    ""path"": ""<Mouse>/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LoadScene"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""19e499da-3b13-44ea-88ca-828fc200324c"",
                     ""path"": ""<Keyboard>/b"",
                     ""interactions"": """",
