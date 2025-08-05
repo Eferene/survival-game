@@ -2,21 +2,21 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PlayerGeneral))]
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody rb;
-    private PlayerGeneral playerGeneral;
-    private Input playerInputActions;
-
-    [Header("Camera & Look Settings")]
+    [Header("Core References")]
     [SerializeField] private CinemachineCamera playerCamera;
 
+    [Header("Look Settings")]
+
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;
+    private float moveSpeed;
+    [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float rotationSpeed = 15f;
-
 
     [Header("Swimming Settings")]
     [SerializeField] private float swimSpeedMultiplier = 0.7f;
@@ -30,20 +30,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float sprintFOV = 70f;
     [SerializeField] private float fovTransitionSpeed = 5f;
 
+    public bool isInWater = false;
+
+    private Rigidbody rb;
+    private PlayerGeneral playerGeneral;
+    private GroundTrigger groundTrigger;
+    private Input playerInputActions;
+
     private Vector2 moveInput;
     private bool isSprinting = false;
     private bool isJumpPressing = false;
-
-    public bool isGrounded = false;
-    public bool isInWater = false;
-
     private float targetFOV;
     private float lastSprintTime;
+
+
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         playerGeneral = GetComponent<PlayerGeneral>();
+        groundTrigger = GetComponent<GroundTrigger>();
         playerInputActions = new Input();
 
         targetFOV = defaultFOV;
@@ -80,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
         if (isInWater)
         {
-            isGrounded = false;
+            groundTrigger.isGrounded = false;
         }
 
         UpdateFOV();
@@ -101,7 +107,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
-        if (isGrounded)
+        if (groundTrigger.isGrounded)
         {
             Jump();
         }
@@ -118,8 +124,8 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
-        if (isInWater) currentSpeed *= swimSpeedMultiplier;
+        moveSpeed = isSprinting ? sprintSpeed : walkSpeed;
+        if (isInWater) moveSpeed *= swimSpeedMultiplier;
 
         Vector3 moveDirection;
 
@@ -135,7 +141,7 @@ public class PlayerController : MonoBehaviour
             moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         }
 
-        Vector3 targetVelocity = moveDirection * currentSpeed;
+        Vector3 targetVelocity = moveDirection * moveSpeed;
 
         // Karakter yerdeyken, yatay hareketin dikey hızı (zıplama, düşme) etkilememesi için Rigidbody'nin mevcut Y ekseni hızı korunur.
         if (!isInWater)
@@ -161,7 +167,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded && !isInWater && playerGeneral.CurrentStamina >= playerGeneral.jumpStaminaCost)
+        if (groundTrigger.isGrounded && !isInWater && playerGeneral.CurrentStamina >= playerGeneral.jumpStaminaCost)
         {
             // ForceMode.Impulse, objenin kütlesi de hesaba katılarak anlık bir itki kuvveti uygular. Bu mod, zıplama gibi anlık eylemler için idealdir.
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
