@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     [Header("Swimming Settings")]
     [SerializeField] private float swimSpeedMultiplier = 0.5f;
     [SerializeField] private float swimAscendSpeed = 1f;
+    [SerializeField] private float swimDescendSpeed = 0.5f;
 
     [Header("Stamina Settings")]
     [SerializeField] private float staminaRegenDelay = 1f;
@@ -92,6 +93,7 @@ public class PlayerController : MonoBehaviour
     private void Movement()
     {
         moveSpeed = isSprinting && playerGeneral.CurrentStamina > 0 ? sprintSpeed : walkSpeed;
+        rb.useGravity = !isInWater; // Gravity'yi sadece suda değilken kullan
 
         Vector3 moveDirection;
 
@@ -106,6 +108,8 @@ public class PlayerController : MonoBehaviour
             Vector3 slopeNormal = groundTrigger.HitInfo.normal;
 
             moveDirection = Vector3.ProjectOnPlane(slopeMoveDirection, slopeNormal).normalized;
+
+            //rb.AddForce(Vector3.up * 0.1f, ForceMode.VelocityChange); // Slope üzerinde kaymayı önlemek için küçük bir yukarı kuvvet ekleyin
         }
         else
         {
@@ -115,15 +119,11 @@ public class PlayerController : MonoBehaviour
         Vector3 targetVelocity = moveDirection * moveSpeed;
 
         if (!isInWater)
-        {
             // Y eksenindeki hızı koruyarak yatay hareketi etkiler
             targetVelocity.y = rb.linearVelocity.y;
-        }
         else
-        {
             // Suda iken, yukarı doğru yüzme için Y eksenindeki hızı artırabiliriz
-            targetVelocity.y += isJumpPressing ? swimAscendSpeed : 0f;
-        }
+            targetVelocity.y += isJumpPressing ? swimAscendSpeed : -swimDescendSpeed;
 
         rb.AddForce(targetVelocity - rb.linearVelocity, ForceMode.VelocityChange);
     }
