@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float sprintSpeed = 10f;
     [SerializeField] private float groundJumpForce = 10f;
     [SerializeField] private float slopeJumpForce = 100f;
+    [SerializeField] private float maxSpeed = 15f;
     private float currentSpeed;
     private float currentJumpForce;
 
@@ -82,6 +83,12 @@ public class PlayerController : MonoBehaviour
     {
         movementInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
+        if (rb.linearVelocity.magnitude > maxSpeed)
+        {
+            // Eğer hız maksimumdan fazlaysa, hızı sınırla
+            rb.linearVelocity = rb.linearVelocity.normalized * maxSpeed;
+        }
+
         UpdateFOV();
         HandleSprintAndStamina();
     }
@@ -127,8 +134,12 @@ public class PlayerController : MonoBehaviour
                 // Dot < 0 ise hareket yukarı doğru
                 if (Vector3.Dot(movementDirection, slopeUpDirection) < 0)
                 {
-                    // Yokuş yukarı hareket engellenir
-                    movementDirection = Vector3.zero;
+                    if (groundTrigger.slopeAngle > 60f)
+                        movementDirection /= 2.5f;
+                    else if (groundTrigger.slopeAngle > 50f)
+                        movementDirection /= 2f;
+                    else
+                        movementDirection /= 1.5f;
                 }
             }
         }
