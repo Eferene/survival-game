@@ -2,19 +2,22 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-public class HandCraftingSystem : MonoBehaviour
+public class CraftingSystem : MonoBehaviour
 {
     [SerializeField] GameObject itemsParent;
     [SerializeField] GameObject itemPrefab;
 
     [SerializeField] List<ItemData> craftableItems;
-    void Start()
-    {
-        LoadCraftableItems();
-    }
+    public CraftingType craftingType = CraftingType.Hand;
 
-    public void LoadCraftableItems()
+    public void LoadCraftableItems(CraftingType type)
     {
+        craftableItems.Clear();
+        foreach (Transform child in itemsParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         UnityEngine.Object[] allObjects = Resources.LoadAll("Items", typeof(ScriptableObject));
 
         craftableItems = new List<ItemData>();
@@ -23,7 +26,7 @@ public class HandCraftingSystem : MonoBehaviour
         {
             if (obj is ItemData item)
             {
-                if (item.isCraftable && item.craftingType == CraftingType.Hand)
+                if (item.isCraftable && item.craftingType == type)
                 {
                     craftableItems.Add(item);
                     GameObject newUIItem = Instantiate(itemPrefab);

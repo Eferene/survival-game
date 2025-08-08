@@ -36,13 +36,12 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dropItemText;
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
-    public bool isDropUIOpen = false;
-    public bool isInventoryOpen = false;
-    public bool isHandBuildingOpen = false;
+    public UIState uiState;
 
     private void Awake()
     {
         playerActions = new Input();
+        uiState = UIState.None;
 
         pointerPositionAction = playerActions.UI.Point;
         pointerPositionAction.Enable();
@@ -75,39 +74,39 @@ public class PlayerInventory : MonoBehaviour
 
     private void Update()
     {
-        if (isInventoryOpen) UseItem();
-        if (isDropUIOpen && handItemGO != null)
+        if (uiState == UIState.InventoryUI) UseItem();
+        if (uiState == UIState.DropItemUI && handItemGO != null)
         {
             dropItemText.text = dropItemSlider.value + "/" + handItemGO.GetComponent<Object>().quantity;
         }
 
-        if (isDropUIOpen || isInventoryOpen) playerGeneral.canHit = false;
+        if (uiState != UIState.None) playerGeneral.canHit = false;
         else playerGeneral.canHit = true;
     }
 
     private void OpenInventory()
     {
-        if (!isDropUIOpen)
+        if (uiState == UIState.None)
         {
             inventoryPanelGO.SetActive(true);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
             crosshair.SetActive(false);
-            isInventoryOpen = true;
+            uiState = UIState.InventoryUI;
         }
     }
 
     public void CloseInventory()
     {
-        if (!isDropUIOpen)
+        if(uiState == UIState.InventoryUI)
         {
             inventoryPanelGO.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
             crosshair.SetActive(true);
-            isInventoryOpen = false;
+            uiState = UIState.None;
         }
     }
 
@@ -116,17 +115,18 @@ public class PlayerInventory : MonoBehaviour
         if (dropItemUI.activeSelf)
         {
             dropItemUI.SetActive(false);
-            isDropUIOpen = false;
+            uiState = UIState.None;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
         }
         else if (handItemGO != null && !dropItemUI.activeSelf)
         {
-            if (inventoryPanelGO.activeSelf) CloseInventory();
+            if (uiState == UIState.InventoryUI) CloseInventory();
+            if (uiState == UIState.HandCraftingUI) playerGeneral.OpenCloseCraftingMenu();
 
             dropItemUI.SetActive(true);
-            isDropUIOpen = true;
+            uiState = UIState.DropItemUI;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             playerCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
@@ -361,4 +361,12 @@ public class PlayerInventory : MonoBehaviour
             }
         }
     }
+}
+
+public enum UIState
+{
+    None,
+    InventoryUI,
+    DropItemUI,
+    HandCraftingUI
 }

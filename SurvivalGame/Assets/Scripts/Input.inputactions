@@ -187,7 +187,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Hand Building",
+                    "name": "Hand Crafting",
                     "type": "Button",
                     "id": "ff9f88bc-46fd-48a4-ad95-28e54f4595e5",
                     "expectedControlType": "",
@@ -266,7 +266,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Hand Building",
+                    "action": "Hand Crafting",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

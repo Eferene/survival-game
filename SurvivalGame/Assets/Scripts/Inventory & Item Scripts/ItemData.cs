@@ -39,5 +39,6 @@ public enum ItemType
 public enum CraftingType
 {
     Hand,
-    Workbench
+    Workbench,
+    Furnace
 }

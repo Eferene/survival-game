@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using System.Linq;
+using Unity.Cinemachine;
 
 public class PlayerGeneral : MonoBehaviour
 {
@@ -61,12 +62,16 @@ public class PlayerGeneral : MonoBehaviour
     private float lastHitTime = -1f;
     private float hitCooldown = 0.5f;
 
+    [Header("Crafting System")]
+    public GameObject craftingSystemUI;
+
     [Header("Raycast & Input Settings")]
     public bool canHit;
 
     [Header("Other Things")]
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private TextMeshProUGUI characterDialogText;
+    [SerializeField] private Transform cinemachineCamera;
 
     private void Awake()
     {
@@ -76,11 +81,17 @@ public class PlayerGeneral : MonoBehaviour
     void OnEnable()
     {
         playerInputActions.Player.Enable();
+
+        playerInputActions.UI.Enable();
+        playerInputActions.UI.HandCrafting.performed += ctx => OpenCloseCraftingMenu();
     }
 
     void OnDisable()
     {
         playerInputActions.Player.Disable();
+
+        playerInputActions.UI.Disable();
+        playerInputActions.UI.HandCrafting.performed -= ctx => OpenCloseCraftingMenu();
     }
 
     private void Start()
@@ -122,9 +133,9 @@ public class PlayerGeneral : MonoBehaviour
             }
         }
         #endregion
-        //Raycast
+
         RaycastHit hit;
-        #region Item Alma Raycast
+        #region Item Alma Raycasti
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
         {
             if (hit.distance < 5)
@@ -181,78 +192,80 @@ public class PlayerGeneral : MonoBehaviour
                     }
                 }
             }
-            #endregion
-            #region Hit Raycast
-            if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
+        }
+        #endregion
+        #region Hit Raycasti
+        if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Tool)
+        {
+            if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
             {
-                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
+                if (hit.distance < 3)
                 {
-                    if (hit.distance < 3)
+                    ToolItem toolItem = playerInventory.handItem as ToolItem;
+                    for (int i = 0; i < toolItem.effectiveTags.Length; i++)
                     {
-                        ToolItem toolItem = playerInventory.handItem as ToolItem;
-                        for (int i = 0; i < toolItem.effectiveTags.Length; i++)
+                        if (toolItem.effectiveTags.Contains(hit.collider.tag))
                         {
-                            if (toolItem.effectiveTags.Contains(hit.collider.tag))
+                            if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
                             {
-                                if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
+                                if (hit.collider.gameObject.GetComponent<Breakable>() != null)
                                 {
-                                    if (hit.collider.gameObject.GetComponent<Breakable>() != null)
-                                    {
-                                        Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
-                                        int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
-                                        breakable.TakeDamage(dmg);
-                                        lastHitTime = Time.time;
-                                        GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
-                                        damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
-                                        damageText.transform.localScale = Vector3.one * 0.2f;
-                                        damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
-                                    }
-                                }
-                            }
-                            else if (!toolItem.effectiveTags.Contains(hit.collider.tag) && hit.collider.tag != "Ground" && hit.collider.tag != "Untagged" && hit.collider.tag != "Item" && hit.collider.tag != "Consumable")
-                            {
-                                if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
-                                {
+                                    Breakable breakable = hit.collider.gameObject.GetComponent<Breakable>();
+                                    int dmg = Random.Range(toolItem.minEfficiency, toolItem.maxEfficiency + 1);
+                                    breakable.TakeDamage(dmg);
                                     lastHitTime = Time.time;
                                     GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
-                                    damageText.GetComponent<TextMeshPro>().text = "0";
+                                    damageText.GetComponent<TextMeshPro>().text = dmg.ToString();
                                     damageText.transform.localScale = Vector3.one * 0.2f;
                                     damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
                                 }
                             }
                         }
+                        else if (!toolItem.effectiveTags.Contains(hit.collider.tag) && hit.collider.tag != "Ground" && hit.collider.tag != "Untagged" && hit.collider.tag != "Item" && hit.collider.tag != "Consumable")
+                        {
+                            if (canHit && playerInputActions.Player.Hit.triggered && Time.time - lastHitTime > hitCooldown)
+                            {
+                                lastHitTime = Time.time;
+                                GameObject damageText = Instantiate(damageTextPrefab, hit.point, Quaternion.identity);
+                                damageText.GetComponent<TextMeshPro>().text = "0";
+                                damageText.transform.localScale = Vector3.one * 0.2f;
+                                damageText.transform.DOMoveY(damageText.transform.position.y + 1f, 1f).OnComplete(() => Destroy(damageText));
+                            }
+                        }
                     }
                 }
-            }
-            #endregion
-            else if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Consumable)
-            {
-                if (canHit && playerInputActions.Player.Hit.triggered)
+                else if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Consumable)
                 {
-                    ConsumableItem consumableItem = playerInventory.handItem as ConsumableItem;
-                    if (consumableItem != null)
+                    if (canHit && playerInputActions.Player.Hit.triggered)
                     {
-                        UseConsumable(consumableItem);
-                        playerInventory.handItemGO.GetComponent<Object>().quantity -= 1;
-                        playerInventory.inventorySlots[playerInventory.selectedSlotIndex].quantity -= 1;
+                        ConsumableItem consumableItem = playerInventory.handItem as ConsumableItem;
+                        if (consumableItem != null)
+                        {
+                            UseConsumable(consumableItem);
+                            playerInventory.handItemGO.GetComponent<Object>().quantity -= 1;
+                            playerInventory.inventorySlots[playerInventory.selectedSlotIndex].quantity -= 1;
 
-                        if (playerInventory.handItemGO.GetComponent<Object>().quantity <= 0)
-                        {
-                            Destroy(playerInventory.handItemGO);
-                            playerInventory.handItemGO = null;
-                            playerInventory.handItem = null;
-                            playerInventory.inventorySlots[playerInventory.selectedSlotIndex].itemData = null;
-                            playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(null, 0);
-                            playerInventory.selectedSlotIndex = -1;
-                        }
-                        else
-                        {
-                            playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(consumableItem, playerInventory.handItemGO.GetComponent<Object>().quantity);
+                            if (playerInventory.handItemGO.GetComponent<Object>().quantity <= 0)
+                            {
+                                Destroy(playerInventory.handItemGO);
+                                playerInventory.handItemGO = null;
+                                playerInventory.handItem = null;
+                                playerInventory.inventorySlots[playerInventory.selectedSlotIndex].itemData = null;
+                                playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(null, 0);
+                                playerInventory.selectedSlotIndex = -1;
+                            }
+                            else
+                            {
+                                playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(consumableItem, playerInventory.handItemGO.GetComponent<Object>().quantity);
+                            }
                         }
                     }
                 }
             }
         }
+        #endregion
+
+
     }
 
     private void UseConsumable(ConsumableItem consumableItem)
@@ -286,5 +299,26 @@ public class PlayerGeneral : MonoBehaviour
             myTween.Kill();
             characterDialogText.gameObject.SetActive(false);
         });
+    }
+
+    public void OpenCloseCraftingMenu()
+    {
+        if (playerInventory.uiState == UIState.None)
+        {
+            playerInventory.uiState = UIState.HandCraftingUI;
+            craftingSystemUI.SetActive(true);
+            craftingSystemUI.GetComponent<CraftingSystem>().LoadCraftableItems(CraftingType.Hand);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
+        }
+        else if (playerInventory.uiState == UIState.HandCraftingUI)
+        {
+            playerInventory.uiState = UIState.None;
+            craftingSystemUI.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
+        }
     }
 }
