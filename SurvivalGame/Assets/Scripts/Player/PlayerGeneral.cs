@@ -72,6 +72,7 @@ public class PlayerGeneral : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private TextMeshProUGUI characterDialogText;
     [SerializeField] private Transform cinemachineCamera;
+    private CraftingObject currentCraftingObject;
 
     private void Awake()
     {
@@ -83,7 +84,7 @@ public class PlayerGeneral : MonoBehaviour
         playerInputActions.Player.Enable();
 
         playerInputActions.UI.Enable();
-        playerInputActions.UI.HandCrafting.performed += ctx => OpenCloseCraftingMenu();
+        playerInputActions.UI.HandCrafting.performed += ctx => OpenCloseCraftingMenu(CraftingType.Hand);
     }
 
     void OnDisable()
@@ -91,7 +92,7 @@ public class PlayerGeneral : MonoBehaviour
         playerInputActions.Player.Disable();
 
         playerInputActions.UI.Disable();
-        playerInputActions.UI.HandCrafting.performed -= ctx => OpenCloseCraftingMenu();
+        playerInputActions.UI.HandCrafting.performed -= ctx => OpenCloseCraftingMenu(CraftingType.Hand);
     }
 
     private void Start()
@@ -106,7 +107,17 @@ public class PlayerGeneral : MonoBehaviour
 
     private void Update()
     {
-        if (CurrentHealth > 0) CurrentHealth -= Time.deltaTime * healthDecreaseRate;
+        if (CurrentHealth > 0)
+        {
+            if (CurrentHunger <= 0 || CurrentThirst <= 0)
+            {
+                CurrentHealth -= Time.deltaTime * healthDecreaseRate * 2;
+            }
+            else if ((CurrentHunger > 0 && CurrentThirst <= 0) || (CurrentHunger <= 0 && CurrentThirst > 0))
+            {
+                CurrentHealth -= Time.deltaTime * healthDecreaseRate;
+            }
+        }
         if (CurrentHunger > 0) CurrentHunger -= Time.deltaTime * hungerDecreaseRate;
         if (CurrentThirst > 0) CurrentThirst -= Time.deltaTime * thirstDecreaseRate;
 
@@ -117,6 +128,16 @@ public class PlayerGeneral : MonoBehaviour
         staminaBar.localScale = new Vector3(CurrentStamina / maxStamina, 1, 1);
         if (currentStamina < maxStamina) staminaBG.gameObject.SetActive(true);
         else staminaBG.gameObject.SetActive(false);
+
+        if (currentCraftingObject != null)
+        {
+            float dist = Vector3.Distance(transform.position, currentCraftingObject.transform.position);
+            if (dist > 5f)
+            {
+                OpenCloseCraftingMenu(currentCraftingObject.type);
+                currentCraftingObject = null;
+            }
+        }
 
         #region Animator & Animations
         if (playerInventory.handItemGO != null)
@@ -264,8 +285,19 @@ public class PlayerGeneral : MonoBehaviour
             }
         }
         #endregion
-
-
+        #region Crafting Raycasti
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, 3f))
+        {
+            if (hit.collider.CompareTag("Crafting"))
+            {
+                if (canHit && playerInputActions.Player.Interaction.triggered)
+                {
+                    currentCraftingObject = hit.collider.GetComponent<CraftingObject>();
+                    OpenCloseCraftingMenu(CraftingType.Workbench);
+                }
+            }
+        }
+        #endregion
     }
 
     private void UseConsumable(ConsumableItem consumableItem)
@@ -301,18 +333,18 @@ public class PlayerGeneral : MonoBehaviour
         });
     }
 
-    public void OpenCloseCraftingMenu()
+    public void OpenCloseCraftingMenu(CraftingType craftingType)
     {
         if (playerInventory.uiState == UIState.None)
         {
-            playerInventory.uiState = UIState.HandCraftingUI;
+            playerInventory.uiState = UIState.CraftingUI;
             craftingSystemUI.SetActive(true);
-            craftingSystemUI.GetComponent<CraftingSystem>().LoadCraftableItems(CraftingType.Hand);
+            craftingSystemUI.GetComponent<CraftingSystem>().LoadCraftableItems(craftingType);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
         }
-        else if (playerInventory.uiState == UIState.HandCraftingUI)
+        else if (playerInventory.uiState == UIState.CraftingUI)
         {
             playerInventory.uiState = UIState.None;
             craftingSystemUI.SetActive(false);

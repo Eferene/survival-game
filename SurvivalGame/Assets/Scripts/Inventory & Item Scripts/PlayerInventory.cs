@@ -123,7 +123,7 @@ public class PlayerInventory : MonoBehaviour
         else if (handItemGO != null && !dropItemUI.activeSelf)
         {
             if (uiState == UIState.InventoryUI) CloseInventory();
-            if (uiState == UIState.HandCraftingUI) playerGeneral.OpenCloseCraftingMenu();
+            if (uiState == UIState.CraftingUI) playerGeneral.OpenCloseCraftingMenu(CraftingType.Hand);
 
             dropItemUI.SetActive(true);
             uiState = UIState.DropItemUI;
@@ -154,7 +154,8 @@ public class PlayerInventory : MonoBehaviour
     {
         handItemGO.GetComponent<Object>().quantity -= quant;
         inventorySlots[selectedSlotIndex].quantity -= quant;
-        GameObject dropPrefab = inventorySlots[selectedSlotIndex].itemData.itemPrefab;
+
+        ItemData droppedItem = handItem;
 
         if (handItemGO.GetComponent<Object>().quantity <= 0)
         {
@@ -170,11 +171,16 @@ public class PlayerInventory : MonoBehaviour
             inventorySlotUIs[selectedSlotIndex].UpdateUI(handItem, handItemGO.GetComponent<Object>().quantity);
         }
 
-        GameObject droppedItem = Instantiate(dropPrefab, handTransform.position, Quaternion.identity);
-        droppedItem.GetComponent<Object>().quantity = quant;
+        SpawnNewItem(droppedItem, quant);
+    }
+
+    public void SpawnNewItem(ItemData itemData, int quantity)
+    {
+        GameObject droppedItem = Instantiate(itemData.itemPrefab, handTransform.position, Quaternion.identity);
+        droppedItem.GetComponent<Object>().quantity = quantity;
         droppedItem.GetComponent<Object>().SetPhysicsEnabled(true);
         droppedItem.GetComponent<Rigidbody>().AddForce(handTransform.forward * 5f + transform.up * 2f, ForceMode.Impulse);
-        OpenCloseDropUI();
+        droppedItem.GetComponent<Object>().inHand = false;
     }
 
     public void AddItemToInventory(ItemData itemData, int quantity)
@@ -188,7 +194,8 @@ public class PlayerInventory : MonoBehaviour
                     inventorySlots[i].itemData = itemData;
                     inventorySlots[i].quantity = 1;
                     inventorySlotUIs[i].UpdateUI(itemData, 1);
-                    return;
+                    quantity--;
+                    if (quantity <= 0) return;
                 }
             }
             return;
@@ -223,6 +230,8 @@ public class PlayerInventory : MonoBehaviour
                 if (quantity <= 0) return;
             }
         }
+
+        SpawnNewItem(itemData, quantity);
     }
 
     public void UseItem()
@@ -368,5 +377,5 @@ public enum UIState
     None,
     InventoryUI,
     DropItemUI,
-    HandCraftingUI
+    CraftingUI
 }

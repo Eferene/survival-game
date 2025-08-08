@@ -10,6 +10,7 @@ public class ButtonController : MonoBehaviour
         if (slider.value > 0)
         {
             playerInventory.DropItem((int)slider.value);
+            playerInventory.OpenCloseDropUI();
         }
         else
         {

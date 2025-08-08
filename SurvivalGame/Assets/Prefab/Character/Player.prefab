@@ -171,7 +171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentHealth: 0
   maxHealth: 100
-  healthDecreaseRate: 0
+  healthDecreaseRate: 2.5
   currentStamina: 0
   maxStamina: 100
   staminaDecreaseRate: 10
@@ -189,9 +189,11 @@ MonoBehaviour:
   staminaBar: {fileID: 0}
   staminaBG: {fileID: 0}
   damageTextPrefab: {fileID: 5481048422191962130, guid: 0d65dd2d93ae40445872a7421b182ceb, type: 3}
+  craftingSystemUI: {fileID: 0}
   canHit: 0
   cameraTransform: {fileID: 6440858225002651933}
   characterDialogText: {fileID: 0}
+  cinemachineCamera: {fileID: 0}
 --- !u!114 &7084626725956955948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,9 +247,7 @@ MonoBehaviour:
   dropItemText: {fileID: 0}
   itemNameText: {fileID: 0}
   itemDescriptionText: {fileID: 0}
-  isDropUIOpen: 0
-  isInventoryOpen: 0
-  isHandBuildingOpen: 0
+  uiState: 0
 --- !u!1 &4249237498603341198
 GameObject:
   m_ObjectHideFlags: 0

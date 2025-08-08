@@ -12,6 +12,7 @@ TagManager:
   - Erenium
   - Galmend
   - FPSCam
+  - Crafting
   layers:
   - Default
   - TransparentFX
