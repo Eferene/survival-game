@@ -10,8 +10,10 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 10f;
-    [SerializeField] private float jumpForce = 10f;
-    private float moveSpeed;
+    [SerializeField] private float groundJumpForce = 10f;
+    [SerializeField] private float slopeJumpForce = 100f;
+    private float currentSpeed;
+    private float currentJumpForce;
 
     [Header("Swimming Settings")]
     [SerializeField] private float swimSpeedMultiplier = 0.5f;
@@ -35,10 +37,10 @@ public class PlayerController : MonoBehaviour
     private GroundTrigger groundTrigger;
     private Input playerInputActions;
 
-    private Vector2 moveInput;
+    private Vector2 movementInput;
     private bool isSprinting = false;
-    private bool isJumpPressing = false;
-    private float lastSprintTime;
+    private bool jumpPressed = false;
+    private float lastSprintTimestamp;
 
     private void Awake()
     {
@@ -78,7 +80,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        moveInput = playerInputActions.Player.Move.ReadValue<Vector2>();
+        movementInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
         UpdateFOV();
         HandleSprintAndStamina();
@@ -86,76 +88,103 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Movement();
-        Rotation();
+        HandleMovement();
+        HandleRotation();
     }
 
-    private void Movement()
+    private void HandleMovement()
     {
-        moveSpeed = isSprinting && playerGeneral.CurrentStamina > 0 ? sprintSpeed : walkSpeed;
-        rb.useGravity = !isInWater; // Gravity'yi sadece suda değilken kullan
+        // Hız belirlemesi: koşma ve stamina durumuna göre değişir
+        currentSpeed = isSprinting && playerGeneral.CurrentStamina > 0 ? sprintSpeed : walkSpeed;
 
-        Vector3 moveDirection;
+        rb.useGravity = !isInWater; // Suda yerçekimini kapat
+
+        Vector3 movementDirection;
 
         if (isInWater)
         {
-            moveSpeed *= swimSpeedMultiplier;
-            moveDirection = (playerCamera.transform.forward * moveInput.y + playerCamera.transform.right * moveInput.x).normalized;
+            currentSpeed *= swimSpeedMultiplier;
+            // Kamera yönünde hareket (yüzme için)
+            movementDirection = (playerCamera.transform.forward * movementInput.y + playerCamera.transform.right * movementInput.x).normalized;
         }
-        else if (groundTrigger.OnSlope())
+        else if (groundTrigger.CheckIfOnSlope())
         {
-            Vector3 slopeMoveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
+            Vector3 inputDirection = (transform.forward * movementInput.y + transform.right * movementInput.x).normalized;
             Vector3 slopeNormal = groundTrigger.HitInfo.normal;
 
-            moveDirection = Vector3.ProjectOnPlane(slopeMoveDirection, slopeNormal).normalized;
+            // Hareket yönünü eğim düzlemine projekte et, böylece eğim boyunca düzgün hareket sağlanır
+            movementDirection = Vector3.ProjectOnPlane(inputDirection, slopeNormal).normalized;
 
-            //rb.AddForce(Vector3.up * 0.1f, ForceMode.VelocityChange); // Slope üzerinde kaymayı önlemek için küçük bir yukarı kuvvet ekleyin
+            rb.AddForce(Vector3.down * 50f, ForceMode.Acceleration);
+
+            // Eğim açısı 45° üstündeyse yokuş yukarı çıkışı engelle
+            if (groundTrigger.slopeAngle > 45f)
+            {
+                // Eğim üzerinde "yukarı" yönü bulmak için çapraz çarpım kullanılır
+                Vector3 slopeUpDirection = Vector3.Cross(Vector3.Cross(Vector3.up, slopeNormal), slopeNormal).normalized;
+
+                // Vector3.Dot ile hareket yönünün eğim yukarısına mı olduğunu kontrol et
+                // Dot < 0 ise hareket yukarı doğru
+                if (Vector3.Dot(movementDirection, slopeUpDirection) < 0)
+                {
+                    // Yokuş yukarı hareket engellenir
+                    movementDirection = Vector3.zero;
+                }
+            }
         }
         else
-        {
-            moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
-        }
+            movementDirection = (transform.forward * movementInput.y + transform.right * movementInput.x).normalized;
 
-        Vector3 targetVelocity = moveDirection * moveSpeed;
+        Vector3 targetVelocity = movementDirection * currentSpeed;
 
         if (!isInWater)
-            // Y eksenindeki hızı koruyarak yatay hareketi etkiler
+            // Karada, mevcut dikey hızı koru (zıplama ve yerçekimi için)
             targetVelocity.y = rb.linearVelocity.y;
         else
-            // Suda iken, yukarı doğru yüzme için Y eksenindeki hızı artırabiliriz
-            targetVelocity.y += isJumpPressing ? swimAscendSpeed : -swimDescendSpeed;
+            // Suda yüzerken yukarı/aşağı hareket için Y hızını ayarla
+            targetVelocity.y += jumpPressed ? swimAscendSpeed : -swimDescendSpeed;
 
+        // Rigidbody hızını hedef hıza eşitle (ani hız değişimi için VelocityChange kullanıyoruz)
         rb.AddForce(targetVelocity - rb.linearVelocity, ForceMode.VelocityChange);
     }
 
-    private void Rotation()
+    private void HandleRotation()
     {
-        // Kamera yönündeki Y rotasyonunu al
-        float targetYRotation = playerCamera.transform.eulerAngles.y;
+        // Kamera yönüne göre oyuncuyu yatayda döndür
+        float desiredYRotation = playerCamera.transform.eulerAngles.y;
+        Quaternion targetRotation = Quaternion.Euler(0f, desiredYRotation, 0f);
 
-        // Sadece yatay eksende döndürmek için (X ve Z sabit)
-        Quaternion targetRotation = Quaternion.Euler(0f, targetYRotation, 0f);
-
-        // Rigidbody’yi smooth şekilde döndür
+        // Slerp ile yumuşak dönüş
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 15f));
     }
 
     private void Jump()
     {
-        isJumpPressing = true;
+        currentJumpForce = groundTrigger.CheckIfOnSlope() ? slopeJumpForce : groundJumpForce;
+
+        jumpPressed = true;
+
+        // Yerdeysek, suda değilsek ve yeterli stamina varsa zıpla
         if (isGrounded && !isInWater && playerGeneral.CurrentStamina > playerGeneral.jumpStaminaCost)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.up * currentJumpForce, ForceMode.VelocityChange);
             playerGeneral.CurrentStamina -= playerGeneral.jumpStaminaCost;
         }
     }
 
+    private void CancelJump()
+    {
+        jumpPressed = false;
+    }
+
     private void HandleSprintAndStamina()
     {
+        // Koşuyorsa ve stamina varsa
         if (isSprinting && playerGeneral.CurrentStamina > 0)
         {
+            // Koşarken stamina azalır
             playerGeneral.CurrentStamina -= Time.deltaTime * playerGeneral.staminaDecreaseRate;
-            lastSprintTime = Time.time;
+            lastSprintTimestamp = Time.time;
 
             if (playerGeneral.CurrentStamina <= 0)
             {
@@ -165,20 +194,17 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Time.time - lastSprintTime > staminaRegenDelay)
+            // Koşmuyorsa ve stamina dolum süresi geçtiyse, stamina artar
+            if (Time.time - lastSprintTimestamp > staminaRegenDelay)
             {
                 playerGeneral.CurrentStamina += Time.deltaTime * playerGeneral.staminaIncreaseRate;
             }
         }
     }
 
-    private void CancelJump()
-    {
-        isJumpPressing = false;
-    }
-
     private void UpdateFOV()
     {
+        // Koşarken görüş alanı genişler, koşmazken eski haline döner
         currentFOV = isSprinting ? sprintFOV : defaultFOV;
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, currentFOV, Time.deltaTime * fovTransitionSpeed);
     }

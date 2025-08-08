@@ -7,61 +7,86 @@ public class GroundTrigger : MonoBehaviour
     [Tooltip("Yere temas kontrolü için kullanılacak sphere'in yarıçapı.")]
     [SerializeField] private float sphereRadius = 0.3f;
 
-    [Tooltip("Kontrol sphere'i ne kadar aşağıda konumlanacak.")]
+    [Tooltip("Kontrol sphere'inin başlangıç noktasından ne kadar aşağıda olacağı.")]
     [SerializeField] private float groundCheckDistance = 0.1f;
 
     [Tooltip("Zemin olarak kabul edilecek layer'lar.")]
     [SerializeField] private LayerMask groundLayer;
 
-    [Tooltip("Maksimum eğim açısı (derece). Bu açının üstündeki yüzeylerde kayma olabilir.")]
-    [SerializeField] private float maxSlopeAngle = 45f;
+    // Güncel zeminin eğim açısı (derece cinsinden)
+    public float slopeAngle;
 
+    // Zeminin eğimli olup olmadığını tutar (sadece dahili kullanım)
+    private bool isOnSlope;
+
+    // PlayerController referansı, zemin temas bilgisini buraya iletmek için kullanılır
     [SerializeField] private PlayerController playerController;
 
-    // Yere temas raycast sonucu (sadece okunabilir)
-    private RaycastHit _hitInfo;
-    public RaycastHit HitInfo => _hitInfo;
+    // SphereCast sonucu çarpılan yüzey bilgisi (sadece okunabilir)
+    private RaycastHit groundHitInfo;
+    public RaycastHit HitInfo => groundHitInfo;
 
 
     void FixedUpdate()
     {
-        CheckGround();
+        PerformGroundCheck();
+
+        isOnSlope = CheckIfOnSlope();
+
+        Debug.Log(CheckIfOnSlope() ? "Eğimli yüzeydeyiz." : "Düz yüzeydeyiz.");
     }
 
-    private void CheckGround()
+    /// <summary>
+    /// Karakterin hemen altında yere temas edip etmediğini sphere cast ile kontrol eder.
+    /// SphereCast, kapsül gibi etrafı kontrol ederek daha sağlam temas algılar.
+    /// </summary>
+    private void PerformGroundCheck()
     {
-        // Karakterin pozisyonundan biraz aşağıdan başlayarak aşağı doğru bir küre "ateşliyoruz".
-        Vector3 origin = transform.position + Vector3.up * 0.1f;
+        Vector3 sphereCastOrigin = transform.position + Vector3.up * 0.1f;
 
-        // origin: Kürenin başladığı nokta.
-        // radius: Kürenin yarıçapı..
-        // direction: Kürenin gidiş yönü.
-        // hit: Çarpılan nesnenin bilgilerini döndürür. 'out' olarak kullanılır.
-        // maxDistance: Sphere'in ne kadar uzağa gideceğini belirtir. Bu, zemin kontrol mesafesidir.
-        // layerMask: Hangi layer’lara çarpacağını belirtir.
-        playerController.isGrounded = Physics.SphereCast(origin, sphereRadius, Vector3.down, out _hitInfo, groundCheckDistance, groundLayer);
+        // sphereCastOrigin: Kürenin başladığı nokta.
+        // sphereRadius: Kürenin yarıçapı..
+        // Vector3.down: Kürenin gidiş yönü.
+        // out groundHitInfo: Çarpılan nesnenin bilgilerini döndürür. 'out' olarak kullanılır.
+        // groundCheckDistance: Sphere'in ne kadar uzağa gideceğini belirtir. Bu, zemin kontrol mesafesidir.
+        // groundLayer: Hangi layer’lara çarpacağını belirtir.
+        playerController.isGrounded = Physics.SphereCast(
+            sphereCastOrigin,
+            sphereRadius,
+            Vector3.down,
+            out groundHitInfo,
+            groundCheckDistance,
+            groundLayer
+        );
     }
 
-    // Bu fonksiyon editörde Scene ekranında bize görsel bir küre çizer.
+    /// <summary>
+    /// Editör Scene view'da zemin kontrol sphere'ini görsel olarak çizer.
+    /// Eğer zemine temas varsa, küre çarpmanın gerçekleştiği mesafeye çizilir, yoksa maksimum kontrol mesafesine.
+    /// </summary>
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Vector3 origin = transform.position + Vector3.up * 0.1f;
 
-        // Kürenin merkezini hesaplıyoruz:
-        // Eğer isGrounded true ise, küre çarpmanın gerçekleştiği mesafeye çizilir (_hitInfo.distance kadar aşağıda)
-        // Değilse, yani temas yoksa, küre maksimum kontrol mesafesinde (groundCheckDistance kadar aşağıda) çizilir
-        Gizmos.DrawWireSphere(origin + Vector3.down * (playerController.isGrounded ? _hitInfo.distance : groundCheckDistance), sphereRadius);
+        float drawDistance = playerController != null && playerController.isGrounded ? groundHitInfo.distance : groundCheckDistance;
+        Gizmos.DrawWireSphere(origin + Vector3.down * drawDistance, sphereRadius);
     }
 
-    public bool OnSlope()
+    /// <summary>
+    /// Zeminin eğimli olup olmadığını kontrol eder.
+    /// Eğer zemin varsa ve eğim normali yukarıya tam paralel değilse,
+    /// eğim açısını hesaplar ve 0°'den büyükse true döner.
+    /// </summary>
+    /// <returns>True ise eğimli yüzeyde, false ise düz zemindeyiz.</returns>
+    public bool CheckIfOnSlope()
     {
-        // Eğer zemin kontrolü yapıldıysa ve zemin var ise, eğim kontrolü yapar.
-        if (playerController.isGrounded && _hitInfo.normal != Vector3.up)
+        if (playerController.isGrounded && groundHitInfo.normal != Vector3.up)
         {
-            float angle = Vector3.Angle(_hitInfo.normal, Vector3.up);
-            return angle > 0 && angle < maxSlopeAngle; // 45 derece eğimden daha az ise eğimli yüzeydeyiz.
+            slopeAngle = Vector3.Angle(groundHitInfo.normal, Vector3.up);
+            return slopeAngle > 0;
         }
-        return false; // Zemin yoksa veya düz ise false döner.
+        slopeAngle = 0f;
+        return false;
     }
 }
