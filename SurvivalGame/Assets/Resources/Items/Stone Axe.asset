@@ -28,7 +28,7 @@ MonoBehaviour:
   - craftingMaterial: {fileID: 11400000, guid: ed2c365cbe9f2cb428a5eb8888daa506, type: 2}
     craftingMaterialAmount: 2
   - craftingMaterial: {fileID: 11400000, guid: 57889826ab83122468e614f322bcc4d4, type: 2}
-    craftingMaterialAmount: 1
+    craftingMaterialAmount: 2
   minEfficiency: 10
   maxEfficiency: 15
   effectiveTags:

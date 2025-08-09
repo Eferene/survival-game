@@ -24,7 +24,11 @@ MonoBehaviour:
   handRotation: {x: 0, y: 0, z: 0}
   isCraftable: 1
   craftingType: 1
-  crafting: []
+  crafting:
+  - craftingMaterial: {fileID: 11400000, guid: ed2c365cbe9f2cb428a5eb8888daa506, type: 2}
+    craftingMaterialAmount: 2
+  - craftingMaterial: {fileID: 11400000, guid: 9380c07fdf54d2f45923af10928318a6, type: 2}
+    craftingMaterialAmount: 3
   minEfficiency: 40
   maxEfficiency: 45
   effectiveTags:

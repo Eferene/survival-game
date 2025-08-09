@@ -99,7 +99,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void CloseInventory()
     {
-        if(uiState == UIState.InventoryUI)
+        if (uiState == UIState.InventoryUI)
         {
             inventoryPanelGO.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
@@ -198,6 +198,14 @@ public class PlayerInventory : MonoBehaviour
                     if (quantity <= 0) return;
                 }
             }
+
+            if (quantity > 0)
+            {
+                for (int i = 0; i < quantity; i++)
+                {
+                    SpawnNewItem(itemData, 1);
+                }
+            }
             return;
         }
 
@@ -231,7 +239,20 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
-        SpawnNewItem(itemData, quantity);
+        while (quantity > 0)
+        {
+            if (quantity > itemData.maxStackSize)
+            {
+                int spawnAmount = itemData.maxStackSize;
+                SpawnNewItem(itemData, spawnAmount);
+                quantity -= spawnAmount;
+            }
+            else
+            {
+                int spawnAmount = quantity;
+                if (spawnAmount <= 0) return;
+            }
+        }
     }
 
     public void UseItem()

@@ -132,7 +132,7 @@ public class PlayerGeneral : MonoBehaviour
         if (currentCraftingObject != null)
         {
             float dist = Vector3.Distance(transform.position, currentCraftingObject.transform.position);
-            if (dist > 5f)
+            if (dist > 5f && playerInventory.uiState == UIState.CraftingUI)
             {
                 OpenCloseCraftingMenu(currentCraftingObject.type);
                 currentCraftingObject = null;
@@ -255,33 +255,6 @@ public class PlayerGeneral : MonoBehaviour
                         }
                     }
                 }
-                else if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Consumable)
-                {
-                    if (canHit && playerInputActions.Player.Hit.triggered)
-                    {
-                        ConsumableItem consumableItem = playerInventory.handItem as ConsumableItem;
-                        if (consumableItem != null)
-                        {
-                            UseConsumable(consumableItem);
-                            playerInventory.handItemGO.GetComponent<Object>().quantity -= 1;
-                            playerInventory.inventorySlots[playerInventory.selectedSlotIndex].quantity -= 1;
-
-                            if (playerInventory.handItemGO.GetComponent<Object>().quantity <= 0)
-                            {
-                                Destroy(playerInventory.handItemGO);
-                                playerInventory.handItemGO = null;
-                                playerInventory.handItem = null;
-                                playerInventory.inventorySlots[playerInventory.selectedSlotIndex].itemData = null;
-                                playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(null, 0);
-                                playerInventory.selectedSlotIndex = -1;
-                            }
-                            else
-                            {
-                                playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(consumableItem, playerInventory.handItemGO.GetComponent<Object>().quantity);
-                            }
-                        }
-                    }
-                }
             }
         }
         #endregion
@@ -294,6 +267,35 @@ public class PlayerGeneral : MonoBehaviour
                 {
                     currentCraftingObject = hit.collider.GetComponent<CraftingObject>();
                     OpenCloseCraftingMenu(CraftingType.Workbench);
+                }
+            }
+        }
+        #endregion
+        #region Tüketme
+        if (playerInventory.handItem != null && playerInventory.handItem.itemType == ItemType.Consumable)
+        {
+            if (canHit && playerInputActions.Player.Hit.triggered)
+            {
+                ConsumableItem consumableItem = playerInventory.handItem as ConsumableItem;
+                if (consumableItem != null)
+                {
+                    UseConsumable(consumableItem);
+                    playerInventory.handItemGO.GetComponent<Object>().quantity -= 1;
+                    playerInventory.inventorySlots[playerInventory.selectedSlotIndex].quantity -= 1;
+
+                    if (playerInventory.handItemGO.GetComponent<Object>().quantity <= 0)
+                    {
+                        Destroy(playerInventory.handItemGO);
+                        playerInventory.handItemGO = null;
+                        playerInventory.handItem = null;
+                        playerInventory.inventorySlots[playerInventory.selectedSlotIndex].itemData = null;
+                        playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(null, 0);
+                        playerInventory.selectedSlotIndex = -1;
+                    }
+                    else
+                    {
+                        playerInventory.inventorySlotUIs[playerInventory.selectedSlotIndex].UpdateUI(consumableItem, playerInventory.handItemGO.GetComponent<Object>().quantity);
+                    }
                 }
             }
         }
