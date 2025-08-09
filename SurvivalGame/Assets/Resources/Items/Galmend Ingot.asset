@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
+  m_Name: Galmend Ingot
+  m_EditorClassIdentifier: 
+  itemID: 12
+  itemName: Galmend Ingot
+  itemDescription: A refined ingot of Galmend, essential for crafting advanced tools
+    and weapons.
+  itemIcon: {fileID: 21300000, guid: 2bb49b11f5b8fa545a5f5616938092e8, type: 3}
+  itemPrefab: {fileID: 6341400454940794413, guid: b121817cbed985041931621feb915d2b, type: 3}
+  isStackable: 1
+  maxStackSize: 16
+  handPosition: {x: 0, y: 0, z: 0}
+  handRotation: {x: 0, y: 0, z: 0}
+  isCraftable: 1
+  craftingType: 2
+  crafting:
+  - craftingMaterial: {fileID: 11400000, guid: 9380c07fdf54d2f45923af10928318a6, type: 2}
+    craftingMaterialAmount: 4

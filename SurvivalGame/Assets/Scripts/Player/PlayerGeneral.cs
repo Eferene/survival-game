@@ -266,7 +266,7 @@ public class PlayerGeneral : MonoBehaviour
                 if (canHit && playerInputActions.Player.Interaction.triggered)
                 {
                     currentCraftingObject = hit.collider.GetComponent<CraftingObject>();
-                    OpenCloseCraftingMenu(CraftingType.Workbench);
+                    OpenCloseCraftingMenu(currentCraftingObject.type);
                 }
             }
         }
