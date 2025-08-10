@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1539009bc7af71246bb2307658fd0b43, type: 3}
-  m_Name: Erenium Axe
+  m_Name: Building Hammer
   m_EditorClassIdentifier: 
-  itemID: 2
-  itemName: Erenium Axe
-  itemDescription: A erenium axe for chopping wood. You can chop bigger trees.
-  itemIcon: {fileID: 21300000, guid: d80c323f659c6c248ae55238c0263ecb, type: 3}
-  itemPrefab: {fileID: 5792404576503917507, guid: e47a6845614c235409972fc1dcf7890c, type: 3}
+  itemID: 14
+  itemName: Building Hammer
+  itemDescription: Simple stone hammer, the backbone of every build. Without this,
+    nothing gets built.
+  itemIcon: {fileID: 21300000, guid: 38c1606a233f9e54a8059d607e8bffe7, type: 3}
+  itemPrefab: {fileID: 8498914695978139454, guid: 1a6de17a1694bc74e9ef7c174c990f64, type: 3}
   isStackable: 0
-  maxStackSize: 1
+  maxStackSize: 0
   handPosition: {x: 0, y: 0, z: 0}
-  handRotation: {x: 0, y: 180, z: 0}
+  handRotation: {x: 0, y: -90, z: 0}
   isCraftable: 1
-  craftingType: 1
+  craftingType: 0
   crafting:
   - craftingMaterial: {fileID: 11400000, guid: ed2c365cbe9f2cb428a5eb8888daa506, type: 2}
     craftingMaterialAmount: 2
-  - craftingMaterial: {fileID: 11400000, guid: 39706044da09a804eb66d7b2f507f5ac, type: 2}
+  - craftingMaterial: {fileID: 11400000, guid: 57889826ab83122468e614f322bcc4d4, type: 2}
     craftingMaterialAmount: 2
-  minEfficiency: 20
-  maxEfficiency: 25
-  effectiveTags:
-  - Tree
+  minEfficiency: 0
+  maxEfficiency: 0
+  effectiveTags: []

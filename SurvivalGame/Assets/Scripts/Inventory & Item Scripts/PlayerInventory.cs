@@ -37,9 +37,13 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemDescriptionText;
     public UIState uiState;
+    [SerializeField] private RectTransform arrowRectTransform;
 
     private void Awake()
     {
+        inventoryPanelGO.SetActive(false);
+        dropItemUI.SetActive(false);
+        
         playerActions = new Input();
         uiState = UIState.None;
 
@@ -293,6 +297,7 @@ public class PlayerInventory : MonoBehaviour
                     {
                         UpdateHandItem(index);
                     }
+                    arrowRectTransform.gameObject.SetActive(true);
                 }
                 else if (index >= 0 && inventorySlots[index].itemData == null)
                 {
@@ -306,6 +311,7 @@ public class PlayerInventory : MonoBehaviour
                         handItem = null;
                     }
                     UpdateHandItem(-1);
+                    arrowRectTransform.gameObject.SetActive(false);
                 }
             }
         }

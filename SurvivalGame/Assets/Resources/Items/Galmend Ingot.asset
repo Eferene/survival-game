@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75e5352167af0441b4323a3ea0c0ee5, type: 3}
   m_Name: Galmend Ingot
   m_EditorClassIdentifier: 
-  itemID: 12
+  itemID: 13
   itemName: Galmend Ingot
   itemDescription: A refined ingot of Galmend, essential for crafting advanced tools
     and weapons.
