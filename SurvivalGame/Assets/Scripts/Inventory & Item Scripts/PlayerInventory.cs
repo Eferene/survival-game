@@ -298,6 +298,41 @@ public class PlayerInventory : MonoBehaviour
                         UpdateHandItem(index);
                     }
                     arrowRectTransform.gameObject.SetActive(true);
+                    switch (index)
+                    {
+                        case 0:
+                            arrowRectTransform.localPosition = new Vector3(0, 165, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, 0);
+                            break;
+                        case 1:
+                            arrowRectTransform.localPosition = new Vector3(116.67f, 116.67f, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -45);
+                            break;
+                        case 2:
+                            arrowRectTransform.localPosition = new Vector3(165, 0, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -90);
+                            break;
+                        case 3:
+                            arrowRectTransform.localPosition = new Vector3(116.67f, -116.67f, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -135);
+                            break;
+                        case 4:
+                            arrowRectTransform.localPosition = new Vector3(0, -165, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -180);
+                            break;
+                        case 5:
+                            arrowRectTransform.localPosition = new Vector3(-116.67f, -116.67f, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -225);
+                            break;
+                        case 6:
+                            arrowRectTransform.localPosition = new Vector3(-165, 0, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -270);
+                            break;
+                        case 7:
+                            arrowRectTransform.localPosition = new Vector3(-116.67f, 116.67f, 0);
+                            arrowRectTransform.localRotation = Quaternion.Euler(0, 0, -315);
+                            break;
+                    }
                 }
                 else if (index >= 0 && inventorySlots[index].itemData == null)
                 {
