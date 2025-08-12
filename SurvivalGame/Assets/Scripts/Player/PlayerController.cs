@@ -83,18 +83,34 @@ public class PlayerController : MonoBehaviour
     {
         movementInput = playerInputActions.Player.Move.ReadValue<Vector2>();
 
-        if (rb.linearVelocity.magnitude > maxSpeed)
-        {
-            // Eğer hız maksimumdan fazlaysa, hızı sınırla
-            rb.linearVelocity = rb.linearVelocity.normalized * maxSpeed;
-        }
-
         UpdateFOV();
         HandleSprintAndStamina();
     }
 
     private void FixedUpdate()
     {
+        Vector3 rbHorizontal = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        Vector3 rbVertical = new Vector3(0f, rb.linearVelocity.y, 0f);
+
+        if (rbHorizontal.magnitude > maxSpeed)
+        {
+            // Eğer hız maksimumdan fazlaysa, hızı sınırla
+            rb.linearVelocity = new Vector3(
+                rbHorizontal.x * maxSpeed,
+                rb.linearVelocity.y, // Y eksenindeki hızı koru (zıplama ve yerçekimi için)
+                rbHorizontal.z * maxSpeed
+            ).normalized;
+        }
+
+        if (rbVertical.magnitude > maxSpeed)
+        {
+            rb.linearVelocity = new Vector3(
+                rb.linearVelocity.x, // X eksenindeki hızı koru
+                rbVertical.y * maxSpeed,
+                rb.linearVelocity.z // Z eksenindeki hızı koru
+            ).normalized;
+        }
+
         HandleMovement();
         HandleRotation();
     }

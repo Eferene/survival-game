@@ -89,7 +89,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 80
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &5600149555719879952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,7 +105,9 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   walkSpeed: 5
   sprintSpeed: 10
-  jumpForce: 5
+  groundJumpForce: 5
+  slopeJumpForce: 7
+  maxSpeed: 10
   swimSpeedMultiplier: 0.5
   swimAscendSpeed: 1
   swimDescendSpeed: 0.15
@@ -150,12 +152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6959e2ccdef91e24abc28f85c41fb9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereRadius: 0.3
+  sphereRadius: 0.45
   groundCheckDistance: 0.9
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  maxSlopeAngle: 45
+  slopeAngle: 0
   playerController: {fileID: 5600149555719879952}
 --- !u!114 &4185201844351019373
 MonoBehaviour:
@@ -248,6 +250,7 @@ MonoBehaviour:
   itemNameText: {fileID: 0}
   itemDescriptionText: {fileID: 0}
   uiState: 0
+  arrowRectTransform: {fileID: 0}
 --- !u!1 &4249237498603341198
 GameObject:
   m_ObjectHideFlags: 0
