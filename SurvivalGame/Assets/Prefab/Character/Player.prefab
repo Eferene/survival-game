@@ -11,11 +11,10 @@ GameObject:
   - component: {fileID: 5639968788880494884}
   - component: {fileID: 2328778524684490536}
   - component: {fileID: 3733392792543592858}
-  - component: {fileID: 5600149555719879952}
-  - component: {fileID: 6041607818956955133}
-  - component: {fileID: 4734352975895314409}
+  - component: {fileID: 3951481035065148866}
   - component: {fileID: 4185201844351019373}
   - component: {fileID: 7084626725956955948}
+  - component: {fileID: 2482368571750670792}
   m_Layer: 2
   m_Name: Player
   m_TagString: Player
@@ -32,12 +31,11 @@ Transform:
   m_GameObject: {fileID: 3447590119985939893}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.8, y: 1, z: 12.37}
+  m_LocalPosition: {x: -0.45, y: 10.815, z: -2.77}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4109705361941417218}
-  - {fileID: 1364474042479190281}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &2328778524684490536
@@ -90,7 +88,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 2
---- !u!114 &5600149555719879952
+--- !u!114 &3951481035065148866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,66 +97,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 3447590119985939893}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a3c7b26afc8b2c4391596d9b512073a, type: 3}
+  m_Script: {fileID: 11500000, guid: 0119e2235980a7a4e9433177e97533d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
-  walkSpeed: 5
-  sprintSpeed: 10
-  groundJumpForce: 5
-  slopeJumpForce: 7
-  maxSpeed: 10
-  swimSpeedMultiplier: 0.5
-  swimAscendSpeed: 1
-  swimDescendSpeed: 0.15
-  staminaRegenDelay: 1
-  defaultFOV: 60
-  sprintFOV: 70
-  fovTransitionSpeed: 5
-  isInWater: 0
-  isGrounded: 0
---- !u!114 &6041607818956955133
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3447590119985939893}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ff7f2e476dba804da56ce1bc084c6ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerCamera: {fileID: 0}
-  walkSpeed: 5
-  sprintSpeed: 12
-  rotationSpeed: 15
-  swimSpeedMultiplier: 0.5
-  swimAscendSpeed: 1
-  staminaRegenDelay: 1
-  defaultFOV: 60
-  sprintFOV: 70
-  fovTransitionSpeed: 5
-  isInWater: 0
---- !u!114 &4734352975895314409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3447590119985939893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6959e2ccdef91e24abc28f85c41fb9ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sphereRadius: 0.45
-  groundCheckDistance: 0.9
+  moveSpeed: 40
+  sprintSpeed: 80
+  maxVelocity: 100
+  dragOnGround: 6
+  jumpForce: 20
+  airControlMultiplier: 0.5
+  dragInAir: 0.5
+  swimForce: 25
+  buoyancy: 10
+  dragInWater: 3
+  swimmingCheckRadius: 0.6
+  swimmingCheckDistance: -0.3
+  groundCheckRadius: 0.48
+  groundCheckDistance: 0.6
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  slopeAngle: 0
-  playerController: {fileID: 5600149555719879952}
+  slopeStickForce: 100
+  extraGravityForce: 20
 --- !u!114 &4185201844351019373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,7 +127,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3447590119985939893}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 745fec3319f935443835544561bcb024, type: 3}
   m_Name: 
@@ -203,7 +164,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3447590119985939893}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8da07462c2fe1ec4eac4629670c5e98c, type: 3}
   m_Name: 
@@ -251,6 +212,36 @@ MonoBehaviour:
   itemDescriptionText: {fileID: 0}
   uiState: 0
   arrowRectTransform: {fileID: 0}
+--- !u!114 &2482368571750670792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3447590119985939893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: 0}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: 
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &4249237498603341198
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,79 +267,13 @@ Transform:
   m_GameObject: {fileID: 4249237498603341198}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.729, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6440858225002651933}
   m_Father: {fileID: 5639968788880494884}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6644403270258061578
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1364474042479190281}
-  - component: {fileID: 9133001269292694072}
-  - component: {fileID: 7768541822649609529}
-  m_Layer: 2
-  m_Name: Check If Is In Water
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1364474042479190281
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6644403270258061578}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5639968788880494884}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &9133001269292694072
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6644403270258061578}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.6
-  m_Center: {x: 0, y: 0.27, z: 0}
---- !u!114 &7768541822649609529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6644403270258061578}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91e8a6781d794e64e8d39a68ce14eaf3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6818041387214035756
 GameObject:
   m_ObjectHideFlags: 0

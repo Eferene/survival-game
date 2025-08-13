@@ -36,9 +36,12 @@ public class RigidbodyMovementController : MonoBehaviour
     [SerializeField] private float swimForce = 5f;              // Karakter sudayken hareket etmek için uygulanan kuvvet.
     [SerializeField] private float buoyancy = 10f;              // Karakteri suyun yüzeyine doğru iten kaldırma kuvveti.
     [SerializeField] private float dragInWater = 3f;            // Karakter sudayken hareketine karşı koyan sürtünme kuvveti.
+    [SerializeField] private float swimmingCheckRadius = 0.5f;  // Karakterin su içinde olup olmadığını kontrol etmek için kullanılan küre yarıçapı.
+    [SerializeField] private float swimmingCheckDistance;       // Su kontrolü için karakterin merkezinden aşağıya doğru olan mesafe.
 
     [Header("Ground & Slope Handling")]
-    [SerializeField] private float groundCheckDistance = 0.2f;  // Karakterin altından ne kadar mesafede zemin kontrolü yapılacağını belirler. q
+    [SerializeField] private float groundCheckRadius = 0.2f;    // Karakterin altından ne kadar mesafede zemin kontrolü yapılacağını belirler.
+    [SerializeField] private float groundCheckDistance = 0.1f;  // Zemin kontrolü için karakterin altına gönderilecek ışının uzunluğu.
     [SerializeField] private LayerMask groundLayer;             // Hangi katmanların "zemin" olarak kabul edileceğini tanımlar.
     [SerializeField] private float slopeStickForce = 100f;      // Karakterin eğimli yüzeylerde aşağı kaymasını önlemek için yere doğru uygulanan yapışma kuvveti.
 
@@ -112,27 +115,23 @@ public class RigidbodyMovementController : MonoBehaviour
 
         // Her fizik adımının sonunda, karakterin hızının belirlenen maksimum limiti aşıp aşmadığını kontrol eder.
         LimitVelocity();
+        // Ayrıca, karakterin hızına göre kamera FOV'sini günceller.
+        ApplyUpdateFOV();
     }
 
     // Oyuncunun durumunu, su ve zemin kontrollerine göre günceller.
     private void UpdatePlayerState()
     {
-        // Öncelikle su içinde olup olmadığını kontrol eder, çünkü bu en öncelikli durumdur.
         if (IsinWater())
         {
             Debug.LogWarning("Player is swimming");
             currentState = PlayerState.Swimming;
-            // Durum belirlendiği için fonksiyondan çıkar, gereksiz kontrolü engeller.
-            return;
         }
-
-        // Su içinde değilse, yerde olup olmadığını kontrol eder.
-        if (IsGrounded())
+        else if (IsGrounded())
         {
             Debug.LogWarning("Player is grounded");
             currentState = PlayerState.Grounded;
         }
-        // Yerde de değilse, tek olasılık havada olmasıdır.
         else
         {
             Debug.LogWarning("Player is flying");
@@ -144,16 +143,16 @@ public class RigidbodyMovementController : MonoBehaviour
     private bool IsinWater()
     {
         // Karakterin merkezinde, "Water" katmanıyla temas eden bir küre olup olmadığını kontrol eder.
-        return Physics.CheckSphere(transform.position, capsuleCollider.radius, LayerMask.GetMask("Water"), QueryTriggerInteraction.Collide);
+        return Physics.CheckSphere(transform.position + Vector3.down * swimmingCheckDistance, swimmingCheckRadius, LayerMask.GetMask("Water"), QueryTriggerInteraction.Collide);
     }
 
     // Karakterin zemine temas edip etmediğini kontrol eder.
     private bool IsGrounded()
     {
         // Karakterin kapsül collider'ının alt merkezinden biraz aşağıya bir pozisyon belirler.
-        Vector3 spherePosition = transform.position + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius + 0.01f);
+        Vector3 spherePosition = transform.position + Vector3.down * groundCheckDistance;
         // Belirlenen pozisyonda, "groundLayer" olarak işaretlenmiş katmanlarla temas eden bir küre olup olmadığını kontrol eder.
-        return Physics.CheckSphere(spherePosition, groundCheckDistance, groundLayer, QueryTriggerInteraction.Ignore);
+        return Physics.CheckSphere(spherePosition, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
     }
 
     // Karakter yerdeyken uygulanacak hareket mantığını yönetir.
@@ -273,16 +272,26 @@ public class RigidbodyMovementController : MonoBehaviour
         }
     }
 
+    private void ApplyUpdateFOV()
+    {
+        float targetFOV = sprintInput ? 80f : 60f; // Sprint yapılıyorsa FOV'yi artır, değilse normalde tut.
+        playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * 5f);
+    }
+
     // Unity Editor'da çalışırken, seçili olan bu objenin etrafına yardımcı görseller (Gizmo) çizer.
     private void OnDrawGizmosSelected()
     {
-        // Editörde çalışırken hata almamak için collider referansının varlığını kontrol eder.
-        if (capsuleCollider == null) return;
+        if (capsuleCollider == null)
+            capsuleCollider = GetComponent<CapsuleCollider>();
 
-        // Gizmo rengini yeşil olarak ayarlar.
         Gizmos.color = Color.yellow;
         // IsGrounded metodunda kullanılan kürenin konumunu ve boyutunu editörde görselleştirir.
-        Vector3 spherePosition = transform.position + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius + 0.01f);
-        Gizmos.DrawWireSphere(spherePosition, capsuleCollider.radius);
+        Vector3 spherePosition = transform.position + Vector3.down * groundCheckDistance;
+        Gizmos.DrawWireSphere(spherePosition, groundCheckRadius);
+
+        Gizmos.color = Color.blue;
+        // IsinWater metodunda kullanılan kürenin konumunu ve boyutunu editörde görselleştirir.
+        Vector3 spherePosition2 = transform.position + Vector3.down * swimmingCheckDistance;
+        Gizmos.DrawWireSphere(spherePosition2, swimmingCheckRadius);
     }
 }
