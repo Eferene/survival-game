@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3951481035065148866}
   - component: {fileID: 4185201844351019373}
   - component: {fileID: 7084626725956955948}
+  - component: {fileID: 2584094953149667729}
   - component: {fileID: 2482368571750670792}
   m_Layer: 2
   m_Name: Player
@@ -109,7 +110,7 @@ MonoBehaviour:
   airControlMultiplier: 0.5
   dragInAir: 0.5
   swimForce: 25
-  buoyancy: 10
+  buoyancy: -1
   dragInWater: 3
   swimmingCheckRadius: 0.6
   swimmingCheckDistance: -0.3
@@ -212,6 +213,23 @@ MonoBehaviour:
   itemDescriptionText: {fileID: 0}
   uiState: 0
   arrowRectTransform: {fileID: 0}
+--- !u!114 &2584094953149667729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3447590119985939893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e463c8f878ed454ebfb05090971e7e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapGenerator: {fileID: 0}
+  playerCharacter: {fileID: 3447590119985939893}
+  minSpawnNormalizedHeight: 0.3
+  searchStep: 2
+  maxSearchRadiusSteps: 100
 --- !u!114 &2482368571750670792
 MonoBehaviour:
   m_ObjectHideFlags: 0
