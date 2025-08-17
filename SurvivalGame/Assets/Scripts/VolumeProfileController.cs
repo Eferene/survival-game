@@ -16,11 +16,11 @@ public class VolumeProfileController : MonoBehaviour
     [SerializeField] private VolumeProfile _surfaceVolumeProfile;
     [SerializeField] private VolumeProfile _underwaterVolumeProfile;
 
-
     private void Start()
     {
-        RenderSettings.fogDensity = _fogDensity / 10;
-        RenderSettings.fogColor = Color.cyan;
+        RenderSettings.fogMode = FogMode.Exponential;
+        RenderSettings.fogStartDistance = 0f;
+        RenderSettings.fogEndDistance = 30f;
     }
 
     private void Update()
@@ -41,6 +41,8 @@ public class VolumeProfileController : MonoBehaviour
         else
         {
             RenderSettings.fog = true;
+            RenderSettings.fogDensity = _fogDensity / 100f;
+            RenderSettings.fogColor = new Color(0.0f, 0.3f, 0.5f);
             _postProcessingVolume.profile = _underwaterVolumeProfile;
         }
     }
