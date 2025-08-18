@@ -16,6 +16,8 @@ public class RigidbodyMovementController : MonoBehaviour
     private CapsuleCollider capsuleCollider;                // Oyuncunun fiziksel sınırlarını ve çarpışmalarını yöneten CapsuleCollider component'inin referansı.
     private Input playerInputActions;                       // Unity'nin Input System'i üzerinden oyuncu girdilerini yönetmek için kullanılan ana sınıfın referansı.
     [SerializeField] private CinemachineCamera playerCamera;// Oyuncuyu takip eden ve hareket yönünü belirlemede kullanılan Cinemachine sanal kamerasının referansı.
+    [SerializeField] private AudioSource playerAudioSource; // Oyuncunun ses efektlerini çalmak için kullanılan AudioSource bileşeninin referansı.
+    [SerializeField] private AudioClip walkSound;           // Yürüme anında çalınacak ses efekti.
     #endregion
 
     #region Hareket Parametreleri (Inspector'dan Ayarlanabilir)
@@ -55,6 +57,9 @@ public class RigidbodyMovementController : MonoBehaviour
     private bool jumpInput = false;     // Oyuncunun zıplama tuşuna basıp basmadığını belirten boolean bayrak.
     private bool sprintInput = false;   // Oyuncunun sprint tuşuna basılı tutup tutmadığını belirten boolean bayrak.
     #endregion
+
+    float lastStepTime = 0f;
+    [SerializeField] private float stepSoundCooldown = 1.5f;
 
     private void Awake()
     {
@@ -147,6 +152,9 @@ public class RigidbodyMovementController : MonoBehaviour
         rb.linearDamping = dragOnGround;
         float currentSpeed = sprintInput ? sprintSpeed : moveSpeed;
         rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Force);
+
+        if (moveInput != Vector2.zero)
+            CallStepSound(); // Yürüyüş sesi efektini çağırır.
     }
 
     // Karakter havadayken uygulanacak hareket mantığını yönetir.
@@ -236,6 +244,15 @@ public class RigidbodyMovementController : MonoBehaviour
     {
         float targetFOV = sprintInput ? 80f : 60f;
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * 5f);
+    }
+
+    private void CallStepSound()
+    {
+        if (Time.time - lastStepTime >= stepSoundCooldown)
+        {
+            playerAudioSource.PlayOneShot(walkSound);
+            lastStepTime = Time.time;
+        }
     }
 
     // Unity Editor'da çalışırken, seçili olan bu objenin etrafına yardımcı görseller (Gizmo) çizer.

@@ -9,7 +9,9 @@ public static class TextureGenerator
         Texture2D texture = new Texture2D(width, height);
         // filterMode.Point, pikseller arası geçişi yumuşatmaz, keskin bırakır.
         // Bu, bloklu, bölgeli haritalar için daha iyi bir görünüm sağlar.
-        texture.filterMode = FilterMode.Bilinear;
+        texture.filterMode = FilterMode.Trilinear;
+        texture.anisoLevel = 9; // Anisotropic filtering'i kapatır, bu da performansı artırır.
+
         // wrapMode.Clamp, texture'ın kenarlarının tekrar etmesini (tile) engeller.
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.SetPixels(colorMap);
