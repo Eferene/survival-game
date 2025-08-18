@@ -2,8 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Bu component'in eklendiği GameObject'te Rigidbody ve CapsuleCollider bileşenlerinin bulunmasını zorunlu kılar.
-// Bu, script'in doğru çalışması için gerekli olan temel fizik bileşenlerini garanti altına alır.
+// GameObject'te Rigidbody ve CapsuleCollider bileşenlerini zorunlu kılar.
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 public class RigidbodyMovementController : MonoBehaviour
@@ -34,6 +33,7 @@ public class RigidbodyMovementController : MonoBehaviour
 
     [Header("Movement - Swimming")]
     [SerializeField] private float swimForce = 5f;              // Karakter sudayken hareket etmek için uygulanan kuvvet.
+    [SerializeField] private float swimAscendSpeed = 3f;        // Karakterin su yüzeyine doğru yüzmesini sağlayan yukarı doğru hareket hızı.
     [SerializeField] private float buoyancy = 10f;              // Karakteri suyun yüzeyine doğru iten kaldırma kuvveti.
     [SerializeField] private float dragInWater = 3f;            // Karakter sudayken hareketine karşı koyan sürtünme kuvveti.
     [SerializeField] private float swimmingCheckRadius = 0.5f;  // Karakterin su içinde olup olmadığını kontrol etmek için kullanılan küre yarıçapı.
@@ -56,48 +56,37 @@ public class RigidbodyMovementController : MonoBehaviour
     private bool sprintInput = false;   // Oyuncunun sprint tuşuna basılı tutup tutmadığını belirten boolean bayrak.
     #endregion
 
-    // Script'in ilk örneklendiği anda, oyun başlamadan önce çağrılır.
-    // Temel component referanslarını ve input olaylarını ayarlamak için kullanılır.
     private void Awake()
     {
-        // Gerekli component referanslarını alıp değişkenlere atar (caching).
         rb = GetComponent<Rigidbody>();
         capsuleCollider = GetComponent<CapsuleCollider>();
 
-        // Yeni bir Input Actions nesnesi oluşturur.
         playerInputActions = new Input();
 
-        // "Move" eylemi gerçekleştirildiğinde (tuşa basıldığında), moveInput değişkenini günceller.
         playerInputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        // "Move" eylemi iptal edildiğinde (tuş bırakıldığında), moveInput değişkenini sıfırlar.
         playerInputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
 
-        // "Jump" eylemi gerçekleştirildiğinde zıplama mantığını tetikler.
-        playerInputActions.Player.Jump.performed += ctx => HandleJumpInput();
+        playerInputActions.Player.Jump.performed += ctx => jumpInput = true;
+        playerInputActions.Player.Jump.canceled += ctx => jumpInput = false;
 
-        // "Run" eylemi gerçekleştirildiğinde sprint modunu aktif eder.
         playerInputActions.Player.Run.performed += ctx => sprintInput = true;
-        // "Run" eylemi iptal edildiğinde sprint modunu deaktif eder.
         playerInputActions.Player.Run.canceled += ctx => sprintInput = false;
 
-        // Cursor gizleme ve kilitleme işlemlerini yapar.
+        // Cursor gizleme ve kilitleme
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Bu script etkinleştirildiğinde çağrılır. Oyuncu input eylemlerini dinlemeye başlar.
-    private void OnEnable() => playerInputActions.Player.Enable();
+    private void OnEnable() => playerInputActions.Player.Enable();      // Oyuncu input eylemlerini dinlemeye başlar.
 
-    // Bu script devre dışı bırakıldığında çağrılır. Oyuncu input eylemlerini dinlemeyi durdurur.
-    private void OnDisable() => playerInputActions.Player.Disable();
+    private void OnDisable() => playerInputActions.Player.Disable();    // Oyuncu input eylemlerini dinlemeyi durdurur.
 
-    // Tüm hareket ve fizik mantığı burada işlenir.
+    // Hareket ve fizik mantığı.
     private void FixedUpdate()
     {
-        // Her fizik adımında oyuncunun mevcut durumunu (yerde, havada, suda) kontrol eder ve günceller.
         UpdatePlayerState();
 
-        // Mevcut duruma göre uygun hareket mantığını çalıştıran durum makinesi.
+        // Mevcut duruma göre uygun hareket mantığını çalıştırır.
         switch (currentState)
         {
             case PlayerState.Grounded:
@@ -113,9 +102,8 @@ public class RigidbodyMovementController : MonoBehaviour
                 break;
         }
 
-        // Her fizik adımının sonunda, karakterin hızının belirlenen maksimum limiti aşıp aşmadığını kontrol eder.
+        HandleJumpInput();
         LimitVelocity();
-        // Ayrıca, karakterin hızına göre kamera FOV'sini günceller.
         ApplyUpdateFOV();
     }
 
@@ -139,84 +127,58 @@ public class RigidbodyMovementController : MonoBehaviour
         }
     }
 
-    // Karakterin su içinde olup olmadığını kontrol eder.
     private bool IsinWater()
     {
-        // Karakterin merkezinde, "Water" katmanıyla temas eden bir küre olup olmadığını kontrol eder.
-        return Physics.CheckSphere(transform.position + Vector3.down * swimmingCheckDistance, swimmingCheckRadius, LayerMask.GetMask("Water"), QueryTriggerInteraction.Collide);
+        Vector3 spherePosition = transform.position + Vector3.down * swimmingCheckDistance;
+        // Karakterde "Water" katmanıyla temas eden bir küre olup olmadığını kontrol eder.
+        return Physics.CheckSphere(spherePosition, swimmingCheckRadius, LayerMask.GetMask("Water"), QueryTriggerInteraction.Collide);
     }
 
-    // Karakterin zemine temas edip etmediğini kontrol eder.
     private bool IsGrounded()
     {
-        // Karakterin kapsül collider'ının alt merkezinden biraz aşağıya bir pozisyon belirler.
         Vector3 spherePosition = transform.position + Vector3.down * groundCheckDistance;
-        // Belirlenen pozisyonda, "groundLayer" olarak işaretlenmiş katmanlarla temas eden bir küre olup olmadığını kontrol eder.
+        // Karakterde groundLayer katmanıyla temas eden bir küre olup olmadığını kontrol eder.
         return Physics.CheckSphere(spherePosition, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
     }
 
     // Karakter yerdeyken uygulanacak hareket mantığını yönetir.
     private void HandleGroundedMovement()
     {
-        // Yerdeyken daha yüksek sürtünme uygular, bu da daha kontrollü duruş sağlar.
         rb.linearDamping = dragOnGround;
-        // Sprint tuşuna basılıyorsa sprint hızını, basılmıyorsa normal yürüme hızını kullanır.
         float currentSpeed = sprintInput ? sprintSpeed : moveSpeed;
-        // Hesaplanan hareket yönü ve hıza göre karaktere sürekli bir kuvvet uygular.
         rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Force);
     }
 
     // Karakter havadayken uygulanacak hareket mantığını yönetir.
     private void HandleAirMovement()
     {
-        // Havadayken daha düşük sürtünme uygular, bu da daha akıcı bir hareket sağlar.
         rb.linearDamping = dragInAir;
-        // Havadaki kontrolü azaltmak için hareket kuvvetini airControlMultiplier ile çarparak uygular.
         rb.AddForce(GetMoveDirection() * moveSpeed * airControlMultiplier, ForceMode.Force);
     }
 
     // Karakter sudayken uygulanacak hareket mantığını yönetir.
     private void HandleSwimmingMovement()
     {
-        // Sudayken Unity'nin standart yerçekimini devre dışı bırakır.
         rb.useGravity = false;
-        // Suya özgü sürtünme uygular.
         rb.linearDamping = dragInWater;
-        // Karakteri su yüzeyine doğru iten kaldırma kuvvetini uygular.
         rb.AddForce(Vector3.up * buoyancy, ForceMode.Force);
 
         // Hareket yönünü, oyuncunun girdisine ve kameranın baktığı yöne göre hesaplar.
         Vector3 swimDirection = (playerCamera.transform.forward * moveInput.y + playerCamera.transform.right * moveInput.x).normalized;
         // Belirlenen yönde yüzme kuvvetini uygular.
         rb.AddForce(swimDirection * swimForce, ForceMode.Force);
-
-        // Zıplama tuşuna basılıyorsa, karakteri su içinde yukarı doğru iter.
-        if (jumpInput)
-        {
-            rb.AddForce(Vector3.up * swimForce, ForceMode.Force);
-        }
     }
 
     // Zıplama girdisini oyuncunun mevcut durumuna göre işler.
     private void HandleJumpInput()
     {
         // Eğer karakter yerdeyse, anlık bir dikey kuvvet uygulayarak zıplamasını sağlar.
-        if (currentState == PlayerState.Grounded)
-        {
+        if (currentState == PlayerState.Grounded && jumpInput)
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
         // Eğer karakter su içindeyse, zıplama tuşu yukarı yüzmek için kullanılır.
-        else if (currentState == PlayerState.Swimming)
-        {
-            // Sürekli yukarı çıkmayı önlemek için zıplama girdisini bir bayrakla yönetir.
-            jumpInput = true;
-            // Kısa bir süre sonra bu bayrağı sıfırlayarak tekrar basılmasını bekler.
-            Invoke(nameof(ResetJumpInput), 0.2f);
-        }
+        else if (currentState == PlayerState.Swimming && jumpInput)
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, swimAscendSpeed, rb.linearVelocity.z);
     }
-
-    // Suda yukarı yüzmek için kullanılan zıplama girdisi bayrağını sıfırlar.
-    private void ResetJumpInput() => jumpInput = false;
 
     // Karakterin eğimli yüzeylerde kaymasını engellemek için ek bir kuvvet uygular.
     private void ApplySlopeStickingForce()
@@ -249,7 +211,7 @@ public class RigidbodyMovementController : MonoBehaviour
         // Kameranın ileri ve sağ yön vektörlerini alır.
         Vector3 camForward = playerCamera.transform.forward;
         Vector3 camRight = playerCamera.transform.right;
-        // Y eksenindeki değerleri sıfırlar, böylece hareket sadece yatay düzlemde (XZ) olur.
+        // Y eksenindeki değerleri sıfırlar, böylece hareket sadece yatay düzlemde olur.
         camForward.y = 0;
         camRight.y = 0;
         // Girdi ve kamera yönlerini birleştirip normalize ederek son hareket yönü vektörünü oluşturur.
@@ -259,22 +221,20 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakterin yatay hızını belirlenen maksimum değerle sınırlar.
     private void LimitVelocity()
     {
-        // Rigidbody'nin mevcut hızının sadece yatay bileşenlerini (x ve z) alır.
+        // Karakterin yatay hızını tutar.
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
-        // Eğer yatay hızın büyüklüğü maksimum hızı aşıyorsa...
         if (horizontalVelocity.magnitude > maxVelocity)
         {
             // Hız vektörünü, yönünü koruyarak maksimum hız büyüklüğüne indirger.
             Vector3 limitedVelocity = horizontalVelocity.normalized * maxVelocity;
-            // Rigidbody'nin hızını, sınırlanmış yatay hız ve orijinal dikey hız ile günceller.
             rb.linearVelocity = new Vector3(limitedVelocity.x, rb.linearVelocity.y, limitedVelocity.z);
         }
     }
 
     private void ApplyUpdateFOV()
     {
-        float targetFOV = sprintInput ? 80f : 60f; // Sprint yapılıyorsa FOV'yi artır, değilse normalde tut.
+        float targetFOV = sprintInput ? 80f : 60f;
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * 5f);
     }
 
@@ -284,13 +244,13 @@ public class RigidbodyMovementController : MonoBehaviour
         if (capsuleCollider == null)
             capsuleCollider = GetComponent<CapsuleCollider>();
 
-        Gizmos.color = Color.yellow;
         // IsGrounded metodunda kullanılan kürenin konumunu ve boyutunu editörde görselleştirir.
+        Gizmos.color = Color.yellow;
         Vector3 spherePosition = transform.position + Vector3.down * groundCheckDistance;
         Gizmos.DrawWireSphere(spherePosition, groundCheckRadius);
 
-        Gizmos.color = Color.blue;
         // IsinWater metodunda kullanılan kürenin konumunu ve boyutunu editörde görselleştirir.
+        Gizmos.color = Color.blue;
         Vector3 spherePosition2 = transform.position + Vector3.down * swimmingCheckDistance;
         Gizmos.DrawWireSphere(spherePosition2, swimmingCheckRadius);
     }

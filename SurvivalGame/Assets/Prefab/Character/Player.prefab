@@ -102,15 +102,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
-  moveSpeed: 40
-  sprintSpeed: 80
-  maxVelocity: 100
-  dragOnGround: 6
-  jumpForce: 20
+  moveSpeed: 30
+  sprintSpeed: 60
+  maxVelocity: 50
+  dragOnGround: 3
+  jumpForce: 12
   airControlMultiplier: 0.5
   dragInAir: 0.5
   swimForce: 25
-  buoyancy: -1
+  swimAscendSpeed: 5
+  buoyancy: 1
   dragInWater: 3
   swimmingCheckRadius: 0.6
   swimmingCheckDistance: -0.3
