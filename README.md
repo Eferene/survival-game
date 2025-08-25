@@ -22,7 +22,7 @@ Bu proje, keşif ve hayatta kalma dinamiklerini birleştiren özgün bir oyun de
 <hr>
 <p align="left">🚀 Yol Haritası (Roadmap)</p>
 <ul>
-<li>[ ] 🛠️ <strong>Crafting Sistemi:</strong> Toplanan kaynakları kullanarak yeni aletler, silahlar ve eşyalar üretme.</li>
+<li>[x] 🛠️ <strong>Crafting Sistemi:</strong> Toplanan kaynakları kullanarak yeni aletler, silahlar ve eşyalar üretme.</li>
 <li>[ ] 🌊 <strong>Yüzme ve Tekne Mekaniği:</strong> Adalar arası geçiş için yüzme ve basit deniz taşıtları.</li>
 <li>[ ] 🏠 <strong>İnşa Sistemi:</strong> Modüler parçalar kullanarak sığınaklar ve üsler inşa etme.</li>
 <li>[ ] 👹 <strong>Düşman Yapay Zekası:</strong> Adalara özgü, farklı zorluk seviyelerinde düşmanlar.</li>
