@@ -4,6 +4,9 @@ using TMPro;
 using DG.Tweening;
 using System.Linq;
 using Unity.Cinemachine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class PlayerGeneral : MonoBehaviour
 {
@@ -65,6 +68,17 @@ public class PlayerGeneral : MonoBehaviour
     [Header("Crafting System")]
     public GameObject craftingSystemUI;
 
+    [Header("Building System")]
+    [SerializeField] private GameObject buildingMenu;
+    [SerializeField] private GraphicRaycaster raycaster;
+    [SerializeField] private EventSystem eventSystem;
+    private InputAction pointerPositionAction;
+    public GameObject selectedBuilding;
+    private GameObject previewBuilding;
+    public Material previewMaterial;
+    public Material blockedPreviewMaterial;
+    public bool previewTrigger;
+
     [Header("Raycast & Input Settings")]
     public bool canHit;
 
@@ -77,6 +91,9 @@ public class PlayerGeneral : MonoBehaviour
     private void Awake()
     {
         playerInputActions = new Input();
+
+        pointerPositionAction = playerInputActions.UI.Point;
+        pointerPositionAction.Enable();
     }
 
     void OnEnable()
@@ -85,6 +102,8 @@ public class PlayerGeneral : MonoBehaviour
 
         playerInputActions.UI.Enable();
         playerInputActions.UI.HandCrafting.performed += ctx => OpenCloseCraftingMenu(CraftingType.Hand);
+        playerInputActions.UI.Building.performed += ctx => OpenBuildingMenu();
+        playerInputActions.UI.Building.canceled += ctx => CloseBuildingMenu();
     }
 
     void OnDisable()
@@ -93,6 +112,8 @@ public class PlayerGeneral : MonoBehaviour
 
         playerInputActions.UI.Disable();
         playerInputActions.UI.HandCrafting.performed -= ctx => OpenCloseCraftingMenu(CraftingType.Hand);
+        playerInputActions.UI.Building.performed += ctx => OpenBuildingMenu();
+        playerInputActions.UI.Building.canceled += ctx => CloseBuildingMenu();
     }
 
     private void Start()
@@ -263,7 +284,7 @@ public class PlayerGeneral : MonoBehaviour
         {
             if (hit.collider.CompareTag("Crafting"))
             {
-                if (canHit && playerInputActions.Player.Interaction.triggered)
+                if (playerInputActions.Player.Interaction.triggered)
                 {
                     currentCraftingObject = hit.collider.GetComponent<CraftingObject>();
                     OpenCloseCraftingMenu(currentCraftingObject.type);
@@ -298,6 +319,46 @@ public class PlayerGeneral : MonoBehaviour
                     }
                 }
             }
+        }
+        #endregion
+        #region Building Raycasti
+        if (selectedBuilding != null)
+        {
+            if (playerInventory.handItem != null && playerInventory.handItem.itemID == 14) // Building Hammer ID is 14
+            {
+                if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding);
+                if (previewBuilding.activeInHierarchy == false) previewBuilding.SetActive(true);
+                if (previewBuilding.GetComponent<PreviewBuilding>() == null) previewBuilding.AddComponent<PreviewBuilding>();
+
+                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
+                {
+                    if (hit.distance < 10f)
+                    {
+                        if (hit.collider.CompareTag("Ground"))
+                        {
+                            Vector3 buildPosition = hit.point;
+                            buildPosition.y += selectedBuilding.transform.localScale.y / 2;
+                            Quaternion buildRotation = Quaternion.Euler(0, Mathf.Round(cameraTransform.eulerAngles.y / 90) * 90, 0);
+
+                            previewBuilding.transform.position = buildPosition;
+                            previewBuilding.transform.rotation = buildRotation;
+
+                            if (playerInputActions.Player.Hit.triggered && !previewTrigger)
+                            {
+                                Instantiate(selectedBuilding, buildPosition, buildRotation);
+                            }
+                        }
+                        else
+                        {
+                            previewBuilding.SetActive(false);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if(previewBuilding != null) previewBuilding.SetActive(false);
         }
         #endregion
     }
@@ -350,6 +411,30 @@ public class PlayerGeneral : MonoBehaviour
         {
             playerInventory.uiState = UIState.None;
             craftingSystemUI.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = true;
+        }
+    }
+
+    public void OpenBuildingMenu()
+    {
+        if (playerInventory.uiState == UIState.None && playerInventory.handItem != null && playerInventory.handItem.itemID == 14) // Building Hammer ID is 14
+        {
+            playerInventory.uiState = UIState.BuildingUI;
+            buildingMenu.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = false;
+        }
+    }
+
+    public void CloseBuildingMenu()
+    {
+        if (playerInventory.uiState == UIState.BuildingUI)
+        {
+            playerInventory.uiState = UIState.None;
+            buildingMenu.SetActive(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             cinemachineCamera.GetComponent<CinemachineInputAxisController>().enabled = true;

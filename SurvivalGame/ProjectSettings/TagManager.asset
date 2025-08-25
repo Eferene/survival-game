@@ -13,6 +13,7 @@ TagManager:
   - Galmend
   - FPSCam
   - Crafting
+  - Building
   layers:
   - Default
   - TransparentFX

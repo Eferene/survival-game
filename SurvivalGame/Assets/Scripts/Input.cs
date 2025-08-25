@@ -282,6 +282,15 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Building"",
+                    ""type"": ""Button"",
+                    ""id"": ""462569f2-64b2-4efe-87f8-a30819ab74cd"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Point"",
                     ""type"": ""Value"",
                     ""id"": ""3fd757b8-bc20-4974-8901-c1b2d4db753d"",
@@ -355,6 +364,17 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""action"": ""Hand Crafting"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3b6cd5d5-0aed-419f-bbad-fe7a382f1b53"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Building"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -373,6 +393,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Inventory = m_UI.FindAction("Inventory", throwIfNotFound: true);
         m_UI_HandCrafting = m_UI.FindAction("Hand Crafting", throwIfNotFound: true);
+        m_UI_Building = m_UI.FindAction("Building", throwIfNotFound: true);
         m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
         m_UI_LoadScene = m_UI.FindAction("LoadScene", throwIfNotFound: true);
     }
@@ -609,6 +630,7 @@ public partial class @Input: IInputActionCollection2, IDisposable
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
     private readonly InputAction m_UI_Inventory;
     private readonly InputAction m_UI_HandCrafting;
+    private readonly InputAction m_UI_Building;
     private readonly InputAction m_UI_Point;
     private readonly InputAction m_UI_LoadScene;
     /// <summary>
@@ -630,6 +652,10 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/HandCrafting".
         /// </summary>
         public InputAction @HandCrafting => m_Wrapper.m_UI_HandCrafting;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/Building".
+        /// </summary>
+        public InputAction @Building => m_Wrapper.m_UI_Building;
         /// <summary>
         /// Provides access to the underlying input action "UI/Point".
         /// </summary>
@@ -670,6 +696,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @HandCrafting.started += instance.OnHandCrafting;
             @HandCrafting.performed += instance.OnHandCrafting;
             @HandCrafting.canceled += instance.OnHandCrafting;
+            @Building.started += instance.OnBuilding;
+            @Building.performed += instance.OnBuilding;
+            @Building.canceled += instance.OnBuilding;
             @Point.started += instance.OnPoint;
             @Point.performed += instance.OnPoint;
             @Point.canceled += instance.OnPoint;
@@ -693,6 +722,9 @@ public partial class @Input: IInputActionCollection2, IDisposable
             @HandCrafting.started -= instance.OnHandCrafting;
             @HandCrafting.performed -= instance.OnHandCrafting;
             @HandCrafting.canceled -= instance.OnHandCrafting;
+            @Building.started -= instance.OnBuilding;
+            @Building.performed -= instance.OnBuilding;
+            @Building.canceled -= instance.OnBuilding;
             @Point.started -= instance.OnPoint;
             @Point.performed -= instance.OnPoint;
             @Point.canceled -= instance.OnPoint;
@@ -803,6 +835,13 @@ public partial class @Input: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHandCrafting(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Building" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnBuilding(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

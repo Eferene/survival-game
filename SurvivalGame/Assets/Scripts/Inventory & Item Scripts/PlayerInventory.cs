@@ -25,9 +25,9 @@ public class PlayerInventory : MonoBehaviour
     public InventorySlotUI[] inventorySlotUIs = new InventorySlotUI[8];
 
     [Header("Raycaster")]
-    public GraphicRaycaster raycaster;
-    public EventSystem eventSystem;
-    public Transform handTransform;
+    [SerializeField] GraphicRaycaster raycaster;
+    [SerializeField] EventSystem eventSystem;
+    [SerializeField] Transform handTransform;
     private InputAction pointerPositionAction;
 
     [Header("UI Elements")]
@@ -439,5 +439,6 @@ public enum UIState
     None,
     InventoryUI,
     DropItemUI,
-    CraftingUI
+    CraftingUI,
+    BuildingUI
 }
