@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
+
 
 /// <summary>
 /// Bu class, Inspector'da ayarlanabilen yerleştirilebilir bir obje türünü tanımlar.
@@ -36,6 +38,8 @@ public class ProceduralObjectPlacer : MonoBehaviour
     [Header("References")]
     [Tooltip("Objeleri yerleştirmek için harita verisini sağlayacak olan MapGenerator. This is mission-critical, bro.")]
     public MapGenerator mapGenerator;
+    [Tooltip("Objelerin yerleştirilmesi tamamlandığında tetiklenecek event. (Opsiyonel)")]
+    public UnityEvent onFinished;
 
     [Header("Placement Settings")]
     [Tooltip("Prosedürel olarak yerleştirilecek obje türlerinin listesi.")]
@@ -197,6 +201,7 @@ public class ProceduralObjectPlacer : MonoBehaviour
                 }
             }
         }
+        onFinished.Invoke();
     }
 
     /// <summary>

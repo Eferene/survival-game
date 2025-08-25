@@ -159,6 +159,13 @@ MonoBehaviour:
   staminaBG: {fileID: 0}
   damageTextPrefab: {fileID: 5481048422191962130, guid: 0d65dd2d93ae40445872a7421b182ceb, type: 3}
   craftingSystemUI: {fileID: 0}
+  buildingMenu: {fileID: 0}
+  raycaster: {fileID: 0}
+  eventSystem: {fileID: 0}
+  selectedBuilding: {fileID: 0}
+  previewMaterial: {fileID: 0}
+  blockedPreviewMaterial: {fileID: 0}
+  previewTrigger: 0
   canHit: 0
   cameraTransform: {fileID: 6440858225002651933}
   characterDialogText: {fileID: 0}

@@ -19,8 +19,8 @@ public class VolumeProfileController : MonoBehaviour
     private void Start()
     {
         RenderSettings.fogMode = FogMode.Exponential;
-        RenderSettings.fogStartDistance = 0f;
-        RenderSettings.fogEndDistance = 30f;
+        RenderSettings.fogStartDistance = 5f;
+        RenderSettings.fogEndDistance = 15f;
     }
 
     private void Update()
