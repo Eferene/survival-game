@@ -3,58 +3,83 @@ using UnityEngine;
 public class PreviewBuilding : MonoBehaviour
 {
     PlayerGeneral playerGeneral;
-    private void Start()
+    public GameObject buildingPrefab;
+    [SerializeField] private Material previewMaterial;
+    [SerializeField] private Material blockedPreviewMaterial;
+
+    void Start()
     {
-        playerGeneral = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerGeneral>();
-        if (GetComponent<Collider>() != null) GetComponent<Collider>().isTrigger = true;
-        if (transform.childCount > 0)
-        {
-            foreach (Transform child in transform)
-            {
-                if (child.GetComponent<MeshRenderer>() != null) child.GetComponent<MeshRenderer>().material = playerGeneral.previewMaterial;
-            }
-        }
-        else
-        {
-            GetComponent<MeshRenderer>().material = playerGeneral.previewMaterial;
-        }
-        gameObject.layer = 2;
+        playerGeneral = GameObject.FindWithTag("Player").GetComponent<PlayerGeneral>();
+        BuildingPlace(true);
     }
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag != "Ground")
-        {
-            playerGeneral.previewTrigger = true;
-            if (transform.childCount > 0)
-            {
-                foreach (Transform child in transform)
-                {
-                    if (child.GetComponent<MeshRenderer>() != null) child.GetComponent<MeshRenderer>().material = playerGeneral.blockedPreviewMaterial;
-                }
-            }
-            else
-            {
-                GetComponent<MeshRenderer>().material = playerGeneral.blockedPreviewMaterial;
-            }
-        }
+        CheckTrigger(other);
+    }
+
+    public void OnTriggerStay(Collider other)
+    {
+        CheckTrigger(other);
     }
 
     public void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag != "Ground")
+        BuildingPlace(true);
+    }
+
+    private void CheckTrigger(Collider other)
+    {
+        if (other.CompareTag("BLock")) return;
+
+        Debug.Log("Collided with: " + other.name + " Tag: " + other.tag);
+        if (!other.CompareTag("Ground"))
         {
-            playerGeneral.previewTrigger = false;
+            BuildingPlace(false);
+        }
+        else
+        {
+            BuildingPlace(true);
+        }
+    }
+
+    private void BuildingPlace(bool canPlace)
+    {
+        playerGeneral.canBuilding = canPlace;
+        if (canPlace)
+        {
             if (transform.childCount > 0)
             {
                 foreach (Transform child in transform)
                 {
-                    if (child.GetComponent<MeshRenderer>() != null) child.GetComponent<MeshRenderer>().material = playerGeneral.previewMaterial;
+                    if (child.GetComponent<Renderer>() != null)
+                    {
+                        child.GetComponent<Renderer>().material = previewMaterial;
+                    }
                 }
             }
-            else
+            if (GetComponent<Renderer>() != null)
             {
-                GetComponent<MeshRenderer>().material = playerGeneral.previewMaterial;
+                GetComponent<Renderer>().material = previewMaterial;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Preview building cannot be placed here.");
+
+            if (transform.childCount > 0)
+            {
+                foreach (Transform child in transform)
+                {
+                    if (child.GetComponent<Renderer>() != null)
+                    {
+                        child.GetComponent<Renderer>().material = blockedPreviewMaterial;
+                    }
+                }
+            }
+            if (GetComponent<Renderer>() != null)
+            {
+                GetComponent<Renderer>().material = blockedPreviewMaterial;
             }
         }
     }

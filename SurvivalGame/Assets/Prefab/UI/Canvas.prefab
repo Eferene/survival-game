@@ -1031,7 +1031,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingIcon: {fileID: 0}
-  building: {fileID: 2744332311109772321, guid: 165282c9058bf3248a130d3d0deb56dd, type: 3}
+  building: {fileID: 5066600402922778994, guid: 1a88a54d249852b489c0f67eb1811854, type: 3}
   iconImage: {fileID: 8420661673562786867}
   slotIndex: 0
 --- !u!222 &8869957569470963373

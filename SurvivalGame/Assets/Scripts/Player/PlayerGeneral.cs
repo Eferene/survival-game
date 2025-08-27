@@ -75,9 +75,7 @@ public class PlayerGeneral : MonoBehaviour
     private InputAction pointerPositionAction;
     public GameObject selectedBuilding;
     private GameObject previewBuilding;
-    public Material previewMaterial;
-    public Material blockedPreviewMaterial;
-    public bool previewTrigger;
+    public bool canBuilding = true;
 
     [Header("Raycast & Input Settings")]
     public bool canHit;
@@ -326,39 +324,38 @@ public class PlayerGeneral : MonoBehaviour
         {
             if (playerInventory.handItem != null && playerInventory.handItem.itemID == 14) // Building Hammer ID is 14
             {
-                if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding);
-                if (previewBuilding.activeInHierarchy == false) previewBuilding.SetActive(true);
-                if (previewBuilding.GetComponent<PreviewBuilding>() == null) previewBuilding.AddComponent<PreviewBuilding>();
-
-                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
+                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, 10f))
                 {
-                    if (hit.distance < 10f)
+                    if (hit.collider.CompareTag("Ground"))
                     {
-                        if (hit.collider.CompareTag("Ground"))
+                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
+
+                        Vector3 previewPosition = hit.point;
+                        previewPosition.y = previewBuilding.transform.localScale.y / 2;
+                        previewBuilding.transform.position = previewPosition;
+
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
                         {
-                            Vector3 buildPosition = hit.point;
-                            buildPosition.y += selectedBuilding.transform.localScale.y / 2;
-                            Quaternion buildRotation = Quaternion.Euler(0, Mathf.Round(cameraTransform.eulerAngles.y / 90) * 90, 0);
-
-                            previewBuilding.transform.position = buildPosition;
-                            previewBuilding.transform.rotation = buildRotation;
-
-                            if (playerInputActions.Player.Hit.triggered && !previewTrigger)
-                            {
-                                Instantiate(selectedBuilding, buildPosition, buildRotation);
-                            }
+                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
                         }
-                        else
+                    }
+                    else if (hit.collider.CompareTag("BLock"))
+                    {
+                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
+
+                        Vector3 previewPosition = hit.collider.transform.parent.position + new Vector3(hit.collider.transform.localPosition.x * previewBuilding.transform.localScale.x * 2, 0, hit.collider.transform.localPosition.z * previewBuilding.transform.localScale.z * 2);
+                        previewPosition.y = previewBuilding.transform.localScale.y / 2;
+                        previewBuilding.transform.position = previewPosition;
+
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
                         {
-                            previewBuilding.SetActive(false);
+                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            if(previewBuilding != null) previewBuilding.SetActive(false);
         }
         #endregion
     }
