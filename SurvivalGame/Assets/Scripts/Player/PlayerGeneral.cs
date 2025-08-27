@@ -74,7 +74,7 @@ public class PlayerGeneral : MonoBehaviour
     [SerializeField] private EventSystem eventSystem;
     private InputAction pointerPositionAction;
     public GameObject selectedBuilding;
-    private GameObject previewBuilding;
+    public GameObject previewBuilding;
     public bool canBuilding = true;
 
     [Header("Raycast & Input Settings")]
@@ -330,21 +330,7 @@ public class PlayerGeneral : MonoBehaviour
                     {
                         if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
 
-                        Vector3 previewPosition = hit.point;
-                        previewPosition.y = previewBuilding.transform.localScale.y / 2;
-                        previewBuilding.transform.position = previewPosition;
-
-                        if (canBuilding && playerInputActions.Player.Hit.triggered)
-                        {
-                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
-                            Destroy(previewBuilding);
-                        }
-                    }
-                    else if (hit.collider.CompareTag("BLock"))
-                    {
-                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
-
-                        Vector3 previewPosition = hit.collider.transform.parent.position + new Vector3(hit.collider.transform.localPosition.x * previewBuilding.transform.localScale.x * 2, 0, hit.collider.transform.localPosition.z * previewBuilding.transform.localScale.z * 2);
+                        Vector3 previewPosition = Vector3Int.RoundToInt(hit.point);
                         previewPosition.y = previewBuilding.transform.localScale.y / 2;
                         previewBuilding.transform.position = previewPosition;
 
@@ -355,6 +341,16 @@ public class PlayerGeneral : MonoBehaviour
                         }
                     }
                 }
+            }
+        }
+        #endregion
+        #region Building Rotation
+        if(previewBuilding != null)
+        {
+            if (playerInputActions.Player.Rotate.triggered)
+            {
+                Quaternion newRotation = previewBuilding.transform.rotation * Quaternion.Euler(0, 45f, 0);
+                previewBuilding.transform.rotation = newRotation;
             }
         }
         #endregion

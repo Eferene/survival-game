@@ -29,7 +29,12 @@ public class BuildingSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (building != null) playerGeneral.selectedBuilding = building;
+        if (building != null)
+        {
+            Destroy(playerGeneral.previewBuilding);
+            playerGeneral.previewBuilding = null;
+            playerGeneral.selectedBuilding = building;
+        }
         else
         {
             playerGeneral.selectedBuilding = null;

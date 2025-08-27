@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class PreviewBuilding : MonoBehaviour
 {
@@ -6,6 +8,8 @@ public class PreviewBuilding : MonoBehaviour
     public GameObject buildingPrefab;
     [SerializeField] private Material previewMaterial;
     [SerializeField] private Material blockedPreviewMaterial;
+
+    private List<Collider> collidingObjects = new List<Collider>();
 
     void Start()
     {
@@ -15,37 +19,65 @@ public class PreviewBuilding : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        CheckTrigger(other);
+        if (!collidingObjects.Contains(other))
+        {
+            collidingObjects.Add(other);
+        }
+
+        CheckAllCollisions();
     }
 
     public void OnTriggerStay(Collider other)
     {
-        CheckTrigger(other);
+        CheckAllCollisions();
     }
 
     public void OnTriggerExit(Collider other)
     {
-        BuildingPlace(true);
+        if (collidingObjects.Contains(other))
+        {
+            collidingObjects.Remove(other);
+        }
+
+        CheckAllCollisions();
     }
 
-    private void CheckTrigger(Collider other)
+    private void CheckAllCollisions()
     {
-        if (other.CompareTag("BLock")) return;
+        bool canPlace = true;
 
-        Debug.Log("Collided with: " + other.name + " Tag: " + other.tag);
-        if (!other.CompareTag("Ground"))
+        if (collidingObjects.Count > 1)
         {
-            BuildingPlace(false);
+            foreach (Collider col in collidingObjects)
+            {
+                if(col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Building"))
+                {
+                    continue;
+                }
+                canPlace = false;
+                break;
+            }
         }
-        else
+        else if (collidingObjects.Count == 1)
         {
-            BuildingPlace(true);
+            Collider col = collidingObjects[0];
+            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Building"))
+            {
+                canPlace = true;
+            }
+            else
+            {
+                canPlace = false;
+            }
         }
+
+        BuildingPlace(canPlace);
     }
 
     private void BuildingPlace(bool canPlace)
     {
         playerGeneral.canBuilding = canPlace;
+
         if (canPlace)
         {
             if (transform.childCount > 0)
@@ -65,8 +97,6 @@ public class PreviewBuilding : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Preview building cannot be placed here.");
-
             if (transform.childCount > 0)
             {
                 foreach (Transform child in transform)
