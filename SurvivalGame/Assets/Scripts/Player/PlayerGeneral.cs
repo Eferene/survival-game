@@ -74,10 +74,8 @@ public class PlayerGeneral : MonoBehaviour
     [SerializeField] private EventSystem eventSystem;
     private InputAction pointerPositionAction;
     public GameObject selectedBuilding;
-    private GameObject previewBuilding;
-    public Material previewMaterial;
-    public Material blockedPreviewMaterial;
-    public bool previewTrigger;
+    public GameObject previewBuilding;
+    public bool canBuilding = true;
 
     [Header("Raycast & Input Settings")]
     public bool canHit;
@@ -326,39 +324,34 @@ public class PlayerGeneral : MonoBehaviour
         {
             if (playerInventory.handItem != null && playerInventory.handItem.itemID == 14) // Building Hammer ID is 14
             {
-                if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding);
-                if (previewBuilding.activeInHierarchy == false) previewBuilding.SetActive(true);
-                if (previewBuilding.GetComponent<PreviewBuilding>() == null) previewBuilding.AddComponent<PreviewBuilding>();
-
-                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, Mathf.Infinity))
+                if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, 10f))
                 {
-                    if (hit.distance < 10f)
+                    if (hit.collider.CompareTag("Ground"))
                     {
-                        if (hit.collider.CompareTag("Ground"))
-                        {
-                            Vector3 buildPosition = hit.point;
-                            buildPosition.y += selectedBuilding.transform.localScale.y / 2;
-                            Quaternion buildRotation = Quaternion.Euler(0, Mathf.Round(cameraTransform.eulerAngles.y / 90) * 90, 0);
+                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
 
-                            previewBuilding.transform.position = buildPosition;
-                            previewBuilding.transform.rotation = buildRotation;
+                        Vector3 previewPosition = Vector3Int.RoundToInt(hit.point);
+                        previewPosition.y = previewBuilding.transform.localScale.y / 2;
+                        previewBuilding.transform.position = previewPosition;
 
-                            if (playerInputActions.Player.Hit.triggered && !previewTrigger)
-                            {
-                                Instantiate(selectedBuilding, buildPosition, buildRotation);
-                            }
-                        }
-                        else
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
                         {
-                            previewBuilding.SetActive(false);
+                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
                         }
                     }
                 }
             }
         }
-        else
+        #endregion
+        #region Building Rotation
+        if(previewBuilding != null)
         {
-            if(previewBuilding != null) previewBuilding.SetActive(false);
+            if (playerInputActions.Player.Rotate.triggered)
+            {
+                Quaternion newRotation = previewBuilding.transform.rotation * Quaternion.Euler(0, 45f, 0);
+                previewBuilding.transform.rotation = newRotation;
+            }
         }
         #endregion
     }
