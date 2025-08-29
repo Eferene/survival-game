@@ -93,6 +93,5 @@ public class DayNightCycle : MonoBehaviour
         }
 
         _skyboxMaterial.SetFloat("_CubemapTransition", blendValue);
-        Debug.Log(blendValue);
     }
 }

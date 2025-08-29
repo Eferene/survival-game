@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5995649023415318429}
   - component: {fileID: 2699865062719008473}
   - component: {fileID: 946530718387950067}
+  - component: {fileID: 1428075269872237875}
   m_Layer: 3
   m_Name: Stone
   m_TagString: Item
@@ -153,3 +154,19 @@ MonoBehaviour:
   quantity: 1
   physics: 1
   inHand: 0
+--- !u!208 &1428075269872237875
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477070430978016809}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.009000001, y: 0.007, z: 0.004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0.001}
+  m_TimeToStationary: 0.5

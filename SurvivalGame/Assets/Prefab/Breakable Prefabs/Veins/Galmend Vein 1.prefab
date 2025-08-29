@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1063319383474425009}
   - component: {fileID: 526700497178198501}
   - component: {fileID: 5065680399915943744}
+  - component: {fileID: 1511158868880715422}
   m_Layer: 3
   m_Name: 'Galmend-1 '
   m_TagString: Galmend
@@ -128,6 +129,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06137658, y: 0.07315732, z: 0.04222204}
   m_Center: {x: 0.000098652206, y: 0.00070292864, z: -0.00102845}
+--- !u!208 &1511158868880715422
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3145582534537995465}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.031000001, y: 0.037, z: 0.021000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.001, z: -0.001}
+  m_TimeToStationary: 0.5
 --- !u!1 &4739417565680053981
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,6 +154,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4748329723343685021}
+  - component: {fileID: 4041348732797462227}
   m_Layer: 3
   m_Name: Galmend Vein 1
   m_TagString: Untagged
@@ -162,6 +180,22 @@ Transform:
   - {fileID: 6906389941852416804}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!208 &4041348732797462227
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4739417565680053981}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &5894755149479358577
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +209,7 @@ GameObject:
   - component: {fileID: 1833700049996692731}
   - component: {fileID: 8797378014396706505}
   - component: {fileID: 283342092176132675}
+  - component: {fileID: 5187345977748788689}
   m_Layer: 3
   m_Name: Galmend-3
   m_TagString: Galmend
@@ -290,6 +325,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.01842438, y: 0.021462489, z: 0.013666693}
   m_Center: {x: -0.0009716558, y: -0.0009026428, z: -0.00042936616}
+--- !u!208 &5187345977748788689
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5894755149479358577}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.009000001, y: 0.011000001, z: 0.007}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.001, y: -0.001, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &8083324250394706013
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,6 +354,7 @@ GameObject:
   - component: {fileID: 437518224041407489}
   - component: {fileID: 4457156578010980387}
   - component: {fileID: 8728120518474133255}
+  - component: {fileID: 5517571797805120728}
   m_Layer: 3
   m_Name: 'Galmend-2 '
   m_TagString: Galmend
@@ -418,3 +470,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.061271414, y: 0.07059926, z: 0.04551657}
   m_Center: {x: 0.0031598574, y: 0.00013288666, z: 0.0035096065}
+--- !u!208 &5517571797805120728
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8083324250394706013}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.031000001, y: 0.035, z: 0.023000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.003, y: 0, z: 0.004}
+  m_TimeToStationary: 0.5

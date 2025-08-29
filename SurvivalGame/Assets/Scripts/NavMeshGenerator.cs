@@ -1,30 +1,48 @@
 ﻿using System.Collections;
-using Unity.AI.Navigation; // Bu using önemli
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class NavMeshGenerator : MonoBehaviour
 {
     [SerializeField] private NavMeshSurface mainIsland;
+    [SerializeField] private NavMeshSurface Island1;
+    [SerializeField] private NavMeshSurface Island2;
+    [SerializeField] private NavMeshSurface Island3;
+    [SerializeField] private NavMeshSurface Island4;
 
-    // Bu metodu event'ten çağıracağız.
-    public void GenerateNavMeshAsync()
+    [SerializeField] private GameObject panel;
+    [SerializeField] private GameObject date;
+
+    public void CallBuildNavMesh()
     {
-        StartCoroutine(UpdateNavMeshCoroutine());
+        //StartCoroutine(BuildNavMesh());
+        mainIsland.BuildNavMesh();
+    }
+    IEnumerator BuildNavMesh()
+    {
+        //TrueLoadingScreen();
+        mainIsland.BuildNavMesh();
+        yield return new WaitForSecondsRealtime(0.2f);
+        Island1.BuildNavMesh();
+        yield return new WaitForSecondsRealtime(0.1f);
+        Island2.BuildNavMesh();
+        yield return new WaitForSecondsRealtime(0.1f);
+        Island3.BuildNavMesh();
+        yield return new WaitForSecondsRealtime(0.1f);
+        Island4.BuildNavMesh();
+        //yield return new WaitForSecondsRealtime(0.1f);
+        //FalseLoadingScreen();
     }
 
-    private IEnumerator UpdateNavMeshCoroutine()
+    void TrueLoadingScreen()
     {
-        Debug.Log("Asenkron NavMesh bake işlemi başlıyor, chill bro...");
+        panel.SetActive(true);
+        date.SetActive(false);
+    }
 
-        // İşte sihirli kısım bu. UpdateNavMesh asenkron çalışır.
-        AsyncOperation operation = mainIsland.UpdateNavMesh(mainIsland.navMeshData);
-
-        // Bake işlemi bitene kadar bekle.
-        while (!operation.isDone)
-        {
-            // İstersen burada operation.progress ile bir loading bar bile doldurabilirsin.
-            yield return null;
-        }
-        Debug.Log("NavMesh Bake tamamdır! Agents are good to go.");
+    void FalseLoadingScreen()
+    {
+        panel.SetActive(false);
+        date.SetActive(true);
     }
 }

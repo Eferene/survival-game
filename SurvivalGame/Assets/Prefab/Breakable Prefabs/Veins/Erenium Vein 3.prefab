@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6601563937924522430}
   - component: {fileID: 5218829946817669365}
   - component: {fileID: 1417171437403313907}
+  - component: {fileID: 8776474152070465710}
   m_Layer: 3
   m_Name: Erenium-2
   m_TagString: Erenium
@@ -128,6 +129,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.05975438, y: 0.07059925, z: 0.045516565}
   m_Center: {x: 0.0034165615, y: -0.00011184437, z: 0.0035096027}
+--- !u!208 &8776474152070465710
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468268893165265203}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.030000001, y: 0.035, z: 0.023000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.003, y: 0, z: 0.004}
+  m_TimeToStationary: 0.5
 --- !u!1 &2205268754193061189
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,6 +154,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6148511582959701574}
+  - component: {fileID: -2693476564642022441}
   m_Layer: 3
   m_Name: Erenium Vein 3
   m_TagString: Untagged
@@ -160,3 +178,19 @@ Transform:
   - {fileID: 4175689748757544181}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!208 &-2693476564642022441
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2205268754193061189}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
