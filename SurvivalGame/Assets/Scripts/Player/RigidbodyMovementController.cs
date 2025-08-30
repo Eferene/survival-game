@@ -24,7 +24,7 @@ public class RigidbodyMovementController : MonoBehaviour
     [Header("Movement - Ground")]
 
     [SerializeField] private float moveSpeed = 8f;              // Karakterin yerdeki standart yürüme hızı.
-    [SerializeField] private float sprintSpeed = 12f;           // Karakterin sprint durumundaki hızı.
+    [SerializeField] private float sprintSpeedMultipler = 12f;  // Karakterin sprint durumundaki hız çarpanı.
     [SerializeField] private float maxVelocity = 15f;           // Karakterin ulaşabileceği maksimum yatay hız. Bu, hızın kontrolsüzce artmasını önler.
     [SerializeField] private float dragOnGround = 6f;           // Karakter yerdeyken uygulanan sürtünme kuvveti. Hareketi durdurduğunda yavaşça kaymasını engeller.
 
@@ -150,8 +150,8 @@ public class RigidbodyMovementController : MonoBehaviour
     private void HandleGroundedMovement()
     {
         rb.linearDamping = dragOnGround;
-        float currentSpeed = sprintInput ? sprintSpeed : moveSpeed;
-        rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Force);
+        float currentSpeed = sprintInput ? moveSpeed * sprintSpeedMultipler : moveSpeed;
+        rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Acceleration);
 
         if (moveInput != Vector2.zero)
             CallStepSound(); // Yürüyüş sesi efektini çağırır.
@@ -160,8 +160,9 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakter havadayken uygulanacak hareket mantığını yönetir.
     private void HandleAirMovement()
     {
+        float currentSpeed = sprintInput ? moveSpeed * sprintSpeedMultipler : moveSpeed;
         rb.linearDamping = dragInAir;
-        rb.AddForce(GetMoveDirection() * moveSpeed * airControlMultiplier, ForceMode.Force);
+        rb.AddForce(GetMoveDirection() * currentSpeed * airControlMultiplier, ForceMode.Acceleration);
     }
 
     // Karakter sudayken uygulanacak hareket mantığını yönetir.
@@ -169,12 +170,12 @@ public class RigidbodyMovementController : MonoBehaviour
     {
         rb.useGravity = false;
         rb.linearDamping = dragInWater;
-        rb.AddForce(Vector3.up * buoyancy, ForceMode.Force);
+        rb.AddForce(Vector3.up * buoyancy, ForceMode.VelocityChange);
 
         // Hareket yönünü, oyuncunun girdisine ve kameranın baktığı yöne göre hesaplar.
         Vector3 swimDirection = (playerCamera.transform.forward * moveInput.y + playerCamera.transform.right * moveInput.x).normalized;
         // Belirlenen yönde yüzme kuvvetini uygular.
-        rb.AddForce(swimDirection * swimForce, ForceMode.Force);
+        rb.AddForce(swimDirection * swimForce, ForceMode.Acceleration);
     }
 
     // Zıplama girdisini oyuncunun mevcut durumuna göre işler.

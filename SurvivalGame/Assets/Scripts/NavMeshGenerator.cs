@@ -13,10 +13,14 @@ public class NavMeshGenerator : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private GameObject date;
 
+    private void Start()
+    {
+        TrueLoadingScreen();
+    }
+
     public void CallBuildNavMesh()
     {
-        //StartCoroutine(BuildNavMesh());
-        mainIsland.BuildNavMesh();
+        StartCoroutine(BuildNavMesh());
     }
     IEnumerator BuildNavMesh()
     {
@@ -30,8 +34,8 @@ public class NavMeshGenerator : MonoBehaviour
         Island3.BuildNavMesh();
         yield return new WaitForSecondsRealtime(0.1f);
         Island4.BuildNavMesh();
-        //yield return new WaitForSecondsRealtime(0.1f);
-        //FalseLoadingScreen();
+        yield return new WaitForSecondsRealtime(0.1f);
+        FalseLoadingScreen();
     }
 
     void TrueLoadingScreen()
