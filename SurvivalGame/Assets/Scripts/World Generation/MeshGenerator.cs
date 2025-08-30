@@ -7,7 +7,7 @@ public static class MeshGenerator
         int mapWidth = heightMap.GetLength(0);
         int mapHeight = heightMap.GetLength(1);
 
-        int meshSimplificationIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2;
+        int meshSimplificationIncrement = 1 << levelOfDetail;
 
         if ((mapWidth - 1) % meshSimplificationIncrement != 0 || (mapHeight - 1) % meshSimplificationIncrement != 0)
         {

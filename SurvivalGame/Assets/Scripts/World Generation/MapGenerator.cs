@@ -81,6 +81,8 @@ public class MapGenerator : MonoBehaviour
         public string name;
         [Range(0, 1)] public float height;
         public Color color;
+        [Tooltip("Geçişin merkezden sağa ve sola ne kadar yayılacağını belirler. (Genişliğin yarısı)")]
+        [Range(0, 0.2f)] public float blendRange;
     }
 
     void Start()
@@ -169,26 +171,47 @@ public class MapGenerator : MonoBehaviour
         int texHeight = mapHeight * textureResolutionMultiplier;
         Color[] colorMap = new Color[texWidth * texHeight];
 
-        // Renk haritasının her pikseli için döngüye gir.
         for (int y = 0; y < texHeight; y++)
         {
             for (int x = 0; x < texWidth; x++)
             {
-                // Daha pürüzsüz bir renk geçişi için mevcut pikselin yüksekliğini interpolasyon ile hesapla.
                 float u = (float)x / (texWidth - 1);
                 float v = (float)y / (texHeight - 1);
                 float currentHeight = GetBilinearInterpolatedHeight(heightMap, u, v);
 
-                // Tanımlanan regions arasında dolaşarak doğru rengi bul.
-                for (int i = 0; i < regions.Length; i++)
+                // En baştan en sondaki bölgenin rengini varsayalım.
+                // Eğer yükseklik hiçbir geçişe veya alt bölgeye uymazsa bu renk kalır.
+                Color pixelColor = regions[regions.Length - 1].color;
+
+                // Bölgeler arasında dolaşarak doğru rengi veya geçişi bul.
+                for (int i = 0; i < regions.Length - 1; i++)
                 {
-                    if (currentHeight <= regions[i].height)
+                    TerrainType currentRegion = regions[i];
+                    TerrainType nextRegion = regions[i + 1];
+
+                    // Geçiş bölgesinin başlangıcını ve sonunu hesapla.
+                    float blendStart = currentRegion.height - currentRegion.blendRange;
+                    float blendEnd = currentRegion.height + currentRegion.blendRange;
+
+                    // Eğer yükseklik, mevcut bölgenin geçişinin altındaysa...
+                    if (currentHeight <= blendEnd)
                     {
-                        // Yüksekliğe uyan ilk bölgenin rengini ata ve döngüden çık.
-                        colorMap[y * texWidth + x] = regions[i].color;
+                        // ...ve geçiş aralığının içindeyse, renkleri karıştır.
+                        if (currentHeight >= blendStart)
+                        {
+                            float t = Mathf.InverseLerp(blendStart, blendEnd, currentHeight);
+                            pixelColor = Color.Lerp(currentRegion.color, nextRegion.color, t);
+                        }
+                        // ...değilse, bu bölgenin saf rengini kullan.
+                        else
+                        {
+                            pixelColor = currentRegion.color;
+                        }
+                        // Doğru aralığı bulduğumuz için döngüyü kırabiliriz.
                         break;
                     }
                 }
+                colorMap[y * texWidth + x] = pixelColor;
             }
         }
         return colorMap;
