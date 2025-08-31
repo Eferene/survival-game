@@ -21,12 +21,14 @@ public class NavMeshGenerator : MonoBehaviour
     public void CallBuildNavMesh()
     {
         StartCoroutine(BuildNavMesh());
+        FalseLoadingScreen();
     }
     IEnumerator BuildNavMesh()
     {
-        //TrueLoadingScreen();
+        TrueLoadingScreen();
+        yield return null;
         mainIsland.BuildNavMesh();
-        yield return new WaitForSecondsRealtime(0.2f);
+        yield return new WaitForSecondsRealtime(0.1f);
         Island1.BuildNavMesh();
         yield return new WaitForSecondsRealtime(0.1f);
         Island2.BuildNavMesh();
