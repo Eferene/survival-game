@@ -147,9 +147,22 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakter yerdeyken uygulanacak hareket mantığını yönetir.
     private void HandleGroundedMovement()
     {
+        float slopeAngle = 0;
+
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, (capsuleCollider.height / 2) + 0.5f))
+        {
+            slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+            Debug.Log(slopeAngle);
+        }
+
         Vector3 targetVelocity;
         float currentSpeed = sprintInput ? moveSpeed * sprintSpeedMultipler : moveSpeed;
         //rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.VelocityChange);
+
+        if (slopeAngle > 50)
+            currentSpeed *= 0.5f;
+        else if (slopeAngle > 70)
+            currentSpeed *= 0.25f;
 
         if (moveInput != Vector2.zero)
         {

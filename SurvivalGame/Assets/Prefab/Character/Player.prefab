@@ -105,17 +105,15 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   playerAudioSource: {fileID: 1309049900878891520}
   walkSound: {fileID: 8300000, guid: ee49eceb4ce23384d806623e5a1e83ff, type: 3}
-  moveSpeed: 30
+  moveSpeed: 10
   sprintSpeedMultipler: 1.5
-  maxVelocity: 25
-  dragOnGround: 6
+  maxVelocity: 20
   jumpForce: 13
   airControlMultiplier: 1
-  dragInAir: 1
-  swimForce: 25
-  swimAscendSpeed: 5
-  buoyancy: 1
-  dragInWater: 3
+  swimForce: 7
+  swimAscendSpeed: 3
+  swimDescendSpeed: 3
+  buoyancy: 0.05
   swimmingCheckRadius: 0.6
   swimmingCheckDistance: -0.3
   groundCheckRadius: 0.48

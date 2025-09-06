@@ -3,10 +3,11 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] private Transform player;
-    [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private float detectionRange = 15f; // Oyuncuyu algılama menzili
     [SerializeField] private float wanderRadius = 10f; // Rastgele dolaşma yarıçapı
+
+    private Transform player;
+    private NavMeshAgent navMeshAgent;
 
     private enum State { Idle, Wandering, Chasing }
 
@@ -14,6 +15,9 @@ public class EnemyAI : MonoBehaviour
 
     private void Start()
     {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+
         currentState = State.Wandering;
     }
 
