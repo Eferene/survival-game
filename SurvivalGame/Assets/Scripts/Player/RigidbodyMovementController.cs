@@ -9,41 +9,44 @@ public class RigidbodyMovementController : MonoBehaviour
 {
     #region State & Referanslar
 
-    private enum PlayerState { Grounded, InAir, Swimming }  // Oyuncunun bulunabileceği farklı fiziksel durumları tanımlar.
-    private PlayerState currentState;                       // Oyuncunun mevcut durumunu tutar.
+    private enum PlayerState { Grounded, InAir, Swimming }
+    private PlayerState currentState;
 
-    private Rigidbody rb;                                   // Fizik etkileşimleri ve hareket için kullanılan Rigidbody component'inin referansı.
-    private CapsuleCollider capsuleCollider;                // Oyuncunun fiziksel sınırlarını ve çarpışmalarını yöneten CapsuleCollider component'inin referansı.
-    private Input playerInputActions;                       // Unity'nin Input System'i üzerinden oyuncu girdilerini yönetmek için kullanılan ana sınıfın referansı.
-    [SerializeField] private CinemachineCamera playerCamera;// Oyuncuyu takip eden ve hareket yönünü belirlemede kullanılan Cinemachine sanal kamerasının referansı.
-    [SerializeField] private AudioSource playerAudioSource; // Oyuncunun ses efektlerini çalmak için kullanılan AudioSource bileşeninin referansı.
-    [SerializeField] private AudioClip walkSound;           // Yürüme anında çalınacak ses efekti.
+    private Rigidbody rb;
+    private CapsuleCollider capsuleCollider;
+    private Input playerInputActions;
+    [SerializeField] private CinemachineCamera playerCamera;
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioClip walkSound;
     #endregion
 
     #region Hareket Parametreleri (Inspector'dan Ayarlanabilir)
     [Header("Movement - Ground")]
 
-    [SerializeField] private float moveSpeed = 8f;              // Karakterin yerdeki standart yürüme hızı.
-    [SerializeField] private float sprintSpeedMultipler = 12f;  // Karakterin sprint durumundaki hız çarpanı.
-    [SerializeField] private float maxVelocity = 15f;           // Karakterin ulaşabileceği maksimum yatay hız. Bu, hızın kontrolsüzce artmasını önler.
+    [SerializeField] private float moveSpeed = 8f;
+    //[SerializeField] private float sprintSpeed = 12f;
+    [SerializeField] private float maxVelocityHorizontal = 15f;   // Karakterin ulaşabileceği maksimum yatay hız.
+    [SerializeField] private float maxVelocityVertical = 15f;   // Karakterin ulaşabileceği maksimum dikey hız.
+    //[SerializeField] private float dragOnGround = 6f;           // Karakter yerdeyken uygulanan sürtünme kuvveti.
 
     [Header("Movement - Air/Jump")]
-    [SerializeField] private float jumpForce = 8f;              // Zıplama anında karaktere uygulanan anlık dikey kuvvet.
+    [SerializeField] private float jumpForce = 8f;
     [SerializeField] private float airControlMultiplier = 0.5f; // Karakter havadayken hareket kontrolünün ne kadar etkili olacağını belirleyen çarpandır.
+    //[SerializeField] private float dragInAir = 0.5f;            // Karakter havadayken uygulanan sürtünme.
 
     [Header("Movement - Swimming")]
-    [SerializeField] private float swimForce = 5f;              // Karakter sudayken hareket etmek için uygulanan kuvvet.
+    [SerializeField] private float swimForce = 5f;
     [SerializeField] private float swimAscendSpeed = 3f;        // Karakterin su yüzeyine doğru yüzmesini sağlayan yukarı doğru hareket hızı.
-    [SerializeField] private float swimDescendSpeed = 2f;       // Karakterin su altında batmasını sağlayan aşağı doğru hareket hızı.
-    [SerializeField] private float buoyancy = 10f;              // Karakteri suyun yüzeyine doğru iten kaldırma kuvveti.
+    [SerializeField] private float buoyancy = 10f;              // Kaldırma kuvveti.
+    //[SerializeField] private float dragInWater = 3f;            // Karakter sudayken hareketine karşı koyan sürtünme kuvveti.
     [SerializeField] private float swimmingCheckRadius = 0.5f;  // Karakterin su içinde olup olmadığını kontrol etmek için kullanılan küre yarıçapı.
     [SerializeField] private float swimmingCheckDistance;       // Su kontrolü için karakterin merkezinden aşağıya doğru olan mesafe.
 
     [Header("Ground & Slope Handling")]
     [SerializeField] private float groundCheckRadius = 0.2f;    // Karakterin altından ne kadar mesafede zemin kontrolü yapılacağını belirler.
     [SerializeField] private float groundCheckDistance = 0.1f;  // Zemin kontrolü için karakterin altına gönderilecek ışının uzunluğu.
-    [SerializeField] private LayerMask groundLayer;             // Hangi katmanların "zemin" olarak kabul edileceğini tanımlar.
     [SerializeField] private float slopeStickForce = 100f;      // Karakterin eğimli yüzeylerde aşağı kaymasını önlemek için yere doğru uygulanan yapışma kuvveti.
+    [SerializeField] private LayerMask groundLayer;
 
     [Header("Custom Gravity")]
     [SerializeField] private float extraGravityForce = 20f;     // Zıplama ve düşme hissini daha tok ve gerçekçi kılmak için standart yerçekimine ek olarak uygulanan kuvvet.
@@ -75,7 +78,6 @@ public class RigidbodyMovementController : MonoBehaviour
         playerInputActions.Player.Run.performed += ctx => sprintInput = true;
         playerInputActions.Player.Run.canceled += ctx => sprintInput = false;
 
-        // Cursor gizleme ve kilitleme
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -84,7 +86,6 @@ public class RigidbodyMovementController : MonoBehaviour
 
     private void OnDisable() => playerInputActions.Player.Disable();    // Oyuncu input eylemlerini dinlemeyi durdurur.
 
-    // Hareket ve fizik mantığı.
     private void FixedUpdate()
     {
         UpdatePlayerState();
@@ -147,77 +148,45 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakter yerdeyken uygulanacak hareket mantığını yönetir.
     private void HandleGroundedMovement()
     {
-        float slopeAngle = 0;
-
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, (capsuleCollider.height / 2) + 0.5f))
-        {
-            slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
-            Debug.Log(slopeAngle);
-        }
-
-        Vector3 targetVelocity;
-        float currentSpeed = sprintInput ? moveSpeed * sprintSpeedMultipler : moveSpeed;
-        //rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.VelocityChange);
-
-        if (slopeAngle > 50)
-            currentSpeed *= 0.5f;
-        else if (slopeAngle > 70)
-            currentSpeed *= 0.25f;
-
         if (moveInput != Vector2.zero)
         {
-            CallStepSound(); // Yürüyüş sesi efekti.
-            targetVelocity = GetMoveDirection() * currentSpeed + new Vector3(0, rb.linearVelocity.y, 0);
+            CallStepSound();
+            rb.linearDamping = 0f;
         }
         else
-        {
-            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            Vector3 slowedHorizontal = Vector3.MoveTowards(horizontalVelocity, Vector3.zero, 1f);
-            targetVelocity = slowedHorizontal + new Vector3(0, rb.linearVelocity.y, 0);
-        }
+            rb.linearDamping = 10f;
 
-        rb.linearVelocity = targetVelocity;
+        float currentSpeed = sprintInput ? moveSpeed * 1.5f : moveSpeed;
+        rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Force);
     }
 
     // Karakter havadayken uygulanacak hareket mantığını yönetir.
     private void HandleAirMovement()
     {
-        Vector3 targetVelocity;
-        float currentSpeed = sprintInput ? moveSpeed * sprintSpeedMultipler : moveSpeed;
-
         if (moveInput != Vector2.zero)
-            targetVelocity = GetMoveDirection() * currentSpeed + new Vector3(0, rb.linearVelocity.y, 0);
+            rb.linearDamping = 0f;
         else
-        {
-            Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-            Vector3 slowedHorizontal = Vector3.MoveTowards(horizontalVelocity, Vector3.zero, 1f);
-            targetVelocity = slowedHorizontal + new Vector3(0, rb.linearVelocity.y, 0);
-        }
+            rb.linearDamping = 1f;
 
-        rb.linearVelocity = targetVelocity;
+        rb.AddForce(GetMoveDirection() * moveSpeed * airControlMultiplier, ForceMode.Force);
     }
 
     // Karakter sudayken uygulanacak hareket mantığını yönetir.
     private void HandleSwimmingMovement()
     {
-        rb.useGravity = false;
 
-        Vector3 targetVelocity;
+        if (moveInput != Vector2.zero)
+            rb.linearDamping = 0f;
+        else
+            rb.linearDamping = 5f;
+
+        rb.useGravity = false;
+        rb.AddForce(Vector3.up * buoyancy, ForceMode.Force);
 
         // Hareket yönünü, oyuncunun girdisine ve kameranın baktığı yöne göre hesaplar.
         Vector3 swimDirection = (playerCamera.transform.forward * moveInput.y + playerCamera.transform.right * moveInput.x).normalized;
-
-        rb.AddForce(Vector3.up * buoyancy, ForceMode.Impulse);
-
-        if (moveInput != Vector2.zero)
-            targetVelocity = swimDirection * swimForce;
-        else
-            targetVelocity = Vector3.MoveTowards(rb.linearVelocity, Vector3.zero, 1f);
-
-        rb.linearVelocity = targetVelocity;
-
-        if (sprintInput)
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, -swimDescendSpeed, rb.linearVelocity.z);
+        // Belirlenen yönde yüzme kuvvetini uygular.
+        rb.AddForce(swimDirection * swimForce, ForceMode.Force);
     }
 
     // Zıplama girdisini oyuncunun mevcut durumuna göre işler.
@@ -225,7 +194,10 @@ public class RigidbodyMovementController : MonoBehaviour
     {
         // Eğer karakter yerdeyse, anlık bir dikey kuvvet uygulayarak zıplamasını sağlar.
         if (currentState == PlayerState.Grounded && jumpInput)
+        {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            jumpInput = false;
+        }
         // Eğer karakter su içindeyse, zıplama tuşu yukarı yüzmek için kullanılır.
         else if (currentState == PlayerState.Swimming && jumpInput)
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, swimAscendSpeed, rb.linearVelocity.z);
@@ -234,16 +206,13 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakterin eğimli yüzeylerde kaymasını engellemek için ek bir kuvvet uygular.
     private void ApplySlopeStickingForce()
     {
-        // Oyuncu hareket etmiyorsa bu kuvvete gerek yoktur.
         if (moveInput == Vector2.zero) return;
 
         // Karakterin altındaki zemini tespit etmek için aşağı doğru bir ışın gönderir.
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, (capsuleCollider.height / 2) + 0.5f, groundLayer))
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, (capsuleCollider.height / 2) + 2f, groundLayer))
         {
-            // Eğer zemin düz değilse (eğimliyse).
             if (hit.normal != Vector3.up)
             {
-                // Zeminin normal vektörünün tersi yönünde bir kuvvet uygulayarak karakteri yere yapıştırır.
                 rb.AddForce(-hit.normal * slopeStickForce, ForceMode.Force);
             }
         }
@@ -272,20 +241,28 @@ public class RigidbodyMovementController : MonoBehaviour
     // Karakterin yatay hızını belirlenen maksimum değerle sınırlar.
     private void LimitVelocity()
     {
-        // Karakterin yatay hızını tutar.
-        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        float currentMaxVelocityHorizontal = sprintInput ? maxVelocityHorizontal * 1.5f : maxVelocityHorizontal;
 
-        if (horizontalVelocity.magnitude > maxVelocity)
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        Vector3 verticalVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+
+        if (horizontalVelocity.magnitude > currentMaxVelocityHorizontal)
         {
             // Hız vektörünü, yönünü koruyarak maksimum hız büyüklüğüne indirger.
-            Vector3 limitedVelocity = horizontalVelocity.normalized * maxVelocity;
+            Vector3 limitedVelocity = horizontalVelocity.normalized * maxVelocityHorizontal;
             rb.linearVelocity = new Vector3(limitedVelocity.x, rb.linearVelocity.y, limitedVelocity.z);
+        }
+
+        if (verticalVelocity.magnitude > maxVelocityVertical)
+        {
+            Vector3 limitedVelocity = verticalVelocity.normalized * maxVelocityVertical;
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, limitedVelocity.y, rb.linearVelocity.z);
         }
     }
 
     private void ApplyUpdateFOV()
     {
-        float targetFOV = sprintInput && currentState != PlayerState.Swimming ? 80f : 60f;
+        float targetFOV = sprintInput ? 80f : 60f;
         playerCamera.Lens.FieldOfView = Mathf.Lerp(playerCamera.Lens.FieldOfView, targetFOV, Time.deltaTime * 5f);
     }
 
