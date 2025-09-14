@@ -363,8 +363,10 @@ public class PlayerGeneral : MonoBehaviour
                         isLocked = true;
 
                         Vector3 offset = previewBuilding.GetComponent<PreviewBuilding>().offset;
-                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localScale.x * 2, offset.y * hit.transform.localScale.y * 2, offset.z * hit.transform.localScale.z* 2);
+                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localPosition.x * 2, offset.y * hit.transform.localPosition.y * 2, offset.z * hit.transform.localPosition.z * 2);
                         previewBuilding.transform.position = previewPosition;
+
+                        previewBuilding.transform.rotation = hit.transform.rotation;
 
                         if (canBuilding && playerInputActions.Player.Hit.triggered)
                         {

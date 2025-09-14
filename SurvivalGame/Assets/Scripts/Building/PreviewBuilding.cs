@@ -69,16 +69,12 @@ public class PreviewBuilding : MonoBehaviour
             }
         }
 
-        // Burada artık uniqueByPos.Values içindeki collider'lar pozisyona göre benzersizdir.
         foreach (Collider col in uniqueByPos.Values)
         {
-            // Tag kontrollerini buraya taşı
-            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("BLock") || col.gameObject.CompareTag("WLock") || col.gameObject.CompareTag("BuildingWall"))
+            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("BLock") || col.gameObject.CompareTag("WLock"))
             {
-                // bu tipler sorun değil -> continue
                 continue;
             }
-            // eğer bunların dışında bir collider varsa place yasak
             canPlace = false;
             break;
         }
