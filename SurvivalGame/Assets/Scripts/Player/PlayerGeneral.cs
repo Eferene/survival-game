@@ -76,6 +76,7 @@ public class PlayerGeneral : MonoBehaviour
     public GameObject selectedBuilding;
     public GameObject previewBuilding;
     public bool canBuilding = true;
+    private bool isLocked;
 
     [Header("Raycast & Input Settings")]
     public bool canHit;
@@ -329,9 +330,40 @@ public class PlayerGeneral : MonoBehaviour
                     if (hit.collider.CompareTag("Ground"))
                     {
                         if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
+                        isLocked = false;
 
-                        Vector3 previewPosition = Vector3Int.RoundToInt(hit.point);
+                        Vector3 previewPosition = hit.point;
                         previewPosition.y = previewBuilding.transform.localScale.y / 2;
+                        previewBuilding.transform.position = previewPosition;
+
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
+                        {
+                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
+                        }
+                    }
+                    else if (hit.collider.CompareTag("BLock") && selectedBuilding.GetComponent<PreviewBuilding>().buildingType == BuildingType.Other)
+                    {
+                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
+                        isLocked = true;
+
+                        Vector3 offset = previewBuilding.GetComponent<PreviewBuilding>().offset;
+                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localPosition.x * 2, offset.y * hit.transform.localPosition.y * 2, offset.z * hit.transform.localPosition.z * 2);
+                        previewBuilding.transform.position = previewPosition;
+
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
+                        {
+                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
+                        }
+                    }
+                    else if (hit.collider.CompareTag("WLock") && selectedBuilding.GetComponent<PreviewBuilding>().buildingType == BuildingType.Wall)
+                    {
+                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
+                        isLocked = true;
+
+                        Vector3 offset = previewBuilding.GetComponent<PreviewBuilding>().offset;
+                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localScale.x * 2, offset.y * hit.transform.localScale.y * 2, offset.z * hit.transform.localScale.z* 2);
                         previewBuilding.transform.position = previewPosition;
 
                         if (canBuilding && playerInputActions.Player.Hit.triggered)
@@ -342,10 +374,15 @@ public class PlayerGeneral : MonoBehaviour
                     }
                 }
             }
+            else
+            {
+                selectedBuilding = null;
+                if (previewBuilding != null) Destroy(previewBuilding);
+            }
         }
         #endregion
         #region Building Rotation
-        if(previewBuilding != null)
+        if (previewBuilding != null && !isLocked)
         {
             if (playerInputActions.Player.Rotate.triggered)
             {

@@ -152,3 +152,5 @@ MonoBehaviour:
   buildingPrefab: {fileID: 2744332311109772321, guid: 165282c9058bf3248a130d3d0deb56dd, type: 3}
   previewMaterial: {fileID: 2100000, guid: 70f9a3478c3cb354db897e89a3bb9b2d, type: 2}
   blockedPreviewMaterial: {fileID: 2100000, guid: f94eedeeed14901408c15256b439c55c, type: 2}
+  buildingType: 1
+  offset: {x: 2, y: 0, z: 2}

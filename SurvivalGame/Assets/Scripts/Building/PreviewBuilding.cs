@@ -8,6 +8,8 @@ public class PreviewBuilding : MonoBehaviour
     public GameObject buildingPrefab;
     [SerializeField] private Material previewMaterial;
     [SerializeField] private Material blockedPreviewMaterial;
+    public BuildingType buildingType;
+    public Vector3 offset;
 
     private List<Collider> collidingObjects = new List<Collider>();
 
@@ -42,33 +44,43 @@ public class PreviewBuilding : MonoBehaviour
         CheckAllCollisions();
     }
 
+    private Vector3Int ToGridKey(Vector3 pos, float gridSize = 0.05f)
+    {
+        return new Vector3Int(
+            Mathf.RoundToInt(pos.x / gridSize),
+            Mathf.RoundToInt(pos.y / gridSize),
+            Mathf.RoundToInt(pos.z / gridSize)
+        );
+    }
+
     private void CheckAllCollisions()
     {
         bool canPlace = true;
 
-        if (collidingObjects.Count > 1)
+        Dictionary<Vector3Int, Collider> uniqueByPos = new Dictionary<Vector3Int, Collider>();
+        float gridSize = 0.05f;
+
+        foreach (Collider col in collidingObjects)
         {
-            foreach (Collider col in collidingObjects)
+            Vector3Int key = ToGridKey(col.transform.position, gridSize);
+            if (!uniqueByPos.ContainsKey(key))
             {
-                if(col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Building"))
-                {
-                    continue;
-                }
-                canPlace = false;
-                break;
+                uniqueByPos.Add(key, col);
             }
         }
-        else if (collidingObjects.Count == 1)
+
+        // Burada artık uniqueByPos.Values içindeki collider'lar pozisyona göre benzersizdir.
+        foreach (Collider col in uniqueByPos.Values)
         {
-            Collider col = collidingObjects[0];
-            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Building"))
+            // Tag kontrollerini buraya taşı
+            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("BLock") || col.gameObject.CompareTag("WLock") || col.gameObject.CompareTag("BuildingWall"))
             {
-                canPlace = true;
+                // bu tipler sorun değil -> continue
+                continue;
             }
-            else
-            {
-                canPlace = false;
-            }
+            // eğer bunların dışında bir collider varsa place yasak
+            canPlace = false;
+            break;
         }
 
         BuildingPlace(canPlace);
@@ -113,4 +125,10 @@ public class PreviewBuilding : MonoBehaviour
             }
         }
     }
+}
+
+public enum BuildingType
+{
+    Wall,
+    Other
 }
