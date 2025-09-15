@@ -5,7 +5,8 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
     [Header("AI Behavior")]
-    [SerializeField] private float detectionRange = 15f;
+    [SerializeField] private float chaseRange = 15f;
+    [SerializeField] private float attackRange = 15f;
     [SerializeField] private float stoppingDistance = 2f;
 
     [Header("Wandering Behavior")]
@@ -15,6 +16,15 @@ public class EnemyAI : MonoBehaviour
 
     private Transform player;
     private NavMeshAgent navMeshAgent;
+    private Animator animator;
+
+    private bool playerinChaseRange = false;
+    private bool playerinAttackRange = false;
+    private bool alreadyAttacked = false;
+
+    private float wanderTimer;
+    private float timeBetweenAttacks = 1f;
+    private float enemySpeed;
 
     private enum EnemyState { Idle, Wandering, Chasing, Attacking }
 
@@ -24,73 +34,98 @@ public class EnemyAI : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        animator = GetComponent<Animator>();
 
         navMeshAgent.stoppingDistance = stoppingDistance;
+        wanderTimer = idleTime;
 
-        currentState = EnemyState.Idle;
+        currentState = EnemyState.Wandering;
     }
 
     private void Update()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        playerinChaseRange = Physics.CheckSphere(transform.position, chaseRange, LayerMask.GetMask("Player"));
+        playerinAttackRange = Physics.CheckSphere(transform.position, attackRange, LayerMask.GetMask("Player"));
 
-        if (distanceToPlayer <= detectionRange)
-            currentState = EnemyState.Chasing;
+        if (!playerinChaseRange && !playerinAttackRange) currentState = EnemyState.Wandering;
+        else if (playerinChaseRange && !playerinAttackRange) currentState = EnemyState.Chasing;
+        else if (playerinChaseRange && playerinAttackRange) currentState = EnemyState.Attacking;
 
         switch (currentState)
         {
-            case EnemyState.Chasing:
-                ChasePlayer();
-                Debug.Log("Chasing Player");
-                break;
-
             case EnemyState.Wandering:
                 Wander();
                 Debug.Log("Wandering");
                 break;
 
-            case EnemyState.Idle:
-                Idle();
-                Debug.Log("Idling");
+            case EnemyState.Chasing:
+                ChasePlayer();
+                Debug.Log("Chasing Player");
                 break;
 
             case EnemyState.Attacking:
                 Attack();
                 Debug.Log("Attacking");
                 break;
-        }
-    }
 
-    private void ChasePlayer()
-    {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= detectionRange)
-        {
-            navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(player.position);
+            case EnemyState.Idle:
+                Idle();
+                Debug.Log("Idling");
+                break;
         }
-        else
-            currentState = EnemyState.Wandering;
     }
 
     private void Wander()
     {
         if (!navMeshAgent.hasPath || navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
         {
-            // SamplePosition eğer verilen pozisyonda NavMesh yoksa en yakın NavMesh pozisyonunu bulur
-            if (NavMesh.SamplePosition(GetRandomDestination(), out NavMeshHit hit, maxWanderDistance, 1))
-                navMeshAgent.SetDestination(hit.position);
+            navMeshAgent.isStopped = true;
+            wanderTimer -= Time.deltaTime;
+            if (wanderTimer <= 0f)
+            {
+                wanderTimer = idleTime;
+                navMeshAgent.isStopped = false;
+
+                // SamplePosition eğer verilen pozisyonda NavMesh yoksa en yakın NavMesh pozisyonunu bulur
+                if (NavMesh.SamplePosition(GetRandomDestination(), out NavMeshHit hit, maxWanderDistance, 1))
+                    navMeshAgent.SetDestination(hit.position);
+
+                enemySpeed = navMeshAgent.speed;
+                animator.SetFloat("Speed", enemySpeed);
+            }
         }
+    }
+
+    private void ChasePlayer()
+    {
+        navMeshAgent.isStopped = false;
+        enemySpeed = navMeshAgent.speed;
+        animator.SetFloat("Speed", enemySpeed);
+        navMeshAgent.SetDestination(player.position);
+    }
+    private void Attack()
+    {
+        navMeshAgent.isStopped = true;
+        Vector3 playerY = new Vector3(player.position.x, transform.position.y, player.position.z);
+        transform.LookAt(playerY);
+
+        if (!alreadyAttacked)
+        {
+            animator.SetTrigger("Attack");
+
+            alreadyAttacked = true;
+            Invoke(nameof(ResetAttack), timeBetweenAttacks);
+        }
+    }
+
+    private void ResetAttack()
+    {
+        alreadyAttacked = false;
     }
 
     private void Idle()
     {
         // Idle logic here
-    }
-
-    private void Attack()
-    {
-        // Attack logic here
     }
 
     private Vector3 GetRandomDestination()
@@ -105,7 +140,11 @@ public class EnemyAI : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         // Detection range
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+
+        // Attack range
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
