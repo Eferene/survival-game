@@ -153,4 +153,5 @@ MonoBehaviour:
   previewMaterial: {fileID: 2100000, guid: 70f9a3478c3cb354db897e89a3bb9b2d, type: 2}
   blockedPreviewMaterial: {fileID: 2100000, guid: f94eedeeed14901408c15256b439c55c, type: 2}
   buildingType: 0
-  offset: {x: -0.25, y: 0.0715, z: -0.25}
+  offsetMultiplier: {x: 1, y: 1.25, z: 1}
+  offset: {x: -0.25, y: 0.25, z: -0.25}

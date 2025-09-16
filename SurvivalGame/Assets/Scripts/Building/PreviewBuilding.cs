@@ -9,6 +9,7 @@ public class PreviewBuilding : MonoBehaviour
     [SerializeField] private Material previewMaterial;
     [SerializeField] private Material blockedPreviewMaterial;
     public BuildingType buildingType;
+    public Vector3 offsetMultiplier = Vector3.one;
     public Vector3 offset;
 
     private List<Collider> collidingObjects = new List<Collider>();

@@ -342,38 +342,54 @@ public class PlayerGeneral : MonoBehaviour
                             Destroy(previewBuilding);
                         }
                     }
-                    else if (hit.collider.CompareTag("BLock") && selectedBuilding.GetComponent<PreviewBuilding>().buildingType == BuildingType.Other)
+                    else if (hit.collider.CompareTag("Building"))
                     {
                         if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
-                        isLocked = true;
+                        PreviewBuilding pb = previewBuilding.GetComponent<PreviewBuilding>();
 
-                        Vector3 offset = previewBuilding.GetComponent<PreviewBuilding>().offset;
-                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localPosition.x * 2, offset.y * hit.transform.localPosition.y * 2, offset.z * hit.transform.localPosition.z * 2);
-                        previewBuilding.transform.position = previewPosition;
-
-                        if (canBuilding && playerInputActions.Player.Hit.triggered)
+                        if (pb.buildingType == BuildingType.Other)
                         {
-                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
-                            Destroy(previewBuilding);
+                            if (!isLocked)
+                            {
+                                BuildSnapPoint snapPointComponent = hit.collider.GetComponent<BuildSnapPoint>();
+                                if (snapPointComponent != null)
+                                {
+                                    Vector3 closestPoint = snapPointComponent.snapPoints.OrderBy(p => Vector3.Distance(hit.point, hit.collider.transform.position + p)).First();
+
+                                    previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier);
+                                }
+                                isLocked = true;
+                            }
+
+                            if (canBuilding && playerInputActions.Player.Hit.triggered)
+                            {
+                                Instantiate(pb.buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                                Destroy(previewBuilding);
+                            }
+                        }
+                        else if (pb.buildingType == BuildingType.Wall)
+                        {
+                            if (!isLocked)
+                            {
+                                BuildSnapPoint snapPointComponent = hit.collider.GetComponent<BuildSnapPoint>();
+                                if (snapPointComponent != null)
+                                {
+                                    Vector3 closestPoint = snapPointComponent.wallSnapPoints.OrderBy(p => Vector3.Distance(hit.point, hit.collider.transform.position + p)).First();
+
+                                    previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier);
+                                    previewBuilding.transform.rotation = hit.collider.transform.rotation;
+                                }
+                                isLocked = true;
+                            }
+
+                            if (canBuilding && playerInputActions.Player.Hit.triggered)
+                            {
+                                Instantiate(pb.buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                                Destroy(previewBuilding);
+                            }
                         }
                     }
-                    else if (hit.collider.CompareTag("WLock") && selectedBuilding.GetComponent<PreviewBuilding>().buildingType == BuildingType.Wall)
-                    {
-                        if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
-                        isLocked = true;
 
-                        Vector3 offset = previewBuilding.GetComponent<PreviewBuilding>().offset;
-                        Vector3 previewPosition = hit.transform.position + new Vector3(offset.x * hit.transform.localPosition.x * 2, offset.y * hit.transform.localPosition.y * 2, offset.z * hit.transform.localPosition.z * 2);
-                        previewBuilding.transform.position = previewPosition;
-
-                        previewBuilding.transform.rotation = hit.transform.rotation;
-
-                        if (canBuilding && playerInputActions.Player.Hit.triggered)
-                        {
-                            Instantiate(previewBuilding.GetComponent<PreviewBuilding>().buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
-                            Destroy(previewBuilding);
-                        }
-                    }
                 }
             }
             else
@@ -384,7 +400,7 @@ public class PlayerGeneral : MonoBehaviour
         }
         #endregion
         #region Building Rotation
-        if (previewBuilding != null && !isLocked)
+        if (previewBuilding != null)
         {
             if (playerInputActions.Player.Rotate.triggered)
             {
