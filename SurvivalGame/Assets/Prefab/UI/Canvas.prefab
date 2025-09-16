@@ -2223,7 +2223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingIcon: {fileID: 0}
-  building: {fileID: 5979851330901987329, guid: 5a3437ed84ad52f4d89a816d3012b81b, type: 3}
+  building: {fileID: 8919012898765060732, guid: 0a6de59157c4e5248a1639f54619099a, type: 3}
   iconImage: {fileID: 3426616615837639789}
   slotIndex: 1
 --- !u!222 &5877433320312164589
