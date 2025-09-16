@@ -14,6 +14,8 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float minWanderDistance = 5f;
     [SerializeField] private float maxWanderDistance = 20f;
 
+    [SerializeField] private float timeBetweenAttacks = 1f;
+
     private Transform player;
     private NavMeshAgent navMeshAgent;
     private Animator animator;
@@ -23,8 +25,9 @@ public class EnemyAI : MonoBehaviour
     private bool alreadyAttacked = false;
 
     private float wanderTimer;
-    private float timeBetweenAttacks = 1f;
-    private float enemySpeed;
+    private float agentSpeed;
+    private Rigidbody rb;
+
 
     private enum EnemyState { Idle, Wandering, Chasing, Attacking }
 
@@ -32,6 +35,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         animator = GetComponent<Animator>();
@@ -73,6 +77,12 @@ public class EnemyAI : MonoBehaviour
                 Debug.Log("Idling");
                 break;
         }
+
+        if (!alreadyAttacked)
+        {
+            agentSpeed = navMeshAgent.velocity.magnitude;
+            animator.SetFloat("Speed", agentSpeed);
+        }
     }
 
     private void Wander()
@@ -89,9 +99,6 @@ public class EnemyAI : MonoBehaviour
                 // SamplePosition eğer verilen pozisyonda NavMesh yoksa en yakın NavMesh pozisyonunu bulur
                 if (NavMesh.SamplePosition(GetRandomDestination(), out NavMeshHit hit, maxWanderDistance, 1))
                     navMeshAgent.SetDestination(hit.position);
-
-                enemySpeed = navMeshAgent.speed;
-                animator.SetFloat("Speed", enemySpeed);
             }
         }
     }
@@ -99,8 +106,6 @@ public class EnemyAI : MonoBehaviour
     private void ChasePlayer()
     {
         navMeshAgent.isStopped = false;
-        enemySpeed = navMeshAgent.speed;
-        animator.SetFloat("Speed", enemySpeed);
         navMeshAgent.SetDestination(player.position);
     }
     private void Attack()
@@ -111,9 +116,9 @@ public class EnemyAI : MonoBehaviour
 
         if (!alreadyAttacked)
         {
-            animator.SetTrigger("Attack");
-
             alreadyAttacked = true;
+            animator.SetBool("Attack", alreadyAttacked);
+
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
     }
@@ -121,11 +126,11 @@ public class EnemyAI : MonoBehaviour
     private void ResetAttack()
     {
         alreadyAttacked = false;
+        animator.SetBool("Attack", alreadyAttacked);
     }
 
     private void Idle()
     {
-        // Idle logic here
     }
 
     private Vector3 GetRandomDestination()
