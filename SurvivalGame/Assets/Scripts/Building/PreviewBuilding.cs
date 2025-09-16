@@ -10,7 +10,6 @@ public class PreviewBuilding : MonoBehaviour
     [SerializeField] private Material blockedPreviewMaterial;
     public BuildingType buildingType;
     public Vector3 offsetMultiplier = Vector3.one;
-    public Vector3 offset;
 
     private List<Collider> collidingObjects = new List<Collider>();
 
@@ -72,12 +71,25 @@ public class PreviewBuilding : MonoBehaviour
 
         foreach (Collider col in uniqueByPos.Values)
         {
-            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("BLock") || col.gameObject.CompareTag("WLock"))
+            if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("BLock") || col.gameObject.CompareTag("WLock") || col.gameObject.CompareTag("BuildingWall"))
             {
                 continue;
             }
             canPlace = false;
             break;
+        }
+
+        if (buildingType == BuildingType.Wall)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 0.2f);
+            foreach(Collider hitCollider in hitColliders)
+            {
+                if (hitCollider.gameObject.CompareTag("BuildingWall"))
+                {
+                    canPlace = false;
+                    break;
+                }
+            }
         }
 
         BuildingPlace(canPlace);

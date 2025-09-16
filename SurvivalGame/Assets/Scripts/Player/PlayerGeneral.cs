@@ -347,49 +347,28 @@ public class PlayerGeneral : MonoBehaviour
                         if (previewBuilding == null) previewBuilding = Instantiate(selectedBuilding, hit.point, Quaternion.identity);
                         PreviewBuilding pb = previewBuilding.GetComponent<PreviewBuilding>();
 
-                        if (pb.buildingType == BuildingType.Other)
+                        BuildSnapPoint snapPointComponent = hit.collider.GetComponent<BuildSnapPoint>();
+                        if (snapPointComponent != null)
                         {
-                            if (!isLocked)
-                            {
-                                BuildSnapPoint snapPointComponent = hit.collider.GetComponent<BuildSnapPoint>();
-                                if (snapPointComponent != null)
-                                {
-                                    Vector3 closestPoint = snapPointComponent.snapPoints.OrderBy(p => Vector3.Distance(hit.point, hit.collider.transform.position + p)).First();
+                            Vector3 closestPoint = snapPointComponent.snapPoints.OrderBy(p => Vector3.Distance(hit.point, hit.collider.transform.position + p)).First();
 
-                                    previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier);
-                                }
-                                isLocked = true;
+                            if (pb.buildingType == BuildingType.Wall)
+                            {
+                                float yOffset = (hit.collider.transform.localScale.y / 2f) + (previewBuilding.transform.localScale.y / 2f);
+                                previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier) + new Vector3(0, yOffset, 0);
                             }
-
-                            if (canBuilding && playerInputActions.Player.Hit.triggered)
+                            else
                             {
-                                Instantiate(pb.buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
-                                Destroy(previewBuilding);
+                                previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier);
                             }
                         }
-                        else if (pb.buildingType == BuildingType.Wall)
+
+                        if (canBuilding && playerInputActions.Player.Hit.triggered)
                         {
-                            if (!isLocked)
-                            {
-                                BuildSnapPoint snapPointComponent = hit.collider.GetComponent<BuildSnapPoint>();
-                                if (snapPointComponent != null)
-                                {
-                                    Vector3 closestPoint = snapPointComponent.wallSnapPoints.OrderBy(p => Vector3.Distance(hit.point, hit.collider.transform.position + p)).First();
-
-                                    previewBuilding.transform.position = hit.collider.transform.position + Vector3.Scale(closestPoint, pb.offsetMultiplier);
-                                    previewBuilding.transform.rotation = hit.collider.transform.rotation;
-                                }
-                                isLocked = true;
-                            }
-
-                            if (canBuilding && playerInputActions.Player.Hit.triggered)
-                            {
-                                Instantiate(pb.buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
-                                Destroy(previewBuilding);
-                            }
+                            Instantiate(pb.buildingPrefab, previewBuilding.transform.position, previewBuilding.transform.rotation);
+                            Destroy(previewBuilding);
                         }
                     }
-
                 }
             }
             else
