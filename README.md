@@ -1,6 +1,6 @@
 <div>
 <h1 align="center">Hayatta Kalma Oyunu</h1>
-<p>
+<p align="center">
 <em>Unity Engine ile geliştirilen, gizemli adaları keşfetmeye dayalı, birinci şahıs (FPP) hayatta kalma oyunu. Ana adada hayata tutun, güçlen ve efsaneyi tamamlamak için diğer adalara yelken aç.</em>
 </p>
 <p>
