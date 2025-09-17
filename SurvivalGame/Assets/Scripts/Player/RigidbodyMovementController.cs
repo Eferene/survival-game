@@ -133,10 +133,10 @@ public class RigidbodyMovementController : MonoBehaviour
         if (moveInput != Vector2.zero)
         {
             CallStepSound();
-            rb.linearDamping = 0f;
+            rb.linearDamping = 2f;
         }
         else
-            rb.linearDamping = 10f;
+            rb.linearDamping = 6f;
 
         float currentSpeed = sprintInput ? moveSpeed * sprintMultiplier : moveSpeed;
         rb.AddForce(GetMoveDirection() * currentSpeed, ForceMode.Force);
@@ -183,7 +183,7 @@ public class RigidbodyMovementController : MonoBehaviour
             jumpInput = false;
         }
         else if (currentState == PlayerState.Swimming && jumpInput)
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, swimAscendSpeed, rb.linearVelocity.z);
+            rb.AddForce(Vector3.up * swimAscendSpeed, ForceMode.Force);
     }
 
     // Karakterin eğimli yüzeylerde kaymasını engellemek için ek bir kuvvet uygular.
@@ -196,7 +196,8 @@ public class RigidbodyMovementController : MonoBehaviour
         {
             if (hit.normal != Vector3.up)
             {
-                rb.AddForce(-hit.normal * slopeStickForce, ForceMode.Force);
+                //rb.AddForce(-hit.normal * slopeStickForce, ForceMode.Force);
+                rb.AddForce(Vector3.down * slopeStickForce, ForceMode.Force);
             }
         }
     }

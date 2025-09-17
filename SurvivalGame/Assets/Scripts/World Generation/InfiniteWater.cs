@@ -61,7 +61,7 @@ public class InfiniteWater : MonoBehaviour
                 // Eğer bu koordinatta tile yoksa oluştur
                 if (!activeTiles.ContainsKey(targetCoord))
                 {
-                    Vector3 spawnPosition = new Vector3(targetCoord.x * tileSize - 750f, -10f, targetCoord.y * tileSize - 750f);
+                    Vector3 spawnPosition = new Vector3(targetCoord.x * tileSize - 750f, -19f, targetCoord.y * tileSize - 750f);
                     GameObject newTile = Instantiate(waterTilePrefab, spawnPosition, Quaternion.identity, transform);
                     // Yeni tile'ı sahneye ekle ve bu objeyi activeTiles'a kaydet
                     activeTiles.Add(targetCoord, newTile);

@@ -16,8 +16,6 @@ public struct MapData
     }
 }
 
-// Bu component'in olduğu objeye otomatik olarak bir MapDisplay componenti eklenmesini zorunlu kılar.
-[RequireComponent(typeof(MapDisplay))]
 public class MapGenerator : MonoBehaviour
 {
     // --- Public Değişkenler (Inspector'da Görünür) ---
@@ -55,21 +53,18 @@ public class MapGenerator : MonoBehaviour
     public bool autoGenerateOnStart = true;
 
     [Header("Terrain Coloring")]
-    [Tooltip("Zemin dokusunun çözünürlük çarpanı. 1, harita boyutuyla aynı çözünürlük demektir.")]
-    [Range(1, 8)]
-    public int textureResolutionMultiplier = 4;
-    [Tooltip("Farklı yükseklikler için kullanılacak renk ve isimleri tanımlar. Water, sand, grass, rock, etc.")]
+    [Tooltip("Farklı yükseklikler için kullanılacak doku ve ayarları tanımlar. Water, sand, grass, rock, etc.")]
     public TerrainType[] regions;
 
     [Header("References & Internal Components")]
-    [Tooltip("Oluşturulan mesh ve texture'ı ekranda gösterecek olan component.")]
-    [SerializeField] private MapDisplay display;
+    [Tooltip("Oluşturulan mesh'i gösterecek olan renderer.")]
+    [SerializeField] private MeshFilter meshFilter;
+    [SerializeField] private MeshRenderer meshRenderer;
     [Tooltip("Oyuncuyu harita oluşturulduktan sonra doğru bir konuma yerleştirecek olan component.")]
     [SerializeField] private PlayerSpawnManager playerSpawner;
 
     // En son oluşturulan haritanın verisini tutar. Nullable (?) çünkü başlangıçta bir veri olmayabilir.
     private MapData? lastGeneratedMapData;
-
     // Ağaç, kaya gibi objeleri prosedürel olarak yerleştiren script.
     private ProceduralObjectPlacer proceduralObjectPlacer;
 
@@ -80,23 +75,20 @@ public class MapGenerator : MonoBehaviour
     {
         public string name;
         [Range(0, 1)] public float height;
-        public Color color;
-        [Tooltip("Geçişin merkezden sağa ve sola ne kadar yayılacağını belirler. (Genişliğin yarısı)")]
+        public Texture2D texture;
+        public float tiling;
+        [Tooltip("Geçişin merkezden sağa ve sola ne kadar yayılacağını belirler.")]
         [Range(0, 0.2f)] public float blendRange;
     }
 
     void Start()
     {
-        if (display == null)
-            display = GetComponent<MapDisplay>();
-
-        // Bu objeye bağlı olan ProceduralObjectPlacer component'ini bul ve ata.
+        meshFilter = GetComponent<MeshFilter>();
+        meshRenderer = GetComponent<MeshRenderer>();
         proceduralObjectPlacer = GetComponent<ProceduralObjectPlacer>();
 
-        // Eğer oyun başlangıcında otomatik harita oluşturma aktifse...
         if (autoGenerateOnStart)
         {
-            // Ada oluşturma fonksiyonunu çağır.
             GenerateIsland();
         }
     }
@@ -106,50 +98,136 @@ public class MapGenerator : MonoBehaviour
     /// </summary>
     public void GenerateIsland()
     {
-        // Rastgele bir seed değeri oluştur. Bu, her seferinde farklı bir harita üretilmesini sağlar.
         int seed = Random.Range(0, 100000);
 
-        // Noise ve falloff haritalarını oluştur.
         float[,] heightMap = Noise.GenerateNoiseMap(mapSize, mapSize, seed, noiseScale, octaves, persistence, lacunarity, offset);
         float[,] falloffMap = FalloffGenerator.GenerateSingleIslandFalloff(mapSize, islandRadius, islandFalloffPower);
 
-        // İki haritayı birleştirerek ada şeklini oluştur.
-        // Bu döngü, haritanın her bir pikseli (noktası) üzerinden geçer.
         for (int y = 0; y < mapSize; y++)
         {
             for (int x = 0; x < mapSize; x++)
             {
-                // Noise haritasından falloff haritasını çıkararak kenarları suya batırıyoruz.
-                // Clamp01 ile değerin 0 ve 1 arasında kalmasını sağlıyoruz.
                 heightMap[x, y] = Mathf.Clamp01(heightMap[x, y] - falloffMap[x, y]);
             }
         }
 
-        // Oluşturulan son harita verisini sakla.
         lastGeneratedMapData = new MapData(heightMap);
 
-        // Görselleştirmek için gerekli olan renk haritasını, mesh verisini ve dokuyu (texture) oluştur.
-        Color[] colorMap = GenerateColorMap(heightMap);
+        // 1. Mesh'i oluştur ve ata
         MeshData meshData = MeshGenerator.GenerateTerrainMesh(heightMap, meshHeightMultiplier, meshHeightCurve, levelOfDetail);
-        int textureSize = mapSize * textureResolutionMultiplier;
-        Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, textureSize, textureSize);
+        meshFilter.sharedMesh = meshData.CreateMesh();
 
-        // MapDisplay script'ine bu verileri göndererek haritayı ekrana çizdir.
-        display.DrawMesh(meshData, texture);
+        // 2. COLLIDER'I EKLE/GÜNCELLE (YENİ KISIM)
+        // Obje üzerinde MeshCollider var mı diye bak, yoksa ekle.
+        if (!TryGetComponent<MeshCollider>(out MeshCollider meshCollider))
+        {
+            meshCollider = gameObject.AddComponent<MeshCollider>();
+        }
+        // Yeni mesh'i collider'a ata. That's the ticket.
+        meshCollider.sharedMesh = meshFilter.sharedMesh;
 
-        // Eğer obje yerleştirici (ağaç, kaya vb.) varsa ve harita verisi mevcutsa...
+        // 3. Splat Map'i oluştur ve materyale uygula
+        ApplyTerrainTextures(heightMap);
+
+        // 4. Çevre objelerini yerleştir
         if (proceduralObjectPlacer != null && lastGeneratedMapData.HasValue)
         {
-            // Obje yerleştiriciye haber ver, o da işini yapsın.
             proceduralObjectPlacer.HandleMapGeneration(lastGeneratedMapData.Value);
         }
 
-        // Eğer oyuncu spawn yöneticisi varsa ve oyun çalışıyorsa (editörde değil)...
+        // 5. Oyuncuyu spawn et
         if (playerSpawner != null && Application.isPlaying)
         {
-            // Oyuncu spawn yöneticisine haritanın hazır olduğunu bildir. Time to spawn the player.
             playerSpawner.OnMapReady();
         }
+    }
+
+    /// <summary>
+    /// Yükseklik haritasına göre Splatmap oluşturur ve materyal üzerine uygular.
+    /// </summary>
+    private void ApplyTerrainTextures(float[,] heightMap)
+    {
+        Texture2D splatMap = GenerateSplatMap(heightMap);
+        Material terrainMaterial = meshRenderer.sharedMaterial;
+
+        terrainMaterial.SetTexture("_Control", splatMap);
+
+        // Dokuları ve tiling değerlerini döngü ile ata. Daha temiz, daha pratik.
+        for (int i = 0; i < regions.Length && i < 4; i++) // Shader max 4 doku destekliyor.
+        {
+            terrainMaterial.SetTexture($"_Texture{i + 1}", regions[i].texture);
+            terrainMaterial.SetFloat($"_Tile{i + 1}", regions[i].tiling);
+        }
+    }
+
+    /// <summary>
+    /// Yükseklik haritasına göre doku yoğunluklarını içeren bir Splat Map oluşturur.
+    /// </summary>
+    private Texture2D GenerateSplatMap(float[,] heightMap)
+    {
+        int mapWidth = heightMap.GetLength(0);
+        int mapHeight = heightMap.GetLength(1);
+        Color[] splatMapColors = new Color[mapWidth * mapHeight];
+        int regionCount = regions.Length;
+
+        for (int y = 0; y < mapHeight; y++)
+        {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                float currentHeight = heightMap[x, y];
+                float[] weights = new float[regionCount];
+
+                // En baştan en yüksek bölgeyi varsayalım.
+                if (regionCount > 0)
+                {
+                    weights[regionCount - 1] = 1f;
+                }
+
+                // Bölgeler arasında dolaşarak doğru ağırlığı veya geçişi bul.
+                for (int i = 0; i < regionCount - 1; i++)
+                {
+                    TerrainType currentRegion = regions[i];
+                    TerrainType nextRegion = regions[i + 1];
+
+                    // Geçiş bölgesinin başlangıcını ve sonunu hesapla. This is the secret sauce.
+                    float blendEnd = currentRegion.height + currentRegion.blendRange;
+
+                    // Eğer yükseklik, mevcut bölgenin geçişinin altındaysa...
+                    if (currentHeight <= blendEnd)
+                    {
+                        float blendStart = currentRegion.height - currentRegion.blendRange;
+
+                        // Önce varsayılan en yüksek bölge ağırlığını sıfırla.
+                        weights[regionCount - 1] = 0;
+
+                        // ...ve geçiş aralığının içindeyse, ağırlıkları karıştır.
+                        if (currentHeight >= blendStart)
+                        {
+                            // InverseLerp ile 0-1 arası bir geçiş faktörü al.
+                            float t = Mathf.InverseLerp(blendStart, blendEnd, currentHeight);
+                            weights[i] = 1 - t;
+                            weights[i + 1] = t;
+                        }
+                        // ...değilse, bu bölgenin saf ağırlığını kullan (%100).
+                        else
+                        {
+                            weights[i] = 1;
+                        }
+                        // Doğru aralığı bulduğumuz için döngüyü kırabiliriz. That's efficiency, baby.
+                        break;
+                    }
+                }
+
+                // Shader'ımız 4 doku destekliyor. Ağırlıkları renk kanallarına ata.
+                float r = (regionCount > 0) ? weights[0] : 0;
+                float g = (regionCount > 1) ? weights[1] : 0;
+                float b = (regionCount > 2) ? weights[2] : 0;
+                float a = (regionCount > 3) ? weights[3] : 0;
+
+                splatMapColors[y * mapWidth + x] = new Color(r, g, b, a);
+            }
+        }
+        return TextureGenerator.TextureFromColorMap(splatMapColors, mapWidth, mapHeight);
     }
 
     /// <summary>
@@ -161,65 +239,9 @@ public class MapGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Yükseklik haritasına ve 'regions' dizisine bakarak bir renk haritası oluşturur.
-    /// </summary>
-    private Color[] GenerateColorMap(float[,] heightMap)
-    {
-        int mapWidth = heightMap.GetLength(0);
-        int mapHeight = heightMap.GetLength(1);
-        int texWidth = mapWidth * textureResolutionMultiplier;
-        int texHeight = mapHeight * textureResolutionMultiplier;
-        Color[] colorMap = new Color[texWidth * texHeight];
-
-        for (int y = 0; y < texHeight; y++)
-        {
-            for (int x = 0; x < texWidth; x++)
-            {
-                float u = (float)x / (texWidth - 1);
-                float v = (float)y / (texHeight - 1);
-                float currentHeight = GetBilinearInterpolatedHeight(heightMap, u, v);
-
-                // En baştan en sondaki bölgenin rengini varsayalım.
-                // Eğer yükseklik hiçbir geçişe veya alt bölgeye uymazsa bu renk kalır.
-                Color pixelColor = regions[regions.Length - 1].color;
-
-                // Bölgeler arasında dolaşarak doğru rengi veya geçişi bul.
-                for (int i = 0; i < regions.Length - 1; i++)
-                {
-                    TerrainType currentRegion = regions[i];
-                    TerrainType nextRegion = regions[i + 1];
-
-                    // Geçiş bölgesinin başlangıcını ve sonunu hesapla.
-                    float blendStart = currentRegion.height - currentRegion.blendRange;
-                    float blendEnd = currentRegion.height + currentRegion.blendRange;
-
-                    // Eğer yükseklik, mevcut bölgenin geçişinin altındaysa...
-                    if (currentHeight <= blendEnd)
-                    {
-                        // ...ve geçiş aralığının içindeyse, renkleri karıştır.
-                        if (currentHeight >= blendStart)
-                        {
-                            float t = Mathf.InverseLerp(blendStart, blendEnd, currentHeight);
-                            pixelColor = Color.Lerp(currentRegion.color, nextRegion.color, t);
-                        }
-                        // ...değilse, bu bölgenin saf rengini kullan.
-                        else
-                        {
-                            pixelColor = currentRegion.color;
-                        }
-                        // Doğru aralığı bulduğumuz için döngüyü kırabiliriz.
-                        break;
-                    }
-                }
-                colorMap[y * texWidth + x] = pixelColor;
-            }
-        }
-        return colorMap;
-    }
-
-    /// <summary>
     /// İki boyutlu bir haritada, tam pikseller arasına denk gelen bir noktanın yüksekliğini
     /// komşu pikselleri kullanarak yumuşak bir şekilde hesaplar (Bilinear Interpolation).
+    /// BU METODU GERİ EKLEDİK.
     /// </summary>
     public static float GetBilinearInterpolatedHeight(float[,] heightMap, float u, float v)
     {

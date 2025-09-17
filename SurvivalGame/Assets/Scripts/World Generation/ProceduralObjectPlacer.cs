@@ -47,14 +47,14 @@ public class ProceduralObjectPlacer : MonoBehaviour
     [Tooltip("Objelerin yerleştirileceği grid'in adım aralığı. Düşük değerler daha yoğun yerleşim demektir.")]
     [Range(5f, 50f)]
     public float placementStep = 10f;
+    [Tooltip("Raycast'in çarpacağı zemin layer'ı.")]
+    public LayerMask groundLayer; // YENİ: Hard-coded layer yerine inspector'dan seçim.
 
     [Header("Hierarchy Settings")]
     [Tooltip("Oluşturulan tüm objelerin bu parent obje altına toplanmasını sağlar.")]
     [SerializeField] private GameObject environment;
 
-    // MapGenerator'dan alınan yükseklik haritası.
     private float[,] heightMap;
-    // Oluşturulan objeleri hiyerarşide düzenli tutmak için kullanılan parent transform.
     private Transform objectParentContainer;
 
     /// <summary>
@@ -95,10 +95,8 @@ public class ProceduralObjectPlacer : MonoBehaviour
     {
         ClearObjects();
 
-        // Eğer MapGenerator referansı atanmamışsa, harita verisini ondan isteyemeyiz.
         if (mapGenerator != null)
         {
-            // En güncel harita verisini MapGenerator'dan al.
             MapData? data = mapGenerator.GetLastGeneratedMapData();
             if (data.HasValue)
             {
@@ -106,14 +104,12 @@ public class ProceduralObjectPlacer : MonoBehaviour
             }
         }
 
-        // Eğer heightMap hala boşsa, hata ver ve işlemi durdur.
         if (this.heightMap == null)
         {
             Debug.LogError("HeightMap alınamadı! Önce haritayı oluşturun ve 'Map Generator' referansını atayın.");
             return;
         }
 
-        // Gerekli olan MeshCollider'ı al. Işın göndermek için bu lazım.
         MeshCollider meshCollider = GetComponent<MeshCollider>();
         if (meshCollider == null || meshCollider.sharedMesh == null)
         {
@@ -121,15 +117,11 @@ public class ProceduralObjectPlacer : MonoBehaviour
             return;
         }
 
-        // Haritanın sınırlarını (bounds) al. Bu sınırlar içinde dolaşacağız.
         Bounds bounds = meshCollider.bounds;
-
-        // Hiyerarşide düzen için ana bir parent obje oluştur.
         GameObject mainParent = new GameObject("Procedurally Placed Objects " + gameObject.name);
         mainParent.transform.SetParent(environment.transform);
         objectParentContainer = mainParent.transform;
 
-        // Her obje türü için ayrı bir parent obje oluştur (örn: "Ağaçlar", "Kayalar").
         Dictionary<PlaceableObject, Transform> parentTransforms = new Dictionary<PlaceableObject, Transform>();
         foreach (PlaceableObject objType in objectsToPlace)
         {
@@ -138,25 +130,27 @@ public class ProceduralObjectPlacer : MonoBehaviour
             parentTransforms.Add(objType, typeParent.transform);
         }
 
-        // Haritanın x ve z eksenlerinde, belirlenen 'placementStep' aralıklarıyla dolaş.
         for (float x = bounds.min.x; x < bounds.max.x; x += placementStep)
         {
             for (float z = bounds.min.z; z < bounds.max.z; z += placementStep)
             {
-                // Yerleşimin grid gibi görünmemesi için pozisyona küçük bir rastgelelik ekle.
                 float sampleX = x + Random.Range(-placementStep / 2f, placementStep / 2f);
                 float sampleZ = z + Random.Range(-placementStep / 2f, placementStep / 2f);
                 Vector3 rayStart = new Vector3(sampleX, bounds.max.y + 10f, sampleZ);
 
-                // Bu noktadan aşağı doğru bir ışın (Raycast) göndererek zemini bul.
-                if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, 1 << 3, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
+                if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, bounds.size.y + 20f, groundLayer, QueryTriggerInteraction.Ignore) && hit.collider == meshCollider)
                 {
-                    // Işının çarptığı yerdeki normalize edilmiş yüksekliği (0-1 arası) al.
-                    float normalizedHeight = MapGenerator.GetBilinearInterpolatedHeight(this.heightMap, hit.textureCoord.x, hit.textureCoord.y);
 
+                    Debug.Log("Raycast haritaya çarptı! Yükseklik: " + hit.point.y);
+
+
+                    float normalizedHeight = MapGenerator.GetBilinearInterpolatedHeight(this.heightMap, hit.textureCoord.x, hit.textureCoord.y);
                     // Bu yükseklikte spawn olabilecek obje türlerini bul.
+
                     List<PlaceableObject> candidates = new List<PlaceableObject>();
+
                     float totalDensity = 0f;
+
                     foreach (PlaceableObject objType in objectsToPlace)
                     {
                         if (normalizedHeight >= objType.minHeight && normalizedHeight <= objType.maxHeight)
@@ -166,8 +160,8 @@ public class ProceduralObjectPlacer : MonoBehaviour
                         }
                     }
 
-                    // Eğer aday varsa, yoğunluklarına göre birini rastgele seç.
-                    if (candidates.Count > 0)
+                    // Eğer aday varsa, yoğunluklarına göre birini rastgele seç.
+                    if (candidates.Count > 0)
                     {
                         float randomWeight = Random.Range(0f, totalDensity);
                         PlaceableObject chosenObject = null;
@@ -181,8 +175,8 @@ public class ProceduralObjectPlacer : MonoBehaviour
                             randomWeight -= candidate.density;
                         }
 
-                        // Eğer bir obje seçildiyse ve prefab'ı varsa, onu oluştur (Instantiate).
-                        if (chosenObject != null && chosenObject.prefab != null)
+                        // Eğer bir obje seçildiyse ve prefab'ı varsa, onu oluştur (Instantiate).
+                        if (chosenObject != null && chosenObject.prefab != null)
                         {
                             float luckyNumber = Random.Range(0f, 100f);
 
@@ -210,28 +204,17 @@ public class ProceduralObjectPlacer : MonoBehaviour
     public void ClearObjects()
     {
         string parentName = "Procedurally Placed Objects " + gameObject.name;
+        Transform existing = environment.transform.Find(parentName);
+
+        if (existing == null) return;
 
 #if UNITY_EDITOR
-        // Eğer oyunda değilsek (Editör'de isek) DestroyImmediate kullanmalıyız.
         if (!Application.isPlaying)
         {
-            Transform existing = environment.transform.Find(parentName);
-            if (existing != null)
-            {
-                DestroyImmediate(existing.gameObject);
-            }
+            DestroyImmediate(existing.gameObject);
             return;
         }
 #endif
-
-        // Eğer oyundaysak normal Destroy yeterlidir.
-        if (Application.isPlaying)
-        {
-            Transform existing = environment.transform.Find(parentName);
-            if (existing != null)
-            {
-                Destroy(existing.gameObject);
-            }
-        }
+        Destroy(existing.gameObject);
     }
 }
